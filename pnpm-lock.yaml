@@ -38,6 +38,9 @@ importers:
       '@modelforge/performance-predictor':
         specifier: workspace:*
         version: link:../../packages/performance-predictor
+      '@modelforge/reconciler':
+        specifier: workspace:*
+        version: link:../../packages/reconciler
       '@modelforge/slo-compiler':
         specifier: workspace:*
         version: link:../../packages/slo-compiler
