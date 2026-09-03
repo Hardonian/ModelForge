@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import * as assert from 'node:assert';
-import { computeModelFit, calculateMemoryRequirements } from '../index.js';
+import { computeModelFit } from '../index.js';
 import { getHardwareDevice } from '@modelforge/hardware-registry';
 
 describe('ModelFit Scoring Engine', () => {
@@ -12,7 +12,8 @@ describe('ModelFit Scoring Engine', () => {
         context_window: 32768,
         layers: 64,
         kv_heads: 8,
-        head_dim: 128
+        head_dim: 128,
+        architecture: 'Qwen2ForCausalLM'
       },
       hardware: {
         device_slug: 'l40s-48gb',
@@ -50,7 +51,8 @@ describe('ModelFit Scoring Engine', () => {
         context_window: 131072,
         layers: 80,
         kv_heads: 8,
-        head_dim: 128
+        head_dim: 128,
+        architecture: 'LlamaForCausalLM'
       },
       hardware: {
         device_slug: 'l4-24gb',

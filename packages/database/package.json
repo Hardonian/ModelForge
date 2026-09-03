@@ -1,0 +1,21 @@
+{
+  "name": "@modelforge/database",
+  "version": "1.0.0",
+  "description": "PostgreSQL database types, multi-tenant schemas, and local fallback data layer",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@modelforge/benchmark-schema": "workspace:*",
+    "@modelforge/hardware-registry": "workspace:*",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@modelforge/config": "workspace:*",
+    "@types/node": "^22.13.4",
+    "typescript": "^5.7.3"
+  }
+}

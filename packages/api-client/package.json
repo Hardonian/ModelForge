@@ -1,0 +1,22 @@
+{
+  "name": "@modelforge/api-client",
+  "version": "1.0.0",
+  "description": "Isomorphic type-safe API client for ModelForge",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@modelforge/benchmark-schema": "workspace:*",
+    "@modelforge/hardware-registry": "workspace:*",
+    "@modelforge/model-fit": "workspace:*",
+    "@modelforge/optimizer": "workspace:*"
+  },
+  "devDependencies": {
+    "@modelforge/config": "workspace:*",
+    "@types/node": "^22.13.4",
+    "typescript": "^5.7.3"
+  }
+}
