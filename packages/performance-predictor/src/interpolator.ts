@@ -41,7 +41,7 @@ export function predictWithNeighbors(
       (h) =>
         h.name.toLowerCase() === target.accelerator.toLowerCase() ||
         h.id.toLowerCase() === target.accelerator.toLowerCase() ||
-        h.slug.toLowerCase() === target.accelerator.toLowerCase()
+        h.slug.toLowerCase() === target.accelerator.toLowerCase(),
     ) || HARDWARE_CATALOG[0]!;
 
   const modelArch: ModelArchSpecs = {
@@ -58,7 +58,7 @@ export function predictWithNeighbors(
     target.precision,
     target.workload,
     target.runtime,
-    deviceCount
+    deviceCount,
   );
 
   // 2. Filter corpus to non-synthetic verified records
@@ -73,7 +73,7 @@ export function predictWithNeighbors(
 
     // Parameter size distance (log ratio)
     const paramRatio = Math.abs(
-      Math.log(target.parameters_billions / record.model.parameters_billions)
+      Math.log(target.parameters_billions / record.model.parameters_billions),
     );
     distance += paramRatio * 1.5;
     if (paramRatio < 0.1) reasons.push("identical model size");
@@ -127,11 +127,11 @@ export function predictWithNeighbors(
     if (minDistance < 0.35) {
       uncertaintyType = "interpolation";
       confidence = "high";
-      intervalPct = 0.10; // 10% interval
+      intervalPct = 0.1; // 10% interval
     } else if (minDistance < 1.2) {
       uncertaintyType = "extrapolation";
       confidence = "medium";
-      intervalPct = 0.20; // 20% interval
+      intervalPct = 0.2; // 20% interval
     } else {
       uncertaintyType = "out_of_distribution";
       confidence = "low";
@@ -145,21 +145,44 @@ export function predictWithNeighbors(
   let finalTpot = analytical.predicted_tpot_ms;
   const finalVram = analytical.predicted_peak_vram_gb;
 
-  if (topNeighbors.length > 0 && topNeighbors[0] && topNeighbors[0].distance < 1.0) {
+  if (
+    topNeighbors.length > 0 &&
+    topNeighbors[0] &&
+    topNeighbors[0].distance < 1.0
+  ) {
     const bestMatch = topNeighbors[0];
     const empiricalTps = bestMatch.record.metrics.tokens_per_second;
-    const empiricalTtft = bestMatch.record.metrics.ttft_ms.p95_ms || bestMatch.record.metrics.ttft_ms.mean_ms;
+    const empiricalTtft =
+      bestMatch.record.metrics.ttft_ms.p95_ms ||
+      bestMatch.record.metrics.ttft_ms.mean_ms;
 
     // Blend: 70% empirical neighbor scaling, 30% analytical
-    const paramScale = bestMatch.record.model.parameters_billions / target.parameters_billions;
+    const paramScale =
+      bestMatch.record.model.parameters_billions / target.parameters_billions;
     const scaledEmpiricalTps = empiricalTps * Math.pow(paramScale, 0.9);
-    finalThroughput = Number((0.7 * scaledEmpiricalTps + 0.3 * analytical.predicted_throughput_tok_s).toFixed(1));
-    finalTtft = Number((0.7 * empiricalTtft + 0.3 * analytical.predicted_ttft_ms).toFixed(1));
-    finalTpot = Number((1000 / (finalThroughput / Math.max(1, target.workload.concurrency))).toFixed(1));
+    finalThroughput = Number(
+      (
+        0.7 * scaledEmpiricalTps +
+        0.3 * analytical.predicted_throughput_tok_s
+      ).toFixed(1),
+    );
+    finalTtft = Number(
+      (0.7 * empiricalTtft + 0.3 * analytical.predicted_ttft_ms).toFixed(1),
+    );
+    finalTpot = Number(
+      (
+        1000 /
+        (finalThroughput / Math.max(1, target.workload.concurrency))
+      ).toFixed(1),
+    );
   }
 
-  const p10Throughput = Number((finalThroughput * (1 - intervalPct)).toFixed(1));
-  const p90Throughput = Number((finalThroughput * (1 + intervalPct)).toFixed(1));
+  const p10Throughput = Number(
+    (finalThroughput * (1 - intervalPct)).toFixed(1),
+  );
+  const p90Throughput = Number(
+    (finalThroughput * (1 + intervalPct)).toFixed(1),
+  );
   const p10Ttft = Number((finalTtft * (1 - intervalPct)).toFixed(1));
   const p90Ttft = Number((finalTtft * (1 + intervalPct)).toFixed(1));
 

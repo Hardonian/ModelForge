@@ -50,8 +50,20 @@ const MOCK_CORPUS: OpenComputeBenchRecord[] = [
       concurrency: 4,
     },
     metrics: {
-      ttft_ms: { p50_ms: 18.0, p90_ms: 21.0, p95_ms: 22.4, p99_ms: 25.0, mean_ms: 19.5 },
-      tpot_ms: { p50_ms: 15.0, p90_ms: 16.5, p95_ms: 17.1, p99_ms: 18.0, mean_ms: 15.8 },
+      ttft_ms: {
+        p50_ms: 18.0,
+        p90_ms: 21.0,
+        p95_ms: 22.4,
+        p99_ms: 25.0,
+        mean_ms: 19.5,
+      },
+      tpot_ms: {
+        p50_ms: 15.0,
+        p90_ms: 16.5,
+        p95_ms: 17.1,
+        p99_ms: 18.0,
+        mean_ms: 15.8,
+      },
       tokens_per_second: 58.4,
       requests_per_second: 2.2,
       peak_vram_bytes: 38500000000,
@@ -62,8 +74,10 @@ const MOCK_CORPUS: OpenComputeBenchRecord[] = [
       runner_version: "1.0.0",
       started_at: new Date().toISOString(),
       completed_at: new Date().toISOString(),
-      environment_hash: "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
-      result_hash: "fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210",
+      environment_hash:
+        "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+      result_hash:
+        "fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210",
     },
     verification: {
       status: "verified",
@@ -78,13 +92,25 @@ test("Performance Predictor - Level 0 Analytical", () => {
     { parameters_billions: 32.5 },
     l40s,
     "fp8",
-    { prompt_tokens: 1024, generated_tokens: 256, context_length: 4096, batch_size: 4, concurrency: 4 },
+    {
+      prompt_tokens: 1024,
+      generated_tokens: 256,
+      context_length: 4096,
+      batch_size: 4,
+      concurrency: 4,
+    },
     "vllm",
-    1
+    1,
   );
 
-  assert.ok(pred.predicted_throughput_tok_s > 20, "Throughput should be positive and realistic");
-  assert.ok(pred.predicted_peak_vram_gb > 30, "Peak VRAM should account for weights + KV cache");
+  assert.ok(
+    pred.predicted_throughput_tok_s > 20,
+    "Throughput should be positive and realistic",
+  );
+  assert.ok(
+    pred.predicted_peak_vram_gb > 30,
+    "Peak VRAM should account for weights + KV cache",
+  );
   assert.ok(pred.predicted_ttft_ms > 0, "TTFT should be positive");
   assert.ok(pred.predicted_tpot_ms > 0, "TPOT should be positive");
 });
@@ -100,17 +126,27 @@ test("Performance Predictor - Level 1 Nearest-Neighbor & Uncertainty", () => {
       accelerator: "NVIDIA L40S",
       runtime: "vllm",
       precision: "fp8",
-      workload: { prompt_tokens: 1024, generated_tokens: 256, context_length: 4096, batch_size: 4, concurrency: 4 },
+      workload: {
+        prompt_tokens: 1024,
+        generated_tokens: 256,
+        context_length: 4096,
+        batch_size: 4,
+        concurrency: 4,
+      },
     },
-    MOCK_CORPUS
+    MOCK_CORPUS,
   );
 
   assert.equal(res1.is_predicted, true);
   assert.equal(res1.uncertainty_type, "interpolation");
   assert.equal(res1.confidence, "high");
   assert.equal(res1.nearest_evidence_benchmark_ids.length, 1);
-  assert.ok(res1.prediction_interval.p10_throughput < res1.predicted_throughput_tok_s);
-  assert.ok(res1.prediction_interval.p90_throughput > res1.predicted_throughput_tok_s);
+  assert.ok(
+    res1.prediction_interval.p10_throughput < res1.predicted_throughput_tok_s,
+  );
+  assert.ok(
+    res1.prediction_interval.p90_throughput > res1.predicted_throughput_tok_s,
+  );
 
   // 2. Extrapolation test (different hardware)
   const res2 = predictor.predict(
@@ -120,9 +156,15 @@ test("Performance Predictor - Level 1 Nearest-Neighbor & Uncertainty", () => {
       accelerator: "NVIDIA H100 SXM5 80GB",
       runtime: "vllm",
       precision: "fp8",
-      workload: { prompt_tokens: 1024, generated_tokens: 256, context_length: 4096, batch_size: 4, concurrency: 4 },
+      workload: {
+        prompt_tokens: 1024,
+        generated_tokens: 256,
+        context_length: 4096,
+        batch_size: 4,
+        concurrency: 4,
+      },
     },
-    MOCK_CORPUS
+    MOCK_CORPUS,
   );
 
   assert.equal(res2.uncertainty_type, "extrapolation");
@@ -136,9 +178,15 @@ test("Performance Predictor - Level 1 Nearest-Neighbor & Uncertainty", () => {
       accelerator: "Apple M3 Ultra 192GB",
       runtime: "llama.cpp",
       precision: "fp16",
-      workload: { prompt_tokens: 1024, generated_tokens: 256, context_length: 4096, batch_size: 1, concurrency: 1 },
+      workload: {
+        prompt_tokens: 1024,
+        generated_tokens: 256,
+        context_length: 4096,
+        batch_size: 1,
+        concurrency: 1,
+      },
     },
-    MOCK_CORPUS
+    MOCK_CORPUS,
   );
 
   assert.equal(res3.uncertainty_type, "out_of_distribution");
@@ -158,7 +206,7 @@ test("Performance Predictor - Offline Evaluation & Error Metrics", () => {
       precision: targetRecord.precision.type,
       workload: targetRecord.workload,
     },
-    MOCK_CORPUS
+    MOCK_CORPUS,
   );
 
   const feedback = evaluatePredictionError(prediction, targetRecord);

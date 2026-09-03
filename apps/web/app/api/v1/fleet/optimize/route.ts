@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
     if (!Array.isArray(fleet) || !Array.isArray(workloads)) {
       return NextResponse.json(
         { error: "fleet and workloads must be arrays" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 

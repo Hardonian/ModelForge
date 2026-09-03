@@ -56,11 +56,11 @@ $$\hat{y} = 0.70 \cdot \left( y_{\text{nearest}} \cdot \left( \frac{N_r}{N_x} \r
 
 ModelForge categorizes uncertainty into three strict classifications:
 
-| Uncertainty Classification | Nearest Distance $D$ | Confidence | Prediction Interval |
-| :--- | :--- | :--- | :--- |
-| **`INTERPOLATION`** | $D < 0.35$ | High | $\pm 10\%$ ($P_{10} - P_{90}$) |
-| **`EXTRAPOLATION`** | $0.35 \le D < 1.2$ | Medium | $\pm 20\%$ ($P_{10} - P_{90}$) |
-| **`OUT_OF_DISTRIBUTION`** | $D \ge 1.2$ | Low | $\pm 35\%$ ($P_{10} - P_{90}$) |
+| Uncertainty Classification | Nearest Distance $D$ | Confidence | Prediction Interval            |
+| :------------------------- | :------------------- | :--------- | :----------------------------- |
+| **`INTERPOLATION`**        | $D < 0.35$           | High       | $\pm 10\%$ ($P_{10} - P_{90}$) |
+| **`EXTRAPOLATION`**        | $0.35 \le D < 1.2$   | Medium     | $\pm 20\%$ ($P_{10} - P_{90}$) |
+| **`OUT_OF_DISTRIBUTION`**  | $D \ge 1.2$          | Low        | $\pm 35\%$ ($P_{10} - P_{90}$) |
 
 ---
 

@@ -75,24 +75,43 @@ export default function PredictPage() {
     }
 
     const baseTpotMs = (weightGb / (bandwidth * 0.85)) * 1000;
-    let runtimeMult = runtime === "tensorrt-llm" ? 1.35 : runtime === "nvidia-dynamo" ? 1.55 : 1.15;
-    const adjustedTpot = Math.max(8.0, Number((baseTpotMs / runtimeMult).toFixed(1)));
+    let runtimeMult =
+      runtime === "tensorrt-llm"
+        ? 1.35
+        : runtime === "nvidia-dynamo"
+          ? 1.55
+          : 1.15;
+    const adjustedTpot = Math.max(
+      8.0,
+      Number((baseTpotMs / runtimeMult).toFixed(1)),
+    );
     const singleTps = 1000 / adjustedTpot;
-    const aggTps = Number((singleTps * concurrency * (1 / (1 + 0.05 * Math.log2(concurrency)))).toFixed(1));
+    const aggTps = Number(
+      (
+        singleTps *
+        concurrency *
+        (1 / (1 + 0.05 * Math.log2(concurrency)))
+      ).toFixed(1),
+    );
 
     const prefillFlops = 2 * params * 1e9 * 1024;
-    const prefillMs = Number(((prefillFlops / (tflops * 1e12)) * 1000 / (runtimeMult * 0.5)).toFixed(1));
+    const prefillMs = Number(
+      (((prefillFlops / (tflops * 1e12)) * 1000) / (runtimeMult * 0.5)).toFixed(
+        1,
+      ),
+    );
     const predTtft = Number((prefillMs + 10).toFixed(1));
 
     // Uncertainty classification
-    let unc: "interpolation" | "extrapolation" | "out_of_distribution" = "extrapolation";
+    let unc: "interpolation" | "extrapolation" | "out_of_distribution" =
+      "extrapolation";
     let conf: "high" | "medium" | "low" = "medium";
-    let interval = 0.20;
+    let interval = 0.2;
 
     if (model.includes("32B") && accelerator.includes("L40S")) {
       unc = "interpolation";
       conf = "high";
-      interval = 0.10;
+      interval = 0.1;
     } else if (params > 100 || accelerator.includes("Apple")) {
       unc = "out_of_distribution";
       conf = "low";
@@ -127,7 +146,9 @@ export default function PredictPage() {
           Performance Predictor
         </h1>
         <p className="mt-2 text-sm text-slate-400 max-w-3xl">
-          Query unmeasured model and hardware configurations. ModelForge combines Level 0 analytical roofline physics with Level 1 empirical nearest-neighbor scaling from the OpenComputeBench corpus.
+          Query unmeasured model and hardware configurations. ModelForge
+          combines Level 0 analytical roofline physics with Level 1 empirical
+          nearest-neighbor scaling from the OpenComputeBench corpus.
         </p>
       </div>
 
@@ -135,9 +156,15 @@ export default function PredictPage() {
       <div className="mb-8 rounded-xl border border-amber-500/30 bg-amber-950/20 p-4 text-xs text-amber-200/90 flex items-start gap-3">
         <ShieldAlert className="h-5 w-5 text-amber-400 shrink-0 mt-0.5" />
         <div>
-          <span className="font-semibold text-amber-300">Constitutional Rule: Prediction Never Replaces Measured Evidence.</span>{" "}
-          All values produced by this engine are labeled <span className="font-mono font-bold text-white bg-amber-500/30 px-1 py-0.5 rounded">PREDICTED</span>. 
-          Each result displays explicit prediction intervals, nearest measured anchor benchmarks, and uncertainty classification.
+          <span className="font-semibold text-amber-300">
+            Constitutional Rule: Prediction Never Replaces Measured Evidence.
+          </span>{" "}
+          All values produced by this engine are labeled{" "}
+          <span className="font-mono font-bold text-white bg-amber-500/30 px-1 py-0.5 rounded">
+            PREDICTED
+          </span>
+          . Each result displays explicit prediction intervals, nearest measured
+          anchor benchmarks, and uncertainty classification.
         </div>
       </div>
 
@@ -150,7 +177,9 @@ export default function PredictPage() {
           </h2>
 
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1">Model Repository</label>
+            <label className="block text-xs font-medium text-slate-300 mb-1">
+              Model Repository
+            </label>
             <select
               value={model}
               onChange={(e) => {
@@ -162,17 +191,29 @@ export default function PredictPage() {
               }}
               className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-xs text-white focus:border-sky-500 focus:outline-none"
             >
-              <option value="Qwen/Qwen2.5-32B-Instruct">Qwen/Qwen2.5-32B-Instruct (32.5B)</option>
-              <option value="meta-llama/Llama-3.3-70B-Instruct">meta-llama/Llama-3.3-70B-Instruct (70.6B)</option>
-              <option value="deepseek-ai/DeepSeek-R1-Distill-Qwen-32B">deepseek-ai/DeepSeek-R1-Distill-Qwen-32B (32.5B)</option>
-              <option value="mistralai/Mistral-Nemo-Instruct-2407">mistralai/Mistral-Nemo-Instruct-2407 (12.2B)</option>
-              <option value="google/gemma-2-9b-it">google/gemma-2-9b-it (9.2B)</option>
+              <option value="Qwen/Qwen2.5-32B-Instruct">
+                Qwen/Qwen2.5-32B-Instruct (32.5B)
+              </option>
+              <option value="meta-llama/Llama-3.3-70B-Instruct">
+                meta-llama/Llama-3.3-70B-Instruct (70.6B)
+              </option>
+              <option value="deepseek-ai/DeepSeek-R1-Distill-Qwen-32B">
+                deepseek-ai/DeepSeek-R1-Distill-Qwen-32B (32.5B)
+              </option>
+              <option value="mistralai/Mistral-Nemo-Instruct-2407">
+                mistralai/Mistral-Nemo-Instruct-2407 (12.2B)
+              </option>
+              <option value="google/gemma-2-9b-it">
+                google/gemma-2-9b-it (9.2B)
+              </option>
             </select>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">Parameters (B)</label>
+              <label className="block text-xs font-medium text-slate-300 mb-1">
+                Parameters (B)
+              </label>
               <input
                 type="number"
                 value={params}
@@ -182,7 +223,9 @@ export default function PredictPage() {
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">Precision</label>
+              <label className="block text-xs font-medium text-slate-300 mb-1">
+                Precision
+              </label>
               <select
                 value={precision}
                 onChange={(e) => setPrecision(e.target.value)}
@@ -196,36 +239,54 @@ export default function PredictPage() {
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1">Hardware Accelerator</label>
+            <label className="block text-xs font-medium text-slate-300 mb-1">
+              Hardware Accelerator
+            </label>
             <select
               value={accelerator}
               onChange={(e) => setAccelerator(e.target.value)}
               className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-xs text-white focus:border-sky-500 focus:outline-none"
             >
-              <option value="NVIDIA H100 SXM5 80GB">NVIDIA H100 SXM5 80GB (3.35 TB/s HBM3)</option>
-              <option value="NVIDIA L40S">NVIDIA L40S 48GB (864 GB/s GDDR6)</option>
-              <option value="NVIDIA GeForce RTX 4090 24GB">NVIDIA GeForce RTX 4090 24GB (1.0 TB/s)</option>
-              <option value="AMD Instinct MI300X 192GB">AMD Instinct MI300X 192GB (5.3 TB/s HBM3)</option>
+              <option value="NVIDIA H100 SXM5 80GB">
+                NVIDIA H100 SXM5 80GB (3.35 TB/s HBM3)
+              </option>
+              <option value="NVIDIA L40S">
+                NVIDIA L40S 48GB (864 GB/s GDDR6)
+              </option>
+              <option value="NVIDIA GeForce RTX 4090 24GB">
+                NVIDIA GeForce RTX 4090 24GB (1.0 TB/s)
+              </option>
+              <option value="AMD Instinct MI300X 192GB">
+                AMD Instinct MI300X 192GB (5.3 TB/s HBM3)
+              </option>
             </select>
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1">Serving Runtime</label>
+            <label className="block text-xs font-medium text-slate-300 mb-1">
+              Serving Runtime
+            </label>
             <select
               value={runtime}
               onChange={(e) => setRuntime(e.target.value)}
               className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-xs text-white focus:border-sky-500 focus:outline-none"
             >
               <option value="vllm">vLLM (PagedAttention baseline)</option>
-              <option value="tensorrt-llm">TensorRT-LLM (In-Flight Batching)</option>
-              <option value="nvidia-dynamo">NVIDIA Dynamo (Disaggregated Prefill/Decode)</option>
+              <option value="tensorrt-llm">
+                TensorRT-LLM (In-Flight Batching)
+              </option>
+              <option value="nvidia-dynamo">
+                NVIDIA Dynamo (Disaggregated Prefill/Decode)
+              </option>
               <option value="sglang">SGLang (RadixAttention)</option>
             </select>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">Context Length</label>
+              <label className="block text-xs font-medium text-slate-300 mb-1">
+                Context Length
+              </label>
               <input
                 type="number"
                 value={contextLength}
@@ -235,7 +296,9 @@ export default function PredictPage() {
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">Concurrency</label>
+              <label className="block text-xs font-medium text-slate-300 mb-1">
+                Concurrency
+              </label>
               <input
                 type="number"
                 value={concurrency}
@@ -267,31 +330,45 @@ export default function PredictPage() {
                       PREDICTED
                     </span>
                     <span className="text-xs text-slate-400">
-                      Uncertainty: <span className="font-bold text-white uppercase">{result.uncertainty_type}</span>
+                      Uncertainty:{" "}
+                      <span className="font-bold text-white uppercase">
+                        {result.uncertainty_type}
+                      </span>
                     </span>
                   </div>
-                  <span className={`text-xs font-semibold px-2 py-0.5 rounded ${result.confidence === "high" ? "bg-emerald-500/10 text-emerald-400" : result.confidence === "medium" ? "bg-amber-500/10 text-amber-400" : "bg-red-500/10 text-red-400"}`}>
+                  <span
+                    className={`text-xs font-semibold px-2 py-0.5 rounded ${result.confidence === "high" ? "bg-emerald-500/10 text-emerald-400" : result.confidence === "medium" ? "bg-amber-500/10 text-amber-400" : "bg-red-500/10 text-red-400"}`}
+                  >
                     {result.confidence.toUpperCase()} CONFIDENCE
                   </span>
                 </div>
 
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-6">
                   <div>
-                    <span className="text-[11px] text-slate-400 block font-medium">Throughput</span>
+                    <span className="text-[11px] text-slate-400 block font-medium">
+                      Throughput
+                    </span>
                     <div className="text-2xl font-bold text-white mt-1 flex items-baseline gap-1">
                       <span>{result.predicted_throughput_tok_s}</span>
-                      <span className="text-xs text-slate-400 font-normal">tok/s</span>
+                      <span className="text-xs text-slate-400 font-normal">
+                        tok/s
+                      </span>
                     </div>
                     <span className="text-[10px] text-sky-400 mt-1 block">
-                      Interval: [{result.p10_throughput} - {result.p90_throughput}]
+                      Interval: [{result.p10_throughput} -{" "}
+                      {result.p90_throughput}]
                     </span>
                   </div>
 
                   <div>
-                    <span className="text-[11px] text-slate-400 block font-medium">TTFT (P95)</span>
+                    <span className="text-[11px] text-slate-400 block font-medium">
+                      TTFT (P95)
+                    </span>
                     <div className="text-2xl font-bold text-white mt-1 flex items-baseline gap-1">
                       <span>{result.predicted_ttft_ms}</span>
-                      <span className="text-xs text-slate-400 font-normal">ms</span>
+                      <span className="text-xs text-slate-400 font-normal">
+                        ms
+                      </span>
                     </div>
                     <span className="text-[10px] text-slate-400 mt-1 block">
                       Prefill bound: {result.prefill_compute_bound_ttft_ms} ms
@@ -299,10 +376,14 @@ export default function PredictPage() {
                   </div>
 
                   <div>
-                    <span className="text-[11px] text-slate-400 block font-medium">Peak VRAM</span>
+                    <span className="text-[11px] text-slate-400 block font-medium">
+                      Peak VRAM
+                    </span>
                     <div className="text-2xl font-bold text-white mt-1 flex items-baseline gap-1">
                       <span>{result.predicted_peak_vram_gb}</span>
-                      <span className="text-xs text-slate-400 font-normal">GB</span>
+                      <span className="text-xs text-slate-400 font-normal">
+                        GB
+                      </span>
                     </div>
                     <span className="text-[10px] text-slate-400 mt-1 block">
                       TPOT bound: {result.memory_bandwidth_bound_tpot_ms} ms
@@ -318,12 +399,20 @@ export default function PredictPage() {
                   </div>
                   <div className="grid grid-cols-2 gap-4 text-slate-400 pt-1">
                     <div>
-                      <span className="text-[11px] text-slate-500 block">Memory Bandwidth Bound TPOT:</span>
-                      <span className="font-mono text-white text-xs">{result.memory_bandwidth_bound_tpot_ms} ms / token</span>
+                      <span className="text-[11px] text-slate-500 block">
+                        Memory Bandwidth Bound TPOT:
+                      </span>
+                      <span className="font-mono text-white text-xs">
+                        {result.memory_bandwidth_bound_tpot_ms} ms / token
+                      </span>
                     </div>
                     <div>
-                      <span className="text-[11px] text-slate-500 block">Prefill Compute Bound TTFT:</span>
-                      <span className="font-mono text-white text-xs">{result.prefill_compute_bound_ttft_ms} ms</span>
+                      <span className="text-[11px] text-slate-500 block">
+                        Prefill Compute Bound TTFT:
+                      </span>
+                      <span className="font-mono text-white text-xs">
+                        {result.prefill_compute_bound_ttft_ms} ms
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -331,7 +420,9 @@ export default function PredictPage() {
                 {/* Nearest Measured Configurations */}
                 <div className="mt-5 pt-4 border-t border-slate-800 flex items-center justify-between text-xs">
                   <div className="text-slate-400">
-                    <span className="text-slate-500">Nearest Measured Benchmark Anchor: </span>
+                    <span className="text-slate-500">
+                      Nearest Measured Benchmark Anchor:{" "}
+                    </span>
                     <Link
                       href={`/benchmarks/${result.nearest_evidence_ids[0]}`}
                       className="text-sky-400 hover:text-sky-300 font-mono underline ml-1"
@@ -339,7 +430,9 @@ export default function PredictPage() {
                       {result.nearest_evidence_ids[0]}
                     </Link>
                   </div>
-                  <span className="text-[11px] text-slate-500">Predictor v1.0.0</span>
+                  <span className="text-[11px] text-slate-500">
+                    Predictor v1.0.0
+                  </span>
                 </div>
               </div>
             </>

@@ -243,21 +243,30 @@ export class ModelForgeClient {
     });
   }
 
-  async claimJob(workerId: string, trustTier = "community"): Promise<{ job: BenchmarkJob | null }> {
+  async claimJob(
+    workerId: string,
+    trustTier = "community",
+  ): Promise<{ job: BenchmarkJob | null }> {
     return this.request<{ job: BenchmarkJob | null }>(`/jobs/claim`, {
       method: "POST",
       body: JSON.stringify({ worker_id: workerId, trust_tier: trustTier }),
     });
   }
 
-  async completeJob(jobId: string, resultBenchmark: unknown): Promise<{ job: BenchmarkJob }> {
+  async completeJob(
+    jobId: string,
+    resultBenchmark: unknown,
+  ): Promise<{ job: BenchmarkJob }> {
     return this.request<{ job: BenchmarkJob }>(`/jobs/${jobId}/complete`, {
       method: "POST",
       body: JSON.stringify({ result_benchmark: resultBenchmark }),
     });
   }
 
-  async listJobs(filters?: { status?: string; orgId?: string }): Promise<BenchmarkJob[]> {
+  async listJobs(filters?: {
+    status?: string;
+    orgId?: string;
+  }): Promise<BenchmarkJob[]> {
     const query = new URLSearchParams();
     if (filters?.status) query.set("status", filters.status);
     if (filters?.orgId) query.set("org_id", filters.orgId);
@@ -282,7 +291,10 @@ export class ModelForgeClient {
     return this.request<FleetResource[]>(`/fleet${qs}`);
   }
 
-  async optimizeFleet(fleet: unknown[], workloads: unknown[]): Promise<unknown> {
+  async optimizeFleet(
+    fleet: unknown[],
+    workloads: unknown[],
+  ): Promise<unknown> {
     return this.request(`/fleet/optimize`, {
       method: "POST",
       body: JSON.stringify({ fleet, workloads }),
@@ -302,19 +314,29 @@ export class ModelForgeClient {
   }
 
   async listTelemetry(deploymentId: string): Promise<TelemetryWindow[]> {
-    return this.request<TelemetryWindow[]>(`/telemetry?deployment_id=${encodeURIComponent(deploymentId)}`);
+    return this.request<TelemetryWindow[]>(
+      `/telemetry?deployment_id=${encodeURIComponent(deploymentId)}`,
+    );
   }
 
-  async listRecommendations(orgId?: string): Promise<OptimizationRecommendation[]> {
+  async listRecommendations(
+    orgId?: string,
+  ): Promise<OptimizationRecommendation[]> {
     const qs = orgId ? `?org_id=${encodeURIComponent(orgId)}` : "";
     return this.request<OptimizationRecommendation[]>(`/recommendations${qs}`);
   }
 
-  async approveRecommendation(id: string, approver = "admin"): Promise<OptimizationRecommendation> {
-    return this.request<OptimizationRecommendation>(`/recommendations/${id}/approve`, {
-      method: "POST",
-      body: JSON.stringify({ approver }),
-    });
+  async approveRecommendation(
+    id: string,
+    approver = "admin",
+  ): Promise<OptimizationRecommendation> {
+    return this.request<OptimizationRecommendation>(
+      `/recommendations/${id}/approve`,
+      {
+        method: "POST",
+        body: JSON.stringify({ approver }),
+      },
+    );
   }
 
   async listVerifiedSavings(orgId?: string): Promise<VerifiedSavings[]> {

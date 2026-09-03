@@ -3,7 +3,10 @@ export * from "./interpolator";
 export * from "./evaluator";
 
 import { PredictionTarget, predictWithNeighbors } from "./interpolator";
-import { OpenComputeBenchRecord, PredictionResult } from "@modelforge/benchmark-schema";
+import {
+  OpenComputeBenchRecord,
+  PredictionResult,
+} from "@modelforge/benchmark-schema";
 
 export const PREDICTOR_VERSION = "predictor_v1.0.0";
 
@@ -16,7 +19,7 @@ export class PerformancePredictor {
 
   predict(
     target: PredictionTarget,
-    corpus: OpenComputeBenchRecord[]
+    corpus: OpenComputeBenchRecord[],
   ): PredictionResult {
     return predictWithNeighbors(target, corpus, this.version);
   }

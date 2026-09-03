@@ -195,7 +195,9 @@ describe("SLO Compiler & Topology Planner", () => {
     assert.ok(cmp.ttft_delta_pct > 50);
 
     const driftStatus = detectDrift([windowBaseline, windowDrifted]);
-    assert.ok(["watch", "action_recommended", "critical"].includes(driftStatus));
+    assert.ok(
+      ["watch", "action_recommended", "critical"].includes(driftStatus),
+    );
 
     const rec = generateOptimizationRecommendation(deployment, windowDrifted);
     assert.ok(rec.projected_monthly_savings_usd >= 0);
@@ -218,9 +220,13 @@ describe("SLO Compiler & Topology Planner", () => {
       total_cost_usd: 80.0, // Observed lower cost!
     };
 
-    const verified = verifySavings(windowBaseline, windowOptimized, rec.id, "org-1");
+    const verified = verifySavings(
+      windowBaseline,
+      windowOptimized,
+      rec.id,
+      "org-1",
+    );
     assert.ok(verified.verified_monthly_savings_usd > 0);
     assert.strictEqual(verified.observation_days, 30);
   });
 });
-

@@ -22,8 +22,11 @@ export async function POST(request: NextRequest) {
 
     if (!model_repository || !parameters_billions || !accelerator) {
       return NextResponse.json(
-        { error: "model_repository, parameters_billions, and accelerator are required" },
-        { status: 400 }
+        {
+          error:
+            "model_repository, parameters_billions, and accelerator are required",
+        },
+        { status: 400 },
       );
     }
 
@@ -45,7 +48,7 @@ export async function POST(request: NextRequest) {
           concurrency: 4,
         },
       },
-      corpus
+      corpus,
     );
 
     return NextResponse.json(prediction);

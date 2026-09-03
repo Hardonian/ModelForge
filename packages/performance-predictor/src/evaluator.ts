@@ -15,7 +15,7 @@ export interface PredictionEvaluationMetrics {
 
 export function evaluatePredictionError(
   prediction: PredictionResult,
-  actual: OpenComputeBenchRecord
+  actual: OpenComputeBenchRecord,
 ): PredictionFeedback {
   const predicted = prediction.predicted_throughput_tok_s;
   const actualTps = actual.metrics.tokens_per_second;
@@ -36,7 +36,7 @@ export function evaluatePredictionError(
 }
 
 export function computeOfflineMetrics(
-  pairs: Array<{ predicted: number; actual: number }>
+  pairs: Array<{ predicted: number; actual: number }>,
 ): PredictionEvaluationMetrics {
   if (pairs.length === 0) {
     return {
@@ -65,7 +65,7 @@ export function computeOfflineMetrics(
   apeList.sort((a, b) => a - b);
   const p90Index = Math.min(
     apeList.length - 1,
-    Math.floor(apeList.length * 0.9)
+    Math.floor(apeList.length * 0.9),
   );
 
   return {

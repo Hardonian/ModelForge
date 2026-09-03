@@ -11,7 +11,10 @@ export async function POST(request: NextRequest) {
     const trustTier = (body.trust_tier || "community") as WorkerTrustTier;
 
     if (!workerId) {
-      return NextResponse.json({ error: "worker_id is required" }, { status: 400 });
+      return NextResponse.json(
+        { error: "worker_id is required" },
+        { status: 400 },
+      );
     }
 
     const job = dataLayer.claimJob(workerId, trustTier);

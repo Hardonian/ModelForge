@@ -1,5 +1,14 @@
 import { dataLayer } from "@modelforge/database";
-import { Table, Layers, Cpu, ShieldCheck, AlertTriangle, XCircle, Clock, Zap } from "lucide-react";
+import {
+  Table,
+  Layers,
+  Cpu,
+  ShieldCheck,
+  AlertTriangle,
+  XCircle,
+  Clock,
+  Zap,
+} from "lucide-react";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";
@@ -28,7 +37,9 @@ export default function CoveragePage() {
           Benchmark Coverage Matrix
         </h1>
         <p className="mt-2 text-sm text-slate-400 max-w-3xl">
-          ModelForge maps every model × accelerator × runtime × precision tuple. Gaps in empirical evidence are scored by active learning priority and scheduled across distributed workers.
+          ModelForge maps every model × accelerator × runtime × precision tuple.
+          Gaps in empirical evidence are scored by active learning priority and
+          scheduled across distributed workers.
         </p>
       </div>
 
@@ -39,8 +50,12 @@ export default function CoveragePage() {
             <ShieldCheck className="h-4 w-4" />
             <span>COVERED CELLS</span>
           </div>
-          <div className="mt-2 text-2xl font-bold text-white">{coveredCount}</div>
-          <p className="text-[11px] text-slate-400 mt-1">Verified reproducible evidence</p>
+          <div className="mt-2 text-2xl font-bold text-white">
+            {coveredCount}
+          </div>
+          <p className="text-[11px] text-slate-400 mt-1">
+            Verified reproducible evidence
+          </p>
         </div>
 
         <div className="rounded-xl border border-amber-500/20 bg-amber-950/10 p-4">
@@ -49,7 +64,9 @@ export default function CoveragePage() {
             <span>STALE CELLS</span>
           </div>
           <div className="mt-2 text-2xl font-bold text-white">{staleCount}</div>
-          <p className="text-[11px] text-slate-400 mt-1">&gt; 90 days since retest</p>
+          <p className="text-[11px] text-slate-400 mt-1">
+            &gt; 90 days since retest
+          </p>
         </div>
 
         <div className="rounded-xl border border-red-500/20 bg-red-950/10 p-4">
@@ -57,8 +74,12 @@ export default function CoveragePage() {
             <XCircle className="h-4 w-4" />
             <span>KNOWN FAILURES</span>
           </div>
-          <div className="mt-2 text-2xl font-bold text-white">{failedCount}</div>
-          <p className="text-[11px] text-slate-400 mt-1">OOM or architectural mismatch</p>
+          <div className="mt-2 text-2xl font-bold text-white">
+            {failedCount}
+          </div>
+          <p className="text-[11px] text-slate-400 mt-1">
+            OOM or architectural mismatch
+          </p>
         </div>
 
         <div className="rounded-xl border border-sky-500/20 bg-sky-950/10 p-4">
@@ -66,8 +87,12 @@ export default function CoveragePage() {
             <Zap className="h-4 w-4" />
             <span>UNTESTED CELLS</span>
           </div>
-          <div className="mt-2 text-2xl font-bold text-white">{untestedCount}</div>
-          <p className="text-[11px] text-slate-400 mt-1">Scheduled by active learning</p>
+          <div className="mt-2 text-2xl font-bold text-white">
+            {untestedCount}
+          </div>
+          <p className="text-[11px] text-slate-400 mt-1">
+            Scheduled by active learning
+          </p>
         </div>
       </div>
 
@@ -78,7 +103,9 @@ export default function CoveragePage() {
           Highest-Priority Evidence Gaps (Active Learning Queue)
         </h2>
         <p className="text-xs text-slate-400 mt-1 mb-4">
-          These configurations have high frontier model adoption and accelerator demand. ModelForge automatically queues these jobs for community and organization workers.
+          These configurations have high frontier model adoption and accelerator
+          demand. ModelForge automatically queues these jobs for community and
+          organization workers.
         </p>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
           {highPriorityGaps.map((gap, i) => (
@@ -91,7 +118,9 @@ export default function CoveragePage() {
                   {gap.model_repository.split("/")[1] || gap.model_repository}
                 </div>
                 <div className="text-[11px] text-slate-400 mt-0.5">
-                  {gap.accelerator} • <span className="text-sky-400">{gap.runtime}</span> ({gap.precision})
+                  {gap.accelerator} •{" "}
+                  <span className="text-sky-400">{gap.runtime}</span> (
+                  {gap.precision})
                 </div>
               </div>
               <div className="flex flex-col items-end">
@@ -108,8 +137,12 @@ export default function CoveragePage() {
       {/* Complete Matrix Table */}
       <div className="overflow-hidden rounded-xl border border-slate-800 bg-slate-900/40 backdrop-blur-sm">
         <div className="border-b border-slate-800 px-5 py-4 flex items-center justify-between">
-          <h3 className="text-sm font-semibold text-white">Full Configuration Matrix ({matrix.length} tuples)</h3>
-          <span className="text-xs text-slate-400">Deterministic Active Learning Priority</span>
+          <h3 className="text-sm font-semibold text-white">
+            Full Configuration Matrix ({matrix.length} tuples)
+          </h3>
+          <span className="text-xs text-slate-400">
+            Deterministic Active Learning Priority
+          </span>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
@@ -127,13 +160,20 @@ export default function CoveragePage() {
             </thead>
             <tbody className="divide-y divide-slate-800/60 text-slate-300">
               {matrix.map((cell, idx) => (
-                <tr key={idx} className="hover:bg-slate-800/30 transition-colors">
+                <tr
+                  key={idx}
+                  className="hover:bg-slate-800/30 transition-colors"
+                >
                   <td className="py-3 px-4 font-mono font-medium text-white truncate max-w-[220px]">
                     {cell.model_repository}
                   </td>
                   <td className="py-3 px-4">{cell.accelerator}</td>
-                  <td className="py-3 px-4 font-mono text-sky-400">{cell.runtime}</td>
-                  <td className="py-3 px-4 font-mono uppercase text-[11px]">{cell.precision}</td>
+                  <td className="py-3 px-4 font-mono text-sky-400">
+                    {cell.runtime}
+                  </td>
+                  <td className="py-3 px-4 font-mono uppercase text-[11px]">
+                    {cell.precision}
+                  </td>
                   <td className="py-3 px-4">
                     {cell.status === "covered" ? (
                       <span className="inline-flex items-center gap-1 rounded bg-emerald-500/10 px-2 py-0.5 text-[11px] font-semibold text-emerald-400 border border-emerald-500/20">
@@ -157,7 +197,9 @@ export default function CoveragePage() {
                     )}
                   </td>
                   <td className="py-3 px-4 font-mono font-semibold text-white">
-                    {cell.measured_throughput_tok_s ? `${cell.measured_throughput_tok_s} tok/s` : "—"}
+                    {cell.measured_throughput_tok_s
+                      ? `${cell.measured_throughput_tok_s} tok/s`
+                      : "—"}
                   </td>
                   <td className="py-3 px-4">
                     <div className="flex items-center gap-2">
@@ -167,7 +209,9 @@ export default function CoveragePage() {
                           style={{ width: `${cell.gap_priority}%` }}
                         />
                       </div>
-                      <span className="font-mono text-[11px] text-slate-400">{cell.gap_priority}</span>
+                      <span className="font-mono text-[11px] text-slate-400">
+                        {cell.gap_priority}
+                      </span>
                     </div>
                   </td>
                   <td className="py-3 px-4 text-right">
@@ -179,7 +223,9 @@ export default function CoveragePage() {
                         {cell.benchmark_ids[0]?.slice(0, 8)}...
                       </Link>
                     ) : (
-                      <span className="text-slate-600 text-[11px]">Unmeasured</span>
+                      <span className="text-slate-600 text-[11px]">
+                        Unmeasured
+                      </span>
                     )}
                   </td>
                 </tr>

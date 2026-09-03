@@ -5,7 +5,7 @@ export const dynamic = "force-dynamic";
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const { id } = await params;
@@ -14,7 +14,10 @@ export async function POST(
 
     const updated = dataLayer.approveRecommendation(id, approver);
     if (!updated) {
-      return NextResponse.json({ error: "Recommendation not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Recommendation not found" },
+        { status: 404 },
+      );
     }
 
     return NextResponse.json(updated);

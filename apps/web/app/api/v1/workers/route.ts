@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
     if (!parsed.success) {
       return NextResponse.json(
         { error: "Invalid worker schema", details: parsed.error.issues },
-        { status: 400 }
+        { status: 400 },
       );
     }
 

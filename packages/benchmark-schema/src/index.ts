@@ -447,11 +447,13 @@ export const BenchmarkJobSchema = z.object({
   workload: WorkloadSpecSchema,
   required_trust_tier: WorkerTrustTierSchema.default("community"),
   target_device: z.string().optional(),
-  resource_limits: z.object({
-    timeout_s: z.number().int().positive().default(900),
-    max_vram_gb: z.number().positive().optional(),
-    max_gpus: z.number().int().positive().default(1),
-  }).default({ timeout_s: 900, max_gpus: 1 }),
+  resource_limits: z
+    .object({
+      timeout_s: z.number().int().positive().default(900),
+      max_vram_gb: z.number().positive().optional(),
+      max_gpus: z.number().int().positive().default(1),
+    })
+    .default({ timeout_s: 900, max_gpus: 1 }),
   status: JobStatusSchema.default("queued"),
   assigned_worker_id: z.string().uuid().optional(),
   assigned_at: z.string().datetime().optional(),
@@ -550,7 +552,9 @@ export const FleetResourceSchema = z.object({
   region: z.string().default("us-east-1"),
   hourly_cost_usd: z.number().nonnegative(),
   is_reserved: z.boolean().default(true),
-  status: z.enum(["available", "allocated", "maintenance"]).default("available"),
+  status: z
+    .enum(["available", "allocated", "maintenance"])
+    .default("available"),
   allocated_workload_ids: z.array(z.string()).default([]),
 });
 export type FleetResource = z.infer<typeof FleetResourceSchema>;
@@ -654,7 +658,9 @@ export const OptimizationRecommendationSchema = z.object({
   approved_by: z.string().optional(),
   approved_at: z.string().datetime().optional(),
 });
-export type OptimizationRecommendation = z.infer<typeof OptimizationRecommendationSchema>;
+export type OptimizationRecommendation = z.infer<
+  typeof OptimizationRecommendationSchema
+>;
 
 export const VerifiedSavingsSchema = z.object({
   id: z.string().uuid(),
@@ -669,4 +675,3 @@ export const VerifiedSavingsSchema = z.object({
 export type VerifiedSavings = z.infer<typeof VerifiedSavingsSchema>;
 
 export * from "./confidence";
-

@@ -73,7 +73,9 @@ export default function FleetPage() {
           Fleet Optimizer & Capacity Planner
         </h1>
         <p className="mt-2 text-sm text-slate-400 max-w-3xl">
-          Optimize placement of enterprise workloads across heterogeneous GPU clusters. Simulate What-If traffic surges, context growth, and hardware migrations before committing capital.
+          Optimize placement of enterprise workloads across heterogeneous GPU
+          clusters. Simulate What-If traffic surges, context growth, and
+          hardware migrations before committing capital.
         </p>
       </div>
 
@@ -86,10 +88,14 @@ export default function FleetPage() {
           >
             <div>
               <div className="flex items-center justify-between">
-                <span className="text-xs font-mono font-semibold text-slate-400">{res.node_id}</span>
+                <span className="text-xs font-mono font-semibold text-slate-400">
+                  {res.node_id}
+                </span>
                 <span
                   className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                    res.is_reserved ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" : "bg-slate-800 text-slate-400"
+                    res.is_reserved
+                      ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+                      : "bg-slate-800 text-slate-400"
                   }`}
                 >
                   {res.is_reserved ? "RESERVED INSTANCE" : "ON-DEMAND"}
@@ -100,14 +106,21 @@ export default function FleetPage() {
                 {res.device_count}× {res.device}
               </h3>
               <p className="text-xs text-slate-400 mt-1">
-                {res.vram_gb} GB VRAM per device • ${res.hourly_cost_usd.toFixed(2)}/hr
+                {res.vram_gb} GB VRAM per device • $
+                {res.hourly_cost_usd.toFixed(2)}/hr
               </p>
             </div>
 
             <div className="mt-4 pt-4 border-t border-slate-800/80">
               <div className="flex justify-between text-xs mb-1.5">
                 <span className="text-slate-400">Allocation Status:</span>
-                <span className={res.status === "allocated" ? "text-amber-400 font-semibold" : "text-emerald-400 font-semibold"}>
+                <span
+                  className={
+                    res.status === "allocated"
+                      ? "text-amber-400 font-semibold"
+                      : "text-emerald-400 font-semibold"
+                  }
+                >
                   {res.status.toUpperCase()}
                 </span>
               </div>
@@ -116,7 +129,9 @@ export default function FleetPage() {
                   {res.allocated_workloads.join(", ")}
                 </div>
               ) : (
-                <div className="text-[11px] text-slate-500 italic mt-1">0 workloads assigned (Idle capacity)</div>
+                <div className="text-[11px] text-slate-500 italic mt-1">
+                  0 workloads assigned (Idle capacity)
+                </div>
               )}
             </div>
           </div>
@@ -131,7 +146,8 @@ export default function FleetPage() {
             What-If Scenario Simulator
           </h2>
           <p className="text-xs text-slate-400 mt-1">
-            Simulate capacity requirements under changing workload parameters without re-benchmarking manually.
+            Simulate capacity requirements under changing workload parameters
+            without re-benchmarking manually.
           </p>
         </div>
 
@@ -141,7 +157,9 @@ export default function FleetPage() {
             <div>
               <div className="flex justify-between text-xs font-medium text-slate-300 mb-1">
                 <span>Traffic Surge Growth</span>
-                <span className="font-mono text-cyan-400">+{trafficGrowth}% (2.0x Concurrency)</span>
+                <span className="font-mono text-cyan-400">
+                  +{trafficGrowth}% (2.0x Concurrency)
+                </span>
               </div>
               <input
                 type="range"
@@ -157,7 +175,9 @@ export default function FleetPage() {
             <div>
               <div className="flex justify-between text-xs font-medium text-slate-300 mb-1">
                 <span>Context Length Growth</span>
-                <span className="font-mono text-cyan-400">+{contextGrowth}% (KV Memory Scaled)</span>
+                <span className="font-mono text-cyan-400">
+                  +{contextGrowth}% (KV Memory Scaled)
+                </span>
               </div>
               <input
                 type="range"
@@ -171,15 +191,23 @@ export default function FleetPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">Hardware Target Migration</label>
+              <label className="block text-xs font-medium text-slate-300 mb-1">
+                Hardware Target Migration
+              </label>
               <select
                 value={targetHw}
                 onChange={(e) => setTargetHw(e.target.value)}
                 className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-xs text-white focus:border-cyan-500 focus:outline-none"
               >
-                <option value="NVIDIA L40S">NVIDIA L40S 48GB (Optimal FinOps Right-Sizing)</option>
-                <option value="NVIDIA H100 SXM5 80GB">NVIDIA H100 SXM5 80GB (Maximum Throughput)</option>
-                <option value="NVIDIA GeForce RTX 4090 24GB">NVIDIA RTX 4090 24GB (Cost Floor)</option>
+                <option value="NVIDIA L40S">
+                  NVIDIA L40S 48GB (Optimal FinOps Right-Sizing)
+                </option>
+                <option value="NVIDIA H100 SXM5 80GB">
+                  NVIDIA H100 SXM5 80GB (Maximum Throughput)
+                </option>
+                <option value="NVIDIA GeForce RTX 4090 24GB">
+                  NVIDIA RTX 4090 24GB (Cost Floor)
+                </option>
               </select>
             </div>
           </div>
@@ -187,7 +215,9 @@ export default function FleetPage() {
           {/* Results Projection */}
           <div className="lg:col-span-7 grid grid-cols-2 gap-4">
             <div className="rounded-lg border border-slate-800 bg-slate-950/60 p-4">
-              <span className="text-[11px] text-slate-400 block font-medium">Required Device Count</span>
+              <span className="text-[11px] text-slate-400 block font-medium">
+                Required Device Count
+              </span>
               <div className="text-2xl font-bold text-white mt-1">
                 {targetHw.includes("4090") ? "4 GPUs" : "2 GPUs"}
               </div>
@@ -198,27 +228,39 @@ export default function FleetPage() {
             </div>
 
             <div className="rounded-lg border border-slate-800 bg-slate-950/60 p-4">
-              <span className="text-[11px] text-slate-400 block font-medium">Estimated P95 TTFT</span>
+              <span className="text-[11px] text-slate-400 block font-medium">
+                Estimated P95 TTFT
+              </span>
               <div className="text-2xl font-bold text-white mt-1">
                 {targetHw.includes("H100") ? "18.2 ms" : "24.5 ms"}
               </div>
-              <p className="text-[11px] text-slate-400 mt-1">Target SLO: &lt; 30 ms</p>
+              <p className="text-[11px] text-slate-400 mt-1">
+                Target SLO: &lt; 30 ms
+              </p>
             </div>
 
             <div className="rounded-lg border border-slate-800 bg-slate-950/60 p-4">
-              <span className="text-[11px] text-slate-400 block font-medium">Projected Monthly Spend</span>
+              <span className="text-[11px] text-slate-400 block font-medium">
+                Projected Monthly Spend
+              </span>
               <div className="text-2xl font-bold text-white mt-1">
                 ${simulatedCost.toLocaleString()} USD
               </div>
-              <p className="text-[11px] text-slate-400 mt-1">Baseline: ${baselineCost.toLocaleString()} USD</p>
+              <p className="text-[11px] text-slate-400 mt-1">
+                Baseline: ${baselineCost.toLocaleString()} USD
+              </p>
             </div>
 
             <div className="rounded-lg border border-slate-800 bg-slate-950/60 p-4">
-              <span className="text-[11px] text-slate-400 block font-medium">Projected FinOps Savings</span>
+              <span className="text-[11px] text-slate-400 block font-medium">
+                Projected FinOps Savings
+              </span>
               <div className="text-2xl font-bold text-emerald-400 mt-1">
                 {savings > 0 ? `+$${savings.toLocaleString()} /mo` : "$0 /mo"}
               </div>
-              <p className="text-[11px] text-emerald-400/90 mt-1">58% cost reduction at identical SLO</p>
+              <p className="text-[11px] text-emerald-400/90 mt-1">
+                58% cost reduction at identical SLO
+              </p>
             </div>
           </div>
         </div>

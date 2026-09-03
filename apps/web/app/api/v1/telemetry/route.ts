@@ -9,7 +9,10 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const deploymentId = searchParams.get("deployment_id");
   if (!deploymentId) {
-    return NextResponse.json({ error: "deployment_id is required" }, { status: 400 });
+    return NextResponse.json(
+      { error: "deployment_id is required" },
+      { status: 400 },
+    );
   }
 
   const telemetry = dataLayer.listTelemetryWindows(deploymentId);
@@ -21,14 +24,22 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
 
     // STRICT ZERO PROMPT LOGGING ENFORCEMENT
-    const forbiddenKeys = ["prompt", "prompt_text", "input_text", "response", "output_text", "messages"];
+    const forbiddenKeys = [
+      "prompt",
+      "prompt_text",
+      "input_text",
+      "response",
+      "output_text",
+      "messages",
+    ];
     for (const key of forbiddenKeys) {
       if (key in body) {
         return NextResponse.json(
           {
-            error: "Zero Prompt Logging Violation: Raw prompts and outputs must never be submitted to ModelForge telemetry.",
+            error:
+              "Zero Prompt Logging Violation: Raw prompts and outputs must never be submitted to ModelForge telemetry.",
           },
-          { status: 400 }
+          { status: 400 },
         );
       }
     }
@@ -40,8 +51,11 @@ export async function POST(request: NextRequest) {
 
     if (!parsed.success) {
       return NextResponse.json(
-        { error: "Invalid telemetry window schema", details: parsed.error.issues },
-        { status: 400 }
+        {
+          error: "Invalid telemetry window schema",
+          details: parsed.error.issues,
+        },
+        { status: 400 },
       );
     }
 

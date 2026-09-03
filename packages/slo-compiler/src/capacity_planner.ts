@@ -51,20 +51,25 @@ export function simulateCapacityScenario(
     HARDWARE_CATALOG.find(
       (h) =>
         h.name.toLowerCase() === targetDeviceName.toLowerCase() ||
-        h.id.toLowerCase() === targetDeviceName.toLowerCase()
+        h.id.toLowerCase() === targetDeviceName.toLowerCase(),
     ) || HARDWARE_CATALOG[0]!;
 
   // Sizing
-  const bpp = targetPrecision === "fp16" ? 2.0 : targetPrecision === "fp8" ? 1.0 : 0.55;
+  const bpp =
+    targetPrecision === "fp16" ? 2.0 : targetPrecision === "fp8" ? 1.0 : 0.55;
   const weightGb = base.parameters_billions * bpp;
   const effectiveContext = base.context_length * contextMult;
   const effectiveConcurrency = Math.round(base.concurrency * trafficMult);
 
-  const kvGb = (2 * 48 * 8 * 128 * effectiveContext * 1 * effectiveConcurrency) / 1e9;
+  const kvGb =
+    (2 * 48 * 8 * 128 * effectiveContext * 1 * effectiveConcurrency) / 1e9;
   const totalRequiredVramGb = weightGb + kvGb + 2.0;
 
   const singleDeviceVramGb = hw.manufacturer.vram_bytes / 1e9;
-  const requiredDevices = Math.max(1, Math.ceil(totalRequiredVramGb / (singleDeviceVramGb * 0.9)));
+  const requiredDevices = Math.max(
+    1,
+    Math.ceil(totalRequiredVramGb / (singleDeviceVramGb * 0.9)),
+  );
   const deviceDelta = requiredDevices - base.device_count;
 
   // Runtime speedup factor
@@ -79,23 +84,46 @@ export function simulateCapacityScenario(
   else if (targetDeviceName.includes("L40S")) baseSpeed = 1.2;
   else if (targetDeviceName.includes("4090")) baseSpeed = 1.0;
 
-  const projectedTtftMs = Number((base.baseline_ttft_ms / (baseSpeed * runtimeLift)).toFixed(1));
-  const projectedTps = Number((base.baseline_throughput_tok_s * baseSpeed * runtimeLift * (requiredDevices / base.device_count)).toFixed(1));
+  const projectedTtftMs = Number(
+    (base.baseline_ttft_ms / (baseSpeed * runtimeLift)).toFixed(1),
+  );
+  const projectedTps = Number(
+    (
+      base.baseline_throughput_tok_s *
+      baseSpeed *
+      runtimeLift *
+      (requiredDevices / base.device_count)
+    ).toFixed(1),
+  );
 
   // Cost projections (730 hours/month)
-  const deviceHourlyCost = hw.typical_cloud_cost_per_hour_usd || (base.hourly_cost_usd / base.device_count);
+  const deviceHourlyCost =
+    hw.typical_cloud_cost_per_hour_usd ||
+    base.hourly_cost_usd / base.device_count;
   const projectedHourlyCost = deviceHourlyCost * requiredDevices;
   const projectedMonthlyCost = projectedHourlyCost * 730;
   const baselineMonthlyCost = base.hourly_cost_usd * 730;
-  const costDelta = Number((projectedMonthlyCost - baselineMonthlyCost).toFixed(2));
+  const costDelta = Number(
+    (projectedMonthlyCost - baselineMonthlyCost).toFixed(2),
+  );
 
   // Headroom calculation
   const totalAvailableVramGb = requiredDevices * singleDeviceVramGb * 0.9;
-  const headroomPct = Number((((totalAvailableVramGb - totalRequiredVramGb) / totalAvailableVramGb) * 100).toFixed(1));
+  const headroomPct = Number(
+    (
+      ((totalAvailableVramGb - totalRequiredVramGb) / totalAvailableVramGb) *
+      100
+    ).toFixed(1),
+  );
 
   let confidence = 85;
-  if (scenario.traffic_growth_pct && scenario.traffic_growth_pct > 100) confidence -= 15;
-  if (scenario.target_accelerator && scenario.target_accelerator !== base.accelerator) confidence -= 10;
+  if (scenario.traffic_growth_pct && scenario.traffic_growth_pct > 100)
+    confidence -= 15;
+  if (
+    scenario.target_accelerator &&
+    scenario.target_accelerator !== base.accelerator
+  )
+    confidence -= 10;
 
   const explanation = `Scenario '${scenario.name}': Evaluated traffic ×${trafficMult.toFixed(2)}, context ×${contextMult.toFixed(2)} on ${requiredDevices}× ${hw.name} running ${targetRuntime} (${targetPrecision}). Resulting capacity headroom is ${headroomPct}%.`;
 

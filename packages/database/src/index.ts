@@ -1182,7 +1182,8 @@ export const SEED_WORKERS: Worker[] = [
       privacy_mode: "public",
       region: "us-east-1",
     },
-    token_hash: "3a7b9c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b",
+    token_hash:
+      "3a7b9c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b",
     last_heartbeat_at: new Date().toISOString(),
     created_at: "2025-01-10T10:00:00Z",
     total_jobs_completed: 14,
@@ -1208,7 +1209,8 @@ export const SEED_WORKERS: Worker[] = [
       privacy_mode: "private",
       region: "us-east-1",
     },
-    token_hash: "5c8d2e4f6a8b0c2d4e6f8a0b2c4d6e8f0a2b4c6d8e0f2a4b6c8d0e2f4a6b8c0d",
+    token_hash:
+      "5c8d2e4f6a8b0c2d4e6f8a0b2c4d6e8f0a2b4c6d8e0f2a4b6c8d0e2f4a6b8c0d",
     last_heartbeat_at: new Date().toISOString(),
     created_at: "2025-01-15T14:30:00Z",
     total_jobs_completed: 8,
@@ -1644,8 +1646,13 @@ export class ModelForgeDataLayer {
 
   listWorkers(orgId?: string): Worker[] {
     const all = Array.from(this.workers.values());
-    if (orgId) return all.filter((w) => w.organization_id === orgId || !w.organization_id);
-    return all.filter((w) => !w.organization_id || w.capabilities.privacy_mode === "public");
+    if (orgId)
+      return all.filter(
+        (w) => w.organization_id === orgId || !w.organization_id,
+      );
+    return all.filter(
+      (w) => !w.organization_id || w.capabilities.privacy_mode === "public",
+    );
   }
 
   heartbeatWorker(id: string): boolean {
@@ -1713,7 +1720,11 @@ export class ModelForgeDataLayer {
   listJobs(filters?: { status?: JobStatus; orgId?: string }): BenchmarkJob[] {
     return Array.from(this.jobs.values()).filter((j) => {
       if (filters?.status && j.status !== filters.status) return false;
-      if (filters?.orgId && j.organization_id && j.organization_id !== filters.orgId)
+      if (
+        filters?.orgId &&
+        j.organization_id &&
+        j.organization_id !== filters.orgId
+      )
         return false;
       return true;
     });
@@ -1723,10 +1734,17 @@ export class ModelForgeDataLayer {
   getCoverageMatrix(modelId?: string): CoverageCell[] {
     const cells: CoverageCell[] = [];
     const models = modelId
-      ? this.listModels().filter((m) => m.id.toLowerCase().includes(modelId.toLowerCase()))
+      ? this.listModels().filter((m) =>
+          m.id.toLowerCase().includes(modelId.toLowerCase()),
+        )
       : this.listModels();
 
-    const accelerators = ["NVIDIA H100 SXM5 80GB", "NVIDIA L40S", "NVIDIA GeForce RTX 4090 24GB", "AMD Instinct MI300X 192GB"];
+    const accelerators = [
+      "NVIDIA H100 SXM5 80GB",
+      "NVIDIA L40S",
+      "NVIDIA GeForce RTX 4090 24GB",
+      "AMD Instinct MI300X 192GB",
+    ];
     const runtimes = ["vllm", "tensorrt-llm", "sglang", "llama.cpp"];
     const precisions = ["fp8", "fp16", "int4"];
 
@@ -1740,21 +1758,23 @@ export class ModelForgeDataLayer {
                 b.model.repository.toLowerCase() === model.id.toLowerCase() &&
                 b.hardware.device.toLowerCase() === accelerator.toLowerCase() &&
                 b.runtime.name.toLowerCase() === runtime.toLowerCase() &&
-                b.precision.type.toLowerCase() === precision.toLowerCase()
+                b.precision.type.toLowerCase() === precision.toLowerCase(),
             );
 
             // Check if known failure
             const failure = this.failures.find(
               (f) =>
                 f.model_repository.toLowerCase() === model.id.toLowerCase() &&
-                f.accelerator.toLowerCase() === accelerator.toLowerCase()
+                f.accelerator.toLowerCase() === accelerator.toLowerCase(),
             );
 
             let status: CoverageCell["status"] = "untested";
             let gapPriority = 50;
 
             if (match) {
-              const freshness = this.evaluateFreshness(match.provenance.completed_at);
+              const freshness = this.evaluateFreshness(
+                match.provenance.completed_at,
+              );
               status = freshness === "STALE" ? "stale" : "covered";
               gapPriority = freshness === "STALE" ? 40 : 0;
             } else if (failure) {
@@ -1762,8 +1782,10 @@ export class ModelForgeDataLayer {
               gapPriority = 10;
             } else {
               // Higher priority for popular frontier models and H100/L40S
-              if (model.id.includes("70B") || model.id.includes("32B")) gapPriority += 25;
-              if (accelerator.includes("H100") || accelerator.includes("L40S")) gapPriority += 20;
+              if (model.id.includes("70B") || model.id.includes("32B"))
+                gapPriority += 25;
+              if (accelerator.includes("H100") || accelerator.includes("L40S"))
+                gapPriority += 20;
             }
 
             cells.push({
@@ -1837,12 +1859,17 @@ export class ModelForgeDataLayer {
   }
 
   // Recommendations & Verified Savings
-  createRecommendation(rec: OptimizationRecommendation): OptimizationRecommendation {
+  createRecommendation(
+    rec: OptimizationRecommendation,
+  ): OptimizationRecommendation {
     this.recommendations.set(rec.id, rec);
     return rec;
   }
 
-  approveRecommendation(id: string, approver = "admin"): OptimizationRecommendation | null {
+  approveRecommendation(
+    id: string,
+    approver = "admin",
+  ): OptimizationRecommendation | null {
     const rec = this.recommendations.get(id);
     if (!rec) return null;
     rec.status = "approved";

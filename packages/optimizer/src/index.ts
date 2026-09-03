@@ -421,7 +421,7 @@ export function optimizeFleetPlacement(
 
   // Sort workloads by priority/size (larger first for bin packing)
   const sortedWorkloads = [...workloads].sort(
-    (a, b) => b.parameters_billions - a.parameters_billions
+    (a, b) => b.parameters_billions - a.parameters_billions,
   );
 
   let totalAllocatedDevices = 0;
@@ -430,7 +430,8 @@ export function optimizeFleetPlacement(
   for (const wl of sortedWorkloads) {
     // Sizing: assume FP8 (1.0 byte/param) + KV cache
     const weightGb = wl.parameters_billions * 1.0;
-    const kvGb = (2 * 48 * 8 * 128 * wl.context_length * 1 * wl.concurrency) / 1e9;
+    const kvGb =
+      (2 * 48 * 8 * 128 * wl.context_length * 1 * wl.concurrency) / 1e9;
     const requiredVramGb = weightGb + kvGb + 1.5;
 
     let placed = false;
@@ -449,7 +450,10 @@ export function optimizeFleetPlacement(
 
       const deviceVramGb = res.vram_bytes_per_device / 1e9;
       // Calculate how many devices needed to hold requiredVramGb
-      const devicesNeeded = Math.max(1, Math.ceil(requiredVramGb / (deviceVramGb * 0.9)));
+      const devicesNeeded = Math.max(
+        1,
+        Math.ceil(requiredVramGb / (deviceVramGb * 0.9)),
+      );
 
       if (rem >= devicesNeeded) {
         // Evaluate latency
@@ -458,7 +462,9 @@ export function optimizeFleetPlacement(
         else if (res.device.includes("L40S")) estimatedTtft = 26.0;
         else if (res.device.includes("4090")) estimatedTtft = 35.0;
 
-        const satisfiesSlo = wl.target_ttft_ms ? estimatedTtft <= wl.target_ttft_ms : true;
+        const satisfiesSlo = wl.target_ttft_ms
+          ? estimatedTtft <= wl.target_ttft_ms
+          : true;
 
         placements.push({
           workload_id: wl.id,
@@ -469,12 +475,14 @@ export function optimizeFleetPlacement(
           devices_used: devicesNeeded,
           estimated_ttft_ms: estimatedTtft,
           satisfies_slo: satisfiesSlo,
-          hourly_cost_usd: (res.hourly_cost_usd / res.device_count) * devicesNeeded,
+          hourly_cost_usd:
+            (res.hourly_cost_usd / res.device_count) * devicesNeeded,
         });
 
         availableDevices.set(res.id, rem - devicesNeeded);
         totalAllocatedDevices += devicesNeeded;
-        totalCostUsd += (res.hourly_cost_usd / res.device_count) * devicesNeeded;
+        totalCostUsd +=
+          (res.hourly_cost_usd / res.device_count) * devicesNeeded;
         placed = true;
         break;
       }
@@ -504,4 +512,3 @@ export function optimizeFleetPlacement(
     total_hourly_cost_usd: Number(totalCostUsd.toFixed(2)),
   };
 }
-

@@ -68,19 +68,34 @@ export default function Navbar() {
             >
               Hardware
             </Link>
-            <Link href="/coverage" className="text-emerald-400 hover:text-emerald-300 transition-colors font-medium">
+            <Link
+              href="/coverage"
+              className="text-emerald-400 hover:text-emerald-300 transition-colors font-medium"
+            >
               Coverage
             </Link>
-            <Link href="/predict" className="text-amber-400 hover:text-amber-300 transition-colors font-medium">
+            <Link
+              href="/predict"
+              className="text-amber-400 hover:text-amber-300 transition-colors font-medium"
+            >
               Predictor
             </Link>
-            <Link href="/fleet" className="text-cyan-400 hover:text-cyan-300 transition-colors font-medium">
+            <Link
+              href="/fleet"
+              className="text-cyan-400 hover:text-cyan-300 transition-colors font-medium"
+            >
               Fleet & Capacity
             </Link>
-            <Link href="/continuous-optimization" className="text-violet-400 hover:text-violet-300 transition-colors font-medium">
+            <Link
+              href="/continuous-optimization"
+              className="text-violet-400 hover:text-violet-300 transition-colors font-medium"
+            >
               FinOps
             </Link>
-            <Link href="/benchmarks" className="hover:text-white transition-colors">
+            <Link
+              href="/benchmarks"
+              className="hover:text-white transition-colors"
+            >
               Benchmarks
             </Link>
             <Link href="/docs" className="hover:text-white transition-colors">

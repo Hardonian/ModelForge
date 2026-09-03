@@ -6,7 +6,7 @@ export const dynamic = "force-dynamic";
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const { id } = await params;
@@ -14,14 +14,20 @@ export async function POST(
     const resultBenchmark = body.result_benchmark;
 
     if (!resultBenchmark) {
-      return NextResponse.json({ error: "result_benchmark is required" }, { status: 400 });
+      return NextResponse.json(
+        { error: "result_benchmark is required" },
+        { status: 400 },
+      );
     }
 
     const parsedBench = OpenComputeBenchSchema.safeParse(resultBenchmark);
     if (!parsedBench.success) {
       return NextResponse.json(
-        { error: "Invalid result_benchmark format", details: parsedBench.error.issues },
-        { status: 400 }
+        {
+          error: "Invalid result_benchmark format",
+          details: parsedBench.error.issues,
+        },
+        { status: 400 },
       );
     }
 
@@ -33,7 +39,10 @@ export async function POST(
       return NextResponse.json({ error: "Job not found" }, { status: 404 });
     }
 
-    return NextResponse.json({ job: updatedJob, benchmark_id: parsedBench.data.benchmark_id });
+    return NextResponse.json({
+      job: updatedJob,
+      benchmark_id: parsedBench.data.benchmark_id,
+    });
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
     return NextResponse.json({ error: msg }, { status: 500 });
