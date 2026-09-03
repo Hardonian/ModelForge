@@ -674,4 +674,419 @@ export const VerifiedSavingsSchema = z.object({
 });
 export type VerifiedSavings = z.infer<typeof VerifiedSavingsSchema>;
 
+// ==========================================
+// Phase 5: Autonomous Inference Control Plane Schemas
+// ==========================================
+
+export const ExecutionModeSchema = z.enum([
+  "advisory",
+  "approval_required",
+  "guarded_automation",
+  "full_policy_automation",
+]);
+export type ExecutionMode = z.infer<typeof ExecutionModeSchema>;
+
+export const ActionTypeSchema = z.enum([
+  "change_runtime",
+  "change_model_revision",
+  "change_precision",
+  "change_gpu_count",
+  "change_replica_count",
+  "change_tensor_parallelism",
+  "change_pipeline_parallelism",
+  "change_dynamo_topology",
+  "change_prefill_decode_ratio",
+  "change_instance_type",
+  "move_workload",
+  "update_autoscaling",
+  "rollback",
+  "noop",
+]);
+export type ActionType = z.infer<typeof ActionTypeSchema>;
+
+export const ActionStatusSchema = z.enum([
+  "planned",
+  "policy_checked",
+  "awaiting_approval",
+  "approved",
+  "provisioning",
+  "warming",
+  "shadowing",
+  "canarying",
+  "promoting",
+  "verifying",
+  "completed",
+  "rolling_back",
+  "rolled_back",
+  "failed",
+  "canceled",
+]);
+export type ActionStatus = z.infer<typeof ActionStatusSchema>;
+
+export const RiskScoreSchema = z.enum(["low", "medium", "high", "critical"]);
+export type RiskScore = z.infer<typeof RiskScoreSchema>;
+
+export const ChangeRiskSchema = z.object({
+  level: RiskScoreSchema,
+  score: z.number().min(0).max(100),
+  reasons: z.array(z.string()),
+  dimensions: z.object({
+    model_change: z.boolean().default(false),
+    runtime_change: z.boolean().default(false),
+    hardware_change: z.boolean().default(false),
+    topology_change: z.boolean().default(false),
+    blast_radius_pct: z.number().min(0).max(100),
+    rollback_difficulty: z.enum(["easy", "moderate", "complex"]),
+  }),
+});
+export type ChangeRisk = z.infer<typeof ChangeRiskSchema>;
+
+export const InferenceDeploymentSpecSchema = z.object({
+  model: z.string().min(1),
+  revision: z.string().default("main"),
+  runtime: z.string().min(1),
+  runtime_version: z.string().min(1),
+  deployment_target: z.enum(["kubernetes", "dynamo", "nim", "docker", "simulation"]),
+  precision: z.string().default("fp16"),
+  quantization: z.string().optional(),
+  accelerator: z.string().min(1),
+  accelerator_count: z.number().int().positive().default(1),
+  replicas: z.number().int().positive().default(1),
+  tensor_parallelism: z.number().int().positive().default(1),
+  pipeline_parallelism: z.number().int().positive().default(1),
+  prefill_workers: z.number().int().nonnegative().optional(),
+  decode_workers: z.number().int().nonnegative().optional(),
+  autoscaling: z
+    .object({
+      min_replicas: z.number().int().positive(),
+      max_replicas: z.number().int().positive(),
+      target_gpu_utilization_pct: z.number().min(10).max(95).default(80),
+      cooldown_seconds: z.number().int().positive().default(300),
+    })
+    .optional(),
+  resource_limits: z
+    .object({
+      vram_bytes: z.number().positive().optional(),
+      max_cost_per_hour_usd: z.number().positive().optional(),
+    })
+    .optional(),
+  regions: z.array(z.string()).default(["us-east-1"]),
+  routing: z
+    .object({
+      strategy: z.enum(["blue_green", "canary", "shadow", "rolling"]).default("canary"),
+      canary_traffic_pct: z.number().min(0).max(100).default(0),
+    })
+    .default({ strategy: "canary", canary_traffic_pct: 0 }),
+  health_checks: z
+    .object({
+      readiness_path: z.string().default("/health/ready"),
+      liveness_path: z.string().default("/health/live"),
+      initial_delay_seconds: z.number().int().positive().default(30),
+      timeout_seconds: z.number().int().positive().default(5),
+    })
+    .default({
+      readiness_path: "/health/ready",
+      liveness_path: "/health/live",
+      initial_delay_seconds: 30,
+      timeout_seconds: 5,
+    }),
+  slo: z.object({
+    max_p95_ttft_ms: z.number().positive(),
+    max_mean_tpot_ms: z.number().positive(),
+    min_throughput_tok_s: z.number().positive(),
+    max_cost_per_hour_usd: z.number().positive(),
+  }),
+  deployment_policy: z.string().optional(),
+  version: z.number().int().positive().default(1),
+});
+export type InferenceDeploymentSpec = z.infer<typeof InferenceDeploymentSpecSchema>;
+
+export const InferenceDeploymentStateSchema = z.object({
+  deployment_id: z.string().uuid(),
+  organization_id: z.string(),
+  name: z.string(),
+  model: z.string(),
+  revision: z.string(),
+  runtime: z.string(),
+  runtime_version: z.string(),
+  accelerator: z.string(),
+  accelerator_count: z.number().int().positive(),
+  replicas: z.number().int().positive(),
+  tensor_parallelism: z.number().int().positive().default(1),
+  pipeline_parallelism: z.number().int().positive().default(1),
+  prefill_workers: z.number().int().nonnegative().optional(),
+  decode_workers: z.number().int().nonnegative().optional(),
+  health: z.enum(["healthy", "degraded", "unhealthy", "warming"]).default("healthy"),
+  deployment_version: z.number().int().positive().default(1),
+  traffic_split: z.object({
+    active_pct: z.number().min(0).max(100).default(100),
+    candidate_pct: z.number().min(0).max(100).default(0),
+    shadow_enabled: z.boolean().default(false),
+  }),
+  last_known_good_spec: InferenceDeploymentSpecSchema.optional(),
+  last_inspected_at: z.string().datetime(),
+});
+export type InferenceDeploymentState = z.infer<typeof InferenceDeploymentStateSchema>;
+
+export const CanaryStageSchema = z.object({
+  traffic_percent: z.number().min(1).max(100),
+  min_requests: z.number().int().positive(),
+  min_duration_minutes: z.number().positive(),
+  max_duration_minutes: z.number().positive().default(120),
+});
+export type CanaryStage = z.infer<typeof CanaryStageSchema>;
+
+export const CanaryPolicySchema = z.object({
+  version: z.number().int().positive().default(1),
+  stages: z.array(CanaryStageSchema).min(1),
+  promotion: z.object({
+    max_p95_latency_regression_percent: z.number().default(5),
+    max_error_rate_delta_percent: z.number().default(0.2),
+    min_cost_improvement_percent: z.number().default(0),
+  }),
+  rollback: z.object({
+    p95_latency_regression_percent: z.number().default(15),
+    error_rate_percent: z.number().default(2),
+    oom_threshold_count: z.number().int().positive().default(1),
+  }),
+});
+export type CanaryPolicy = z.infer<typeof CanaryPolicySchema>;
+
+export const RollbackPlanSchema = z.object({
+  rollback_id: z.string().uuid(),
+  source_deployment_id: z.string().uuid(),
+  target_stable_spec: InferenceDeploymentSpecSchema,
+  required_resources: z.object({
+    accelerator: z.string(),
+    device_count: z.number().int().positive(),
+    replicas: z.number().int().positive(),
+  }),
+  estimated_rollback_duration_s: z.number().positive().default(60),
+  known_risks: z.array(z.string()).default([]),
+  rollback_actions: z.array(z.string()),
+  validation_checks: z.array(z.string()),
+  verified_at: z.string().datetime().optional(),
+});
+export type RollbackPlan = z.infer<typeof RollbackPlanSchema>;
+
+export const AutomationPolicySchema = z.object({
+  policy_id: z.string().uuid(),
+  organization_id: z.string(),
+  name: z.string().default("default-policy"),
+  mode: ExecutionModeSchema.default("advisory"),
+  requirements: z.object({
+    minimum_confidence: z.number().min(0).max(100).default(85),
+    minimum_reproductions: z.number().int().nonnegative().default(1),
+    predictions_allowed: z.boolean().default(true),
+    prediction_max_uncertainty_percent: z.number().positive().default(20),
+  }),
+  changes: z.object({
+    allow: z.array(ActionTypeSchema).default(["change_replica_count", "update_autoscaling"]),
+    approval_required: z
+      .array(ActionTypeSchema)
+      .default([
+        "change_runtime",
+        "change_model_revision",
+        "change_gpu_count",
+        "change_precision",
+        "change_dynamo_topology",
+      ]),
+    deny: z.array(ActionTypeSchema).default([]),
+  }),
+  blast_radius: z.object({
+    max_canary_percent: z.number().min(1).max(100).default(50),
+    max_gpu_change: z.number().int().positive().default(8),
+    max_spend_usd_hour: z.number().positive().default(100),
+    max_simultaneous_actions: z.number().int().positive().default(2),
+  }),
+  economics: z.object({
+    minimum_projected_savings_percent: z.number().min(0).default(5),
+  }),
+  slo: z.object({
+    max_p95_regression_percent: z.number().default(3),
+  }),
+  maintenance_windows: z
+    .array(
+      z.object({
+        days: z.array(z.number().int().min(0).max(6)),
+        start_hour_utc: z.number().int().min(0).max(23),
+        end_hour_utc: z.number().int().min(0).max(23),
+      })
+    )
+    .default([]),
+  freeze_windows: z
+    .array(
+      z.object({
+        name: z.string(),
+        start_time: z.string().datetime(),
+        end_time: z.string().datetime(),
+        reason: z.string(),
+      })
+    )
+    .default([]),
+  allowed_regions: z.array(z.string()).default(["us-east-1", "us-west-2", "eu-west-1"]),
+});
+export type AutomationPolicy = z.infer<typeof AutomationPolicySchema>;
+
+export const OptimizationActionSchema = z.object({
+  action_id: z.string().uuid(),
+  organization_id: z.string(),
+  project_id: z.string().default("default"),
+  deployment_id: z.string().uuid(),
+  recommendation_id: z.string().uuid().optional(),
+  action_type: ActionTypeSchema,
+  execution_mode: ExecutionModeSchema.default("advisory"),
+  current_spec: InferenceDeploymentSpecSchema,
+  target_spec: InferenceDeploymentSpecSchema,
+  reason: z.string(),
+  evidence: z.object({
+    source_benchmark_ids: z.array(z.string()).default([]),
+    confidence_score: z.number().min(0).max(100),
+    is_predicted: z.boolean().default(false),
+  }),
+  policy_evaluation: z.object({
+    passed: z.boolean(),
+    mode_applied: ExecutionModeSchema,
+    checks: z.array(
+      z.object({
+        name: z.string(),
+        passed: z.boolean(),
+        detail: z.string(),
+      })
+    ),
+  }),
+  estimated_cost_delta_usd_month: z.number(),
+  estimated_p95_latency_delta_pct: z.number(),
+  estimated_capacity_delta_pct: z.number(),
+  risk: ChangeRiskSchema,
+  blast_radius: z.object({
+    max_traffic_pct: z.number(),
+    affected_gpus: z.number().int(),
+    affected_workload: z.string(),
+  }),
+  rollback_plan: RollbackPlanSchema,
+  status: ActionStatusSchema.default("planned"),
+  action_hash: z.string(),
+  created_at: z.string().datetime(),
+  approved_by: z.string().optional(),
+  approved_at: z.string().datetime().optional(),
+  started_at: z.string().datetime().optional(),
+  completed_at: z.string().datetime().optional(),
+  result: z
+    .object({
+      success: z.boolean(),
+      error_message: z.string().optional(),
+      canary_run_id: z.string().uuid().optional(),
+      restored_last_known_good: z.boolean().optional(),
+    })
+    .optional(),
+  audit_reference: z.string().optional(),
+  version: z.number().int().positive().default(1),
+});
+export type OptimizationAction = z.infer<typeof OptimizationActionSchema>;
+
+export const CanaryRunSchema = z.object({
+  canary_id: z.string().uuid(),
+  action_id: z.string().uuid(),
+  deployment_id: z.string().uuid(),
+  organization_id: z.string(),
+  current_stage_index: z.number().int().nonnegative().default(0),
+  total_stages: z.number().int().positive(),
+  active_traffic_percent: z.number().min(0).max(100),
+  status: z
+    .enum(["warming", "shadowing", "progressing", "promoting", "completed", "aborting", "rolled_back", "failed"])
+    .default("warming"),
+  stage_metrics: z
+    .array(
+      z.object({
+        stage_index: z.number().int(),
+        traffic_percent: z.number(),
+        request_count: z.number().int().nonnegative(),
+        duration_minutes: z.number().nonnegative(),
+        p95_ttft_ms: z.number().positive(),
+        mean_tpot_ms: z.number().positive(),
+        error_rate_pct: z.number().min(0).max(100),
+        gpu_utilization_pct: z.number().min(0).max(100),
+        passed: z.boolean(),
+        evaluated_at: z.string().datetime(),
+      })
+    )
+    .default([]),
+  failure_reason: z.string().optional(),
+  started_at: z.string().datetime(),
+  completed_at: z.string().datetime().optional(),
+});
+export type CanaryRun = z.infer<typeof CanaryRunSchema>;
+
+export const ProductionOutcomeSchema = z.object({
+  outcome_id: z.string().uuid(),
+  action_id: z.string().uuid(),
+  deployment_id: z.string().uuid(),
+  organization_id: z.string(),
+  action_type: ActionTypeSchema,
+  before_metrics: z.object({
+    p95_ttft_ms: z.number().positive(),
+    mean_tpot_ms: z.number().positive(),
+    throughput_tok_s: z.number().positive(),
+    cost_per_hour_usd: z.number().positive(),
+    error_rate_pct: z.number().min(0).max(100),
+  }),
+  after_metrics: z.object({
+    p95_ttft_ms: z.number().positive(),
+    mean_tpot_ms: z.number().positive(),
+    throughput_tok_s: z.number().positive(),
+    cost_per_hour_usd: z.number().positive(),
+    error_rate_pct: z.number().min(0).max(100),
+  }),
+  observation_window_hours: z.number().positive().default(24),
+  slo_delta_pct: z.number(),
+  cost_delta_usd_month: z.number(),
+  quality_delta_pct: z.number().default(0),
+  capacity_delta_pct: z.number().default(0),
+  rollback_occurred: z.boolean().default(false),
+  verified_at: z.string().datetime(),
+});
+export type ProductionOutcome = z.infer<typeof ProductionOutcomeSchema>;
+
+export const AutomationFreezeSchema = z.object({
+  freeze_id: z.string().uuid(),
+  organization_id: z.string(),
+  scope: z.enum(["global", "project", "deployment"]).default("global"),
+  target_id: z.string().optional(),
+  reason: z.string(),
+  frozen_by: z.string(),
+  frozen_at: z.string().datetime(),
+  expires_at: z.string().datetime().optional(),
+  status: z.enum(["active", "lifted"]).default("active"),
+});
+export type AutomationFreeze = z.infer<typeof AutomationFreezeSchema>;
+
+export const ControlAuditLogSchema = z.object({
+  log_id: z.string().uuid(),
+  organization_id: z.string(),
+  action_id: z.string().uuid().optional(),
+  actor: z.object({
+    user_id: z.string(),
+    role: z.string(),
+    service_account: z.boolean().default(false),
+  }),
+  event_type: z.enum([
+    "action_created",
+    "policy_evaluated",
+    "action_approved",
+    "execution_started",
+    "canary_stage_promoted",
+    "canary_aborted",
+    "rollback_triggered",
+    "rollback_completed",
+    "action_completed",
+    "freeze_activated",
+    "freeze_lifted",
+  ]),
+  action_hash: z.string().optional(),
+  details: z.record(z.any()).default({}),
+  timestamp: z.string().datetime(),
+});
+export type ControlAuditLog = z.infer<typeof ControlAuditLogSchema>;
+
 export * from "./confidence";
