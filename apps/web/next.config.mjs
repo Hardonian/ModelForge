@@ -9,7 +9,11 @@ const nextConfig = {
     '@modelforge/api-client'
   ],
   reactStrictMode: true,
-  poweredByHeader: false
+  poweredByHeader: false,
+  webpack: (config) => {
+    config.output.hashFunction = 'sha256';
+    return config;
+  }
 };
 
 export default nextConfig;
