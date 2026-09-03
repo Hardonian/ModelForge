@@ -11,7 +11,8 @@ describe('Workload Optimizer Engine', () => {
         context_window: 32768,
         layers: 64,
         kv_heads: 8,
-        head_dim: 128
+        head_dim: 128,
+        architecture: 'Qwen2ForCausalLM'
       },
       workload: {
         context_length: 4096,
@@ -46,7 +47,8 @@ describe('Workload Optimizer Engine', () => {
         context_window: 32768,
         layers: 80,
         kv_heads: 8,
-        head_dim: 128
+        head_dim: 128,
+        architecture: 'LlamaForCausalLM'
       },
       workload: {
         context_length: 2048,

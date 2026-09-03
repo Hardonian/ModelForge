@@ -29,7 +29,7 @@ describe('ModelFit Scoring Engine', () => {
         prompt_tokens: 1024,
         generated_tokens: 256,
         concurrency: 2,
-        target_tpot_ms: 25
+        target_tpot_ms: 60
       },
       benchmark_provenance: 'verified'
     });
