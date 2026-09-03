@@ -9,6 +9,7 @@
 ## 1. Why Performance CI?
 
 Standard software CI gates check unit tests, linting, and security vulnerabilities. However, in generative AI systems:
+
 - A new quantization kernel might silently introduce a 15% latency penalty.
 - A tokenizer change might cause context padding to blow up KV cache memory.
 - A serving engine bump might regress P95 Time-to-First-Token (TTFT) by 40%.
@@ -75,7 +76,7 @@ jobs:
 When running in CI, ModelForge posts a markdown table to the GitHub pull request:
 
 | Metric | Baseline | Current Run | Delta % | Threshold | Status |
-|---|---|---|---|---|---|
+| --- | --- | --- | --- | --- | --- |
 | **Throughput (tok/s)** | 72.4 | 71.0 | -1.9% | -5.0% max drop | ✅ **PASS** |
 | **P95 TTFT (ms)** | 280.0 | 290.0 | +3.5% | +10.0% max rise | ✅ **PASS** |
 | **Peak VRAM (GB)** | 38.6 | 38.8 | +0.5% | +8.0% max rise | ✅ **PASS** |
