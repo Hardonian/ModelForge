@@ -80,7 +80,7 @@ export type OptimizerResult = z.infer<typeof OptimizerResultSchema>;
 function generateManifests(
   modelId: string,
   precision: string,
-  runtime: string,
+  _runtime: string,
   deviceCount: number,
   gpuName: string
 ): {
@@ -201,7 +201,8 @@ export function solveWorkloadOptimization(rawQuery: OptimizerQuery): OptimizerRe
                 context_window: query.model.context_window,
                 layers: query.model.layers,
                 kv_heads: query.model.kv_heads,
-                head_dim: query.model.head_dim
+                head_dim: query.model.head_dim,
+                architecture: query.model.architecture
               },
               hardware: {
                 device_slug: device.slug,
