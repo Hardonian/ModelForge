@@ -8,7 +8,7 @@ The ModelForge Distributed Benchmark Network enables heterogeneous hardware node
 
 To balance open community contributions with enterprise verification standards, ModelForge categorizes workers into six distinct trust tiers:
 
-```
+```text
 [Attested]       -> Hardware TPM / Confidential Computing (SEV-SNP / TDX)
   [Managed]      -> First-party ModelForge official runner infrastructure
     [Organization]-> Enterprise authenticated private workers (tenant isolated)
@@ -44,7 +44,7 @@ stateDiagram-v2
     Retryable --> Queued
 ```
 
-### Protocol Lifecycle:
+### Protocol Lifecycle
 
 1. **Enqueue**: Active learning scheduler or enterprise admin places a job in `queued` status with a `priority_score` (0–150).
 2. **Claim**: A worker sends an authenticated HTTP POST to `/api/v1/jobs/claim` specifying its hardware device and trust tier. The queue matches the highest-priority eligible job.

@@ -24,7 +24,7 @@ $$\Delta_{\text{TTFT}} = \frac{\text{TTFT}_{\text{observed}} - \text{TTFT}_{\tex
 
 $$\Delta_{\text{Throughput}} = \frac{\text{Throughput}_{\text{observed}} - \text{Throughput}_{\text{expected}}}{\text{Throughput}_{\text{expected}}} \times 100\%$$
 
-### Drift Status State Machine:
+### Drift Status State Machine
 
 1. **`NORMAL`**: Latency delta within $\pm 15\%$, error rate $< 0.05\%$.
 2. **`WATCH`**: Latency delta $+20\%$ to $+40\%$, or GPU utilization $> 85\%$.
@@ -38,6 +38,7 @@ $$\Delta_{\text{Throughput}} = \frac{\text{Throughput}_{\text{observed}} - \text
 ModelForge adheres to a core enterprise safety principle: **Never automatically mutate production serving infrastructure without human sign-off**.
 
 When drift is detected:
+
 1. ModelForge analyzes the root cause (e.g. KV cache saturation during traffic surge).
 2. The engine generates an `OptimizationRecommendation` with projected monthly savings and latency improvements.
 3. The recommendation transitions to `ready_for_review`.

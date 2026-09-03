@@ -40,7 +40,7 @@ $$\text{Memory}_{\text{KV}} = 2 \times L \times H_{\text{kv}} \times D_{\text{he
 
 ## 3. Level 1: Empirical Nearest-Neighbor Interpolation
 
-Analytical equations provide foundational lower bounds, but production serving introduces dynamic effects (KV paging overhead, CUDA graph launch latency, in-flight batching schedules). 
+Analytical equations provide foundational lower bounds, but production serving introduces dynamic effects (KV paging overhead, CUDA graph launch latency, in-flight batching schedules).
 
 Level 1 searches the OpenComputeBench corpus for the $k$-nearest verified empirical configurations. Distance $D$ between target configuration $x$ and corpus record $r$ is computed across logarithmic parameter ratio, hardware similarity, runtime, and precision:
 

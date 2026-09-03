@@ -54,6 +54,7 @@ ModelForge is strategically positioned as **the decision and optimization intell
 ## 4. Switching Costs & Data Gravity
 
 Once an enterprise adopts ModelForge:
+
 - **Verified Savings Records**: Provide finance and procurement teams with documented ROI on GPU expenditure.
 - **Continuous Drift Baselines**: Alert infrastructure teams immediately when model fine-tunes or traffic surges violate established SLOs.
 - **GitOps Manifest Integration**: Deployment plans compile directly into Helm charts, KServe specs, and NVIDIA Dynamo configurations, creating structural workflow stickiness.
