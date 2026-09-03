@@ -19,13 +19,15 @@ export class ProductionOutcomeRecorder {
   ): CalibrationFeedback {
     const actualLatencyDeltaPct = outcome.slo_delta_pct;
     const predictedLatencyDeltaPct = action.estimated_p95_latency_delta_pct;
-    const latencyErrorPct = Math.abs(actualLatencyDeltaPct - predictedLatencyDeltaPct);
+    // Only penalize if actual latency is worse (higher) than predicted
+    const latencyErrorPct = Math.max(0, actualLatencyDeltaPct - predictedLatencyDeltaPct);
 
     const actualCostDeltaUsd = outcome.cost_delta_usd_month;
     const predictedCostDeltaUsd = action.estimated_cost_delta_usd_month;
+    // Only penalize if actual cost is worse (higher spend) than predicted
     const costErrorPct =
       predictedCostDeltaUsd !== 0
-        ? (Math.abs(actualCostDeltaUsd - predictedCostDeltaUsd) / Math.abs(predictedCostDeltaUsd)) * 100
+        ? Math.max(0, actualCostDeltaUsd - predictedCostDeltaUsd) / Math.abs(predictedCostDeltaUsd) * 100
         : 0;
 
     let qualityScore = 100 - latencyErrorPct * 1.5 - costErrorPct * 0.5;

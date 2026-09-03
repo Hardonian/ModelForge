@@ -2,8 +2,6 @@ import {
   AutomationPolicy,
   ExecutionMode,
   ActionType,
-  OptimizationAction,
-  ChangeRisk,
 } from "@modelforge/benchmark-schema";
 
 export interface PolicyCheckResult {

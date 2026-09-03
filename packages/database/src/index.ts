@@ -16,6 +16,13 @@ import {
   DriftEvent,
   OptimizationRecommendation,
   VerifiedSavings,
+  InferenceDeploymentState,
+  OptimizationAction,
+  CanaryRun,
+  AutomationPolicy,
+  ProductionOutcome,
+  AutomationFreeze,
+  ControlAuditLog,
 } from "@modelforge/benchmark-schema";
 import {
   HARDWARE_CATALOG,
@@ -1425,6 +1432,257 @@ export const SEED_VERIFIED_SAVINGS: VerifiedSavings[] = [
   },
 ];
 
+// --- PHASE 5 SEED COLLECTIONS (Control Plane) ---
+
+export const SEED_CONTROL_DEPLOYMENTS: InferenceDeploymentState[] = [
+  {
+    deployment_id: "dep-ctrl-1111-4111-8111-111111111111",
+    organization_id: "org_enterprise_alpha",
+    name: "qwen-32b-production-service",
+    model: "Qwen/Qwen2.5-32B-Instruct",
+    revision: "main",
+    runtime: "vllm",
+    runtime_version: "0.6.2",
+    accelerator: "NVIDIA-L40S",
+    accelerator_count: 2,
+    replicas: 2,
+    tensor_parallelism: 2,
+    pipeline_parallelism: 1,
+    health: "healthy",
+    deployment_version: 1,
+    traffic_split: { active_pct: 90, candidate_pct: 10, shadow_enabled: false },
+    last_inspected_at: "2025-02-02T10:00:00Z",
+  },
+];
+
+export const SEED_AUTOMATION_POLICIES: AutomationPolicy[] = [
+  {
+    policy_id: "pol-1111-4111-8111-111111111111",
+    organization_id: "org_enterprise_alpha",
+    name: "enterprise-guarded-policy",
+    mode: "guarded_automation",
+    requirements: {
+      minimum_confidence: 85,
+      minimum_reproductions: 1,
+      predictions_allowed: true,
+      prediction_max_uncertainty_percent: 20,
+    },
+    changes: {
+      allow: ["change_replica_count", "update_autoscaling"],
+      approval_required: [
+        "change_runtime",
+        "change_model_revision",
+        "change_gpu_count",
+        "change_precision",
+        "change_dynamo_topology",
+      ],
+      deny: [],
+    },
+    blast_radius: {
+      max_canary_percent: 50,
+      max_gpu_change: 8,
+      max_spend_usd_hour: 100,
+      max_simultaneous_actions: 3,
+    },
+    economics: { minimum_projected_savings_percent: 5 },
+    slo: { max_p95_regression_percent: 5 },
+    maintenance_windows: [],
+    freeze_windows: [],
+    allowed_regions: ["us-east-1", "us-west-2", "eu-west-1"],
+  },
+];
+
+export const SEED_OPTIMIZATION_ACTIONS: OptimizationAction[] = [
+  {
+    action_id: "act-1111-4111-8111-111111111111",
+    organization_id: "org_enterprise_alpha",
+    project_id: "default",
+    deployment_id: "dep-ctrl-1111-4111-8111-111111111111",
+    recommendation_id: "rec11111-1111-4111-8111-111111111111",
+    action_type: "change_runtime",
+    execution_mode: "guarded_automation",
+    current_spec: {
+      model: "Qwen/Qwen2.5-32B-Instruct",
+      revision: "main",
+      runtime: "vllm",
+      runtime_version: "0.6.2",
+      deployment_target: "kubernetes",
+      precision: "fp8",
+      accelerator: "NVIDIA-L40S",
+      accelerator_count: 2,
+      replicas: 2,
+      tensor_parallelism: 2,
+      pipeline_parallelism: 1,
+      regions: ["us-east-1"],
+      routing: { strategy: "canary", canary_traffic_pct: 10 },
+      health_checks: { readiness_path: "/health/ready", liveness_path: "/health/live", initial_delay_seconds: 30, timeout_seconds: 5 },
+      slo: { max_p95_ttft_ms: 38.2, max_mean_tpot_ms: 25.0, min_throughput_tok_s: 50.0, max_cost_per_hour_usd: 6.0 },
+      version: 1,
+    },
+    target_spec: {
+      model: "Qwen/Qwen2.5-32B-Instruct",
+      revision: "main",
+      runtime: "tensorrt-llm",
+      runtime_version: "0.15.0",
+      deployment_target: "kubernetes",
+      precision: "fp8",
+      accelerator: "NVIDIA-L40S",
+      accelerator_count: 2,
+      replicas: 2,
+      tensor_parallelism: 2,
+      pipeline_parallelism: 1,
+      regions: ["us-east-1"],
+      routing: { strategy: "canary", canary_traffic_pct: 10 },
+      health_checks: { readiness_path: "/health/ready", liveness_path: "/health/live", initial_delay_seconds: 30, timeout_seconds: 5 },
+      slo: { max_p95_ttft_ms: 24.0, max_mean_tpot_ms: 18.0, min_throughput_tok_s: 85.0, max_cost_per_hour_usd: 2.5 },
+      version: 2,
+    },
+    reason: "Software lift migration from vLLM to TensorRT-LLM on NVIDIA L40S, achieving +37% latency improvement and $2,520/mo projected savings",
+    evidence: {
+      source_benchmark_ids: ["00000000-0000-0000-0000-000000000001"],
+      confidence_score: 92,
+      is_predicted: false,
+    },
+    policy_evaluation: {
+      passed: true,
+      mode_applied: "guarded_automation",
+      checks: [
+        { name: "confidence_threshold", passed: true, detail: "Confidence 92% exceeds minimum 85%" },
+        { name: "blast_radius", passed: true, detail: "Canary traffic 10% within limit 50%" },
+      ],
+    },
+    estimated_cost_delta_usd_month: -2520.0,
+    estimated_p95_latency_delta_pct: -37.2,
+    estimated_capacity_delta_pct: 35.0,
+    risk: {
+      level: "medium",
+      score: 35,
+      reasons: ["Serving runtime upgraded from vLLM to TensorRT-LLM"],
+      dimensions: {
+        model_change: false,
+        runtime_change: true,
+        hardware_change: false,
+        topology_change: false,
+        blast_radius_pct: 10,
+        rollback_difficulty: "moderate",
+      },
+    },
+    blast_radius: {
+      max_traffic_pct: 10,
+      affected_gpus: 2,
+      affected_workload: "qwen-32b-production-service",
+    },
+    rollback_plan: {
+      rollback_id: "rol-1111-4111-8111-111111111111",
+      source_deployment_id: "dep-ctrl-1111-4111-8111-111111111111",
+      target_stable_spec: {
+        model: "Qwen/Qwen2.5-32B-Instruct",
+        revision: "main",
+        runtime: "vllm",
+        runtime_version: "0.6.2",
+        deployment_target: "kubernetes",
+        precision: "fp8",
+        accelerator: "NVIDIA-L40S",
+        accelerator_count: 2,
+        replicas: 2,
+        tensor_parallelism: 2,
+        pipeline_parallelism: 1,
+        regions: ["us-east-1"],
+        routing: { strategy: "canary", canary_traffic_pct: 0 },
+        health_checks: { readiness_path: "/health/ready", liveness_path: "/health/live", initial_delay_seconds: 30, timeout_seconds: 5 },
+        slo: { max_p95_ttft_ms: 38.2, max_mean_tpot_ms: 25.0, min_throughput_tok_s: 50.0, max_cost_per_hour_usd: 6.0 },
+        version: 1,
+      },
+      required_resources: { accelerator: "NVIDIA-L40S", device_count: 2, replicas: 2 },
+      estimated_rollback_duration_s: 45,
+      known_risks: [],
+      rollback_actions: ["Revert traffic split router to active deployment", "Decommission canary pod"],
+      validation_checks: ["Verify health endpoint returns 200 OK"],
+    },
+    status: "canarying",
+    action_hash: "a1b2c3d4e5f67890123456789abcdef0123456789abcdef0123456789abcdef0",
+    created_at: "2025-02-02T10:15:00Z",
+    approved_by: "lead_infra_architect",
+    approved_at: "2025-02-02T10:20:00Z",
+    started_at: "2025-02-02T10:25:00Z",
+    version: 1,
+  },
+];
+
+export const SEED_CANARY_RUNS: CanaryRun[] = [
+  {
+    canary_id: "can-1111-4111-8111-111111111111",
+    action_id: "act-1111-4111-8111-111111111111",
+    deployment_id: "dep-ctrl-1111-4111-8111-111111111111",
+    organization_id: "org_enterprise_alpha",
+    current_stage_index: 0,
+    total_stages: 4,
+    active_traffic_percent: 10,
+    status: "progressing",
+    stage_metrics: [
+      {
+        stage_index: 0,
+        traffic_percent: 10,
+        request_count: 2450,
+        duration_minutes: 25,
+        p95_ttft_ms: 23.8,
+        mean_tpot_ms: 17.5,
+        error_rate_pct: 0.01,
+        gpu_utilization_pct: 72,
+        passed: true,
+        evaluated_at: "2025-02-02T10:50:00Z",
+      },
+    ],
+    started_at: "2025-02-02T10:25:00Z",
+  },
+];
+
+export const SEED_PRODUCTION_OUTCOMES: ProductionOutcome[] = [
+  {
+    outcome_id: "out-1111-4111-8111-111111111111",
+    action_id: "act-0000-4111-8111-000000000000",
+    deployment_id: "dep-ctrl-1111-4111-8111-111111111111",
+    organization_id: "org_enterprise_alpha",
+    action_type: "change_runtime",
+    before_metrics: {
+      p95_ttft_ms: 38.2,
+      mean_tpot_ms: 25.0,
+      throughput_tok_s: 50.0,
+      cost_per_hour_usd: 6.0,
+      error_rate_pct: 0.02,
+    },
+    after_metrics: {
+      p95_ttft_ms: 24.1,
+      mean_tpot_ms: 17.8,
+      throughput_tok_s: 86.2,
+      cost_per_hour_usd: 2.5,
+      error_rate_pct: 0.01,
+    },
+    observation_window_hours: 720,
+    slo_delta_pct: -36.9,
+    cost_delta_usd_month: -2520.0,
+    quality_delta_pct: 0,
+    capacity_delta_pct: 35.0,
+    rollback_occurred: false,
+    verified_at: "2025-02-01T12:00:00Z",
+  },
+];
+
+export const SEED_AUTOMATION_FREEZES: AutomationFreeze[] = [];
+
+export const SEED_CONTROL_AUDIT_LOGS: ControlAuditLog[] = [
+  {
+    log_id: "log-1111-4111-8111-111111111111",
+    organization_id: "org_enterprise_alpha",
+    action_id: "act-1111-4111-8111-111111111111",
+    actor: { user_id: "lead_infra_architect", role: "admin", service_account: false },
+    event_type: "action_approved",
+    action_hash: "a1b2c3d4e5f67890123456789abcdef0123456789abcdef0123456789abcdef0",
+    details: { note: "Approved software lift for Qwen 2.5 32B onto TensorRT-LLM" },
+    timestamp: "2025-02-02T10:20:00Z",
+  },
+];
+
 export class ModelForgeDataLayer {
   private benchmarks: Map<string, OpenComputeBenchRecord> = new Map();
   private models: Map<string, ModelMetadata> = new Map();
@@ -1442,6 +1700,15 @@ export class ModelForgeDataLayer {
   private driftEvents: Map<string, DriftEvent[]> = new Map();
   private recommendations: Map<string, OptimizationRecommendation> = new Map();
   private verifiedSavings: Map<string, VerifiedSavings> = new Map();
+
+  // Phase 5 Collections (Control Plane)
+  private controlDeployments: Map<string, InferenceDeploymentState> = new Map();
+  private actions: Map<string, OptimizationAction> = new Map();
+  private canaryRuns: Map<string, CanaryRun> = new Map();
+  private policies: Map<string, AutomationPolicy> = new Map();
+  private outcomes: Map<string, ProductionOutcome> = new Map();
+  private freezes: Map<string, AutomationFreeze> = new Map();
+  private controlAuditLogs: ControlAuditLog[] = [];
 
   constructor() {
     for (const b of SEED_BENCHMARKS) {
@@ -1481,6 +1748,26 @@ export class ModelForgeDataLayer {
     for (const sav of SEED_VERIFIED_SAVINGS) {
       this.verifiedSavings.set(sav.id, sav);
     }
+    // Initialize Phase 5 Collections
+    for (const cd of SEED_CONTROL_DEPLOYMENTS) {
+      this.controlDeployments.set(cd.deployment_id, cd);
+    }
+    for (const pol of SEED_AUTOMATION_POLICIES) {
+      this.policies.set(pol.organization_id, pol);
+    }
+    for (const act of SEED_OPTIMIZATION_ACTIONS) {
+      this.actions.set(act.action_id, act);
+    }
+    for (const can of SEED_CANARY_RUNS) {
+      this.canaryRuns.set(can.canary_id, can);
+    }
+    for (const out of SEED_PRODUCTION_OUTCOMES) {
+      this.outcomes.set(out.outcome_id, out);
+    }
+    for (const frz of SEED_AUTOMATION_FREEZES) {
+      this.freezes.set(frz.freeze_id, frz);
+    }
+    this.controlAuditLogs = [...SEED_CONTROL_AUDIT_LOGS];
   }
 
   listModels(family?: string): ModelMetadata[] {
@@ -1902,6 +2189,143 @@ export class ModelForgeDataLayer {
     if (ageDays > 180) return "STALE";
     if (ageDays > 60) return "AGING";
     return "CURRENT";
+  }
+
+  // --- Phase 5: Autonomous Inference Control Plane Methods ---
+
+  getControlDeployment(id: string): InferenceDeploymentState | null {
+    return this.controlDeployments.get(id) || null;
+  }
+
+  listControlDeployments(orgId?: string): InferenceDeploymentState[] {
+    const list = Array.from(this.controlDeployments.values());
+    if (orgId) return list.filter((d) => d.organization_id === orgId);
+    return list;
+  }
+
+  updateControlDeployment(dep: InferenceDeploymentState): InferenceDeploymentState {
+    this.controlDeployments.set(dep.deployment_id, dep);
+    return dep;
+  }
+
+  createOptimizationAction(action: OptimizationAction): OptimizationAction {
+    this.actions.set(action.action_id, action);
+    this.recordControlAuditLog({
+      log_id: `log-${Date.now()}`,
+      organization_id: action.organization_id,
+      action_id: action.action_id,
+      actor: { user_id: "system", role: "operator", service_account: true },
+      event_type: "action_created",
+      action_hash: action.action_hash,
+      details: { action_type: action.action_type, deployment_id: action.deployment_id },
+      timestamp: new Date().toISOString(),
+    });
+    return action;
+  }
+
+  getOptimizationAction(id: string): OptimizationAction | null {
+    return this.actions.get(id) || null;
+  }
+
+  listOptimizationActions(orgId?: string, deploymentId?: string): OptimizationAction[] {
+    let list = Array.from(this.actions.values());
+    if (orgId) list = list.filter((a) => a.organization_id === orgId);
+    if (deploymentId) list = list.filter((a) => a.deployment_id === deploymentId);
+    return list;
+  }
+
+  updateOptimizationAction(action: OptimizationAction): OptimizationAction {
+    this.actions.set(action.action_id, action);
+    return action;
+  }
+
+  createCanaryRun(run: CanaryRun): CanaryRun {
+    this.canaryRuns.set(run.canary_id, run);
+    return run;
+  }
+
+  getCanaryRun(id: string): CanaryRun | null {
+    return this.canaryRuns.get(id) || null;
+  }
+
+  updateCanaryRun(run: CanaryRun): CanaryRun {
+    this.canaryRuns.set(run.canary_id, run);
+    return run;
+  }
+
+  getAutomationPolicy(orgId: string): AutomationPolicy | null {
+    return this.policies.get(orgId) || null;
+  }
+
+  setAutomationPolicy(policy: AutomationPolicy): AutomationPolicy {
+    this.policies.set(policy.organization_id, policy);
+    return policy;
+  }
+
+  recordProductionOutcome(outcome: ProductionOutcome): ProductionOutcome {
+    this.outcomes.set(outcome.outcome_id, outcome);
+    return outcome;
+  }
+
+  listProductionOutcomes(orgId?: string): ProductionOutcome[] {
+    const list = Array.from(this.outcomes.values());
+    if (orgId) return list.filter((o) => o.organization_id === orgId);
+    return list;
+  }
+
+  activateFreeze(freeze: AutomationFreeze): AutomationFreeze {
+    this.freezes.set(freeze.freeze_id, freeze);
+    this.recordControlAuditLog({
+      log_id: `log-${Date.now()}`,
+      organization_id: freeze.organization_id,
+      actor: { user_id: freeze.frozen_by, role: "admin", service_account: false },
+      event_type: "freeze_activated",
+      details: { scope: freeze.scope, target_id: freeze.target_id, reason: freeze.reason },
+      timestamp: new Date().toISOString(),
+    });
+    return freeze;
+  }
+
+  liftFreeze(freezeId: string): boolean {
+    const freeze = this.freezes.get(freezeId);
+    if (!freeze) return false;
+    freeze.status = "lifted";
+    this.recordControlAuditLog({
+      log_id: `log-${Date.now()}`,
+      organization_id: freeze.organization_id,
+      actor: { user_id: "admin", role: "admin", service_account: false },
+      event_type: "freeze_lifted",
+      details: { freeze_id: freezeId },
+      timestamp: new Date().toISOString(),
+    });
+    return true;
+  }
+
+  listFreezes(orgId?: string): AutomationFreeze[] {
+    const list = Array.from(this.freezes.values());
+    if (orgId) return list.filter((f) => f.organization_id === orgId);
+    return list;
+  }
+
+  isFreezeActive(orgId: string, deploymentId?: string): boolean {
+    const list = this.listFreezes(orgId);
+    return list.some(
+      (f) =>
+        f.status === "active" &&
+        (f.scope === "global" || (f.scope === "deployment" && f.target_id === deploymentId))
+    );
+  }
+
+  recordControlAuditLog(log: ControlAuditLog): ControlAuditLog {
+    this.controlAuditLogs.push(log);
+    return log;
+  }
+
+  listControlAuditLogs(orgId?: string, actionId?: string): ControlAuditLog[] {
+    let list = [...this.controlAuditLogs];
+    if (orgId) list = list.filter((l) => l.organization_id === orgId);
+    if (actionId) list = list.filter((l) => l.action_id === actionId);
+    return list;
   }
 }
 

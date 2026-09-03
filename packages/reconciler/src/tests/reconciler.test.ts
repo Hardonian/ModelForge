@@ -3,10 +3,8 @@ import assert from "node:assert/strict";
 import {
   Reconciler,
   PolicyEngine,
-  CanaryEngine,
   ExecutionEngine,
   SimulatedExecutionProvider,
-  SimulatedStateProvider,
   ShadowTrafficEngine,
   ProductionOutcomeRecorder,
 } from "../index";
@@ -15,7 +13,6 @@ import {
   InferenceDeploymentSpec,
   AutomationPolicy,
   CanaryPolicy,
-  OptimizationAction,
 } from "@modelforge/benchmark-schema";
 
 describe("ModelForge Autonomous Inference Control Plane", () => {
@@ -165,7 +162,7 @@ describe("ModelForge Autonomous Inference Control Plane", () => {
       samplePolicy
     );
     assert.equal(deniedEval.allowed, false);
-    assert.ok(deniedEval.denial_reasons[0].includes("denied"));
+    assert.ok(deniedEval.denial_reasons[0]?.includes("denied"));
   });
 
   test("ExecutionEngine executes safe canary progression through to full promotion", async () => {
@@ -268,11 +265,11 @@ describe("ModelForge Autonomous Inference Control Plane", () => {
     const startResult = await engine.startExecution(action, false);
     assert.ok(startResult.canaryRun);
 
-    // Inject high latency surge (+30% regression, threshold is 15%)
+    // Inject high latency surge (+45% regression, threshold is 15%)
     const badTelemetry = {
       request_count: 200,
       duration_minutes: 10,
-      p95_ttft_ms: 85, // baseline 60 -> +41.6% regression!
+      p95_ttft_ms: 145, // baseline 100 -> +45% regression!
       mean_tpot_ms: 40,
       error_rate_pct: 0.05,
       gpu_utilization_pct: 95,

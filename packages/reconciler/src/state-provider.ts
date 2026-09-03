@@ -1,6 +1,5 @@
 import {
   InferenceDeploymentState,
-  InferenceDeploymentSpec,
 } from "@modelforge/benchmark-schema";
 
 export interface StateProviderHealthProbe {
