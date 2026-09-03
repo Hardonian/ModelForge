@@ -351,4 +351,141 @@ export class ModelForgeClient {
     const qs = orgId ? `?org_id=${encodeURIComponent(orgId)}` : "";
     return this.request<VerifiedSavings[]>(`/verified-savings${qs}`);
   }
+
+  // --- Phase 5: Autonomous Inference Control Plane Methods ---
+
+  async getControlStatus(orgId = "default"): Promise<{
+    status: string;
+    mode: string;
+    kill_switch_active: boolean;
+    active_deployments_count: number;
+    pending_actions_count: number;
+    canary_in_progress_count: number;
+    freezes: AutomationFreeze[];
+  }> {
+    return this.request(`/control/status?org_id=${encodeURIComponent(orgId)}`);
+  }
+
+  async triggerFreeze(params: {
+    organization_id: string;
+    reason: string;
+    scope?: "global" | "project" | "deployment";
+    target_id?: string;
+    frozen_by?: string;
+  }): Promise<AutomationFreeze> {
+    return this.request<AutomationFreeze>(`/control/freeze`, {
+      method: "POST",
+      body: JSON.stringify(params),
+    });
+  }
+
+  async liftFreeze(freezeId: string): Promise<{ success: boolean }> {
+    return this.request<{ success: boolean }>(`/control/freeze?freeze_id=${encodeURIComponent(freezeId)}`, {
+      method: "DELETE",
+    });
+  }
+
+  async listControlDeployments(orgId?: string): Promise<InferenceDeploymentState[]> {
+    const qs = orgId ? `?org_id=${encodeURIComponent(orgId)}` : "";
+    return this.request<InferenceDeploymentState[]>(`/control/deployments${qs}`);
+  }
+
+  async getControlDeployment(id: string): Promise<InferenceDeploymentState> {
+    return this.request<InferenceDeploymentState>(`/control/deployments?id=${encodeURIComponent(id)}`);
+  }
+
+  async reconcileDeployment(
+    deploymentId: string,
+    desiredSpec: InferenceDeploymentSpec,
+    executionMode?: string
+  ): Promise<OptimizationAction> {
+    return this.request<OptimizationAction>(`/control/deployments/${deploymentId}/reconcile`, {
+      method: "POST",
+      body: JSON.stringify({ desired_spec: desiredSpec, execution_mode: executionMode }),
+    });
+  }
+
+  async listActions(orgId?: string, deploymentId?: string): Promise<OptimizationAction[]> {
+    const params = new URLSearchParams();
+    if (orgId) params.append("org_id", orgId);
+    if (deploymentId) params.append("deployment_id", deploymentId);
+    const qs = params.toString() ? `?${params.toString()}` : "";
+    return this.request<OptimizationAction[]>(`/control/actions${qs}`);
+  }
+
+  async getAction(actionId: string): Promise<OptimizationAction> {
+    return this.request<OptimizationAction>(`/control/actions/${actionId}`);
+  }
+
+  async createAction(action: unknown): Promise<OptimizationAction> {
+    return this.request<OptimizationAction>(`/control/actions`, {
+      method: "POST",
+      body: JSON.stringify(action),
+    });
+  }
+
+  async approveAction(actionId: string, approvedBy = "admin"): Promise<OptimizationAction> {
+    return this.request<OptimizationAction>(`/control/actions/${actionId}/approve`, {
+      method: "POST",
+      body: JSON.stringify({ approved_by: approvedBy }),
+    });
+  }
+
+  async executeAction(
+    actionId: string,
+    candidateId?: string,
+    telemetry?: unknown
+  ): Promise<{ action: OptimizationAction; canary_run?: CanaryRun; outcome?: ProductionOutcome }> {
+    return this.request(`/control/actions/${actionId}/execute`, {
+      method: "POST",
+      body: JSON.stringify({ candidate_id: candidateId, telemetry }),
+    });
+  }
+
+  async rollbackAction(
+    actionId: string,
+    reason: string,
+    candidateId?: string
+  ): Promise<{ action: OptimizationAction; success: boolean }> {
+    return this.request(`/control/actions/${actionId}/rollback`, {
+      method: "POST",
+      body: JSON.stringify({ reason, candidate_id: candidateId }),
+    });
+  }
+
+  async getPolicy(orgId: string): Promise<AutomationPolicy> {
+    return this.request<AutomationPolicy>(`/control/policies?org_id=${encodeURIComponent(orgId)}`);
+  }
+
+  async updatePolicy(policy: unknown): Promise<AutomationPolicy> {
+    return this.request<AutomationPolicy>(`/control/policies`, {
+      method: "PUT",
+      body: JSON.stringify(policy),
+    });
+  }
+
+  async testPolicy(policy: unknown, action: unknown): Promise<{
+    allowed: boolean;
+    requires_human_approval: boolean;
+    denial_reasons: string[];
+    checks: Array<{ name: string; passed: boolean; detail: string }>;
+  }> {
+    return this.request(`/control/policies/test`, {
+      method: "POST",
+      body: JSON.stringify({ policy, action }),
+    });
+  }
+
+  async listOutcomes(orgId?: string): Promise<ProductionOutcome[]> {
+    const qs = orgId ? `?org_id=${encodeURIComponent(orgId)}` : "";
+    return this.request<ProductionOutcome[]>(`/control/outcomes${qs}`);
+  }
+
+  async listControlAuditLogs(orgId?: string, actionId?: string): Promise<ControlAuditLog[]> {
+    const params = new URLSearchParams();
+    if (orgId) params.append("org_id", orgId);
+    if (actionId) params.append("action_id", actionId);
+    const qs = params.toString() ? `?${params.toString()}` : "";
+    return this.request<ControlAuditLog[]>(`/control/audit-logs${qs}`);
+  }
 }

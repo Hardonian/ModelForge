@@ -8,7 +8,8 @@ const nextConfig = {
     '@modelforge/database',
     '@modelforge/api-client',
     '@modelforge/slo-compiler',
-    '@modelforge/performance-predictor'
+    '@modelforge/performance-predictor',
+    '@modelforge/reconciler'
   ],
   reactStrictMode: true,
   poweredByHeader: false,
