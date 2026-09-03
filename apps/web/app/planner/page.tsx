@@ -236,7 +236,7 @@ export default function PlannerPage() {
                   Recommended Deployment Candidate (Rank #1)
                 </span>
                 <h3 className="text-xl font-bold text-white mt-0.5">
-                  {plan.recommended_candidate.target} &bull; {plan.recommended_candidate.hardware.device_name}
+                  {plan.recommended_candidate.runtime.toUpperCase()} &bull; {plan.recommended_candidate.accelerator} ({plan.recommended_candidate.accelerator_count}x)
                 </h3>
               </div>
               <div className="flex items-center gap-2">
@@ -249,15 +249,15 @@ export default function PlannerPage() {
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center text-xs">
               <div className="p-3 rounded-xl border border-slate-800 bg-[#070b14]">
                 <div className="text-[10px] font-mono text-slate-400">Expected Throughput</div>
-                <div className="text-lg font-bold text-emerald-300 mt-0.5">{plan.recommended_candidate.expected_tps} tok/s</div>
+                <div className="text-lg font-bold text-emerald-300 mt-0.5">{plan.recommended_candidate.expected_throughput_tps} tok/s</div>
               </div>
               <div className="p-3 rounded-xl border border-slate-800 bg-[#070b14]">
                 <div className="text-[10px] font-mono text-slate-400">P95 TTFT</div>
-                <div className="text-lg font-bold text-white mt-0.5">{plan.recommended_candidate.expected_ttft_ms} ms</div>
+                <div className="text-lg font-bold text-white mt-0.5">{plan.recommended_candidate.expected_p95_ttft_ms} ms</div>
               </div>
               <div className="p-3 rounded-xl border border-slate-800 bg-[#070b14]">
                 <div className="text-[10px] font-mono text-slate-400">Cost / 1M Tokens</div>
-                <div className="text-lg font-bold text-emerald-400 mt-0.5">${plan.recommended_candidate.cost_per_1m_tokens_usd.toFixed(2)}</div>
+                <div className="text-lg font-bold text-emerald-400 mt-0.5">${plan.recommended_candidate.cost_per_million_tokens_usd.toFixed(2)}</div>
               </div>
               <div className="p-3 rounded-xl border border-slate-800 bg-[#070b14]">
                 <div className="text-[10px] font-mono text-slate-400">Evidence Provenance</div>
@@ -266,16 +266,16 @@ export default function PlannerPage() {
             </div>
 
             {/* Disaggregated Topology Callout */}
-            {plan.recommended_candidate.topology.mode === 'disaggregated' && (
+            {plan.recommended_candidate.disaggregated_topology?.enabled && (
               <div className="p-3.5 rounded-xl border border-indigo-500/30 bg-indigo-950/20 text-xs text-indigo-200 space-y-1">
                 <div className="font-mono font-bold text-indigo-300 text-[11px] uppercase flex items-center gap-1.5">
                   <Workflow className="h-3.5 w-3.5" />
                   Disaggregated Prefill / Decode Topology Active
                 </div>
                 <p className="text-[11px] text-slate-300 leading-relaxed">
-                  Routing policy: <span className="font-mono text-white">{plan.recommended_candidate.topology.routing_policy}</span> across 
-                  1x Prefill worker ({plan.recommended_candidate.topology.prefill_workers[0]?.device_type}) and 
-                  1x Decode worker ({plan.recommended_candidate.topology.decode_workers[0]?.device_type}).
+                  Routing policy: <span className="font-mono text-white">{plan.recommended_candidate.disaggregated_topology.routing_policy}</span> across 
+                  Prefill workers ({plan.recommended_candidate.disaggregated_topology.prefill_workers}x) and 
+                  Decode workers ({plan.recommended_candidate.disaggregated_topology.decode_workers}x).
                 </p>
               </div>
             )}
@@ -299,11 +299,11 @@ export default function PlannerPage() {
                 <tbody className="divide-y divide-slate-800/60 text-slate-300">
                   {plan.candidate_rankings.map((c, idx) => (
                     <tr key={idx} className="hover:bg-slate-800/30">
-                      <td className="py-2.5 font-semibold text-white">{c.target}</td>
-                      <td className="py-2.5 font-mono text-[11px]">{c.hardware.device_name}</td>
-                      <td className="py-2.5 text-emerald-300 font-mono">{c.expected_tps} tok/s</td>
-                      <td className="py-2.5 font-mono">{c.expected_ttft_ms} ms</td>
-                      <td className="py-2.5 font-mono text-slate-300">${c.cost_per_1m_tokens_usd.toFixed(2)}</td>
+                      <td className="py-2.5 font-semibold text-white uppercase">{c.runtime}</td>
+                      <td className="py-2.5 font-mono text-[11px]">{c.accelerator} ({c.accelerator_count}x)</td>
+                      <td className="py-2.5 text-emerald-300 font-mono">{c.expected_throughput_tps} tok/s</td>
+                      <td className="py-2.5 font-mono">{c.expected_p95_ttft_ms} ms</td>
+                      <td className="py-2.5 font-mono text-slate-300">${c.cost_per_million_tokens_usd.toFixed(2)}</td>
                       <td className="py-2.5">
                         <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold ${
                           c.meets_slo ? 'bg-emerald-500/10 text-emerald-300' : 'bg-red-500/10 text-red-300'
