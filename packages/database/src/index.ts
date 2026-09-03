@@ -5,6 +5,17 @@ import {
   FreshnessStatus,
   computeEnvironmentHash,
   computeResultHash,
+  Worker,
+  WorkerTrustTier,
+  BenchmarkJob,
+  JobStatus,
+  CoverageCell,
+  FleetResource,
+  ProductionDeployment,
+  TelemetryWindow,
+  DriftEvent,
+  OptimizationRecommendation,
+  VerifiedSavings,
 } from "@modelforge/benchmark-schema";
 import {
   HARDWARE_CATALOG,
@@ -1148,6 +1159,270 @@ export const SUPPORT_MATRIX = {
 
 export type SupportMatrix = typeof SUPPORT_MATRIX;
 
+// --- PHASE 4 SEED COLLECTIONS ---
+
+export const SEED_WORKERS: Worker[] = [
+  {
+    id: "w1111111-1111-4111-8111-111111111111",
+    name: "community-h100-node-1",
+    trust_tier: "community",
+    status: "ready",
+    capabilities: {
+      hardware_device: "NVIDIA H100 SXM5 80GB",
+      device_count: 1,
+      vram_bytes: 80000000000,
+      cpu_cores: 32,
+      ram_bytes: 256000000000,
+      os: "Ubuntu 22.04 LTS",
+      driver_version: "550.54.15",
+      cuda_version: "12.4",
+      supported_runtimes: ["vllm", "tensorrt-llm", "nvidia-dynamo"],
+      container_runtime: "docker",
+      max_job_duration_s: 1800,
+      privacy_mode: "public",
+      region: "us-east-1",
+    },
+    token_hash: "3a7b9c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b",
+    last_heartbeat_at: new Date().toISOString(),
+    created_at: "2025-01-10T10:00:00Z",
+    total_jobs_completed: 14,
+  },
+  {
+    id: "w2222222-2222-4222-8222-222222222222",
+    name: "enterprise-l40s-cluster-a",
+    trust_tier: "organization",
+    status: "ready",
+    organization_id: "org_enterprise_alpha",
+    capabilities: {
+      hardware_device: "NVIDIA L40S",
+      device_count: 2,
+      vram_bytes: 48000000000,
+      cpu_cores: 64,
+      ram_bytes: 512000000000,
+      os: "Ubuntu 22.04 LTS",
+      driver_version: "550.54.15",
+      cuda_version: "12.4",
+      supported_runtimes: ["vllm", "tensorrt-llm"],
+      container_runtime: "docker",
+      max_job_duration_s: 3600,
+      privacy_mode: "private",
+      region: "us-east-1",
+    },
+    token_hash: "5c8d2e4f6a8b0c2d4e6f8a0b2c4d6e8f0a2b4c6d8e0f2a4b6c8d0e2f4a6b8c0d",
+    last_heartbeat_at: new Date().toISOString(),
+    created_at: "2025-01-15T14:30:00Z",
+    total_jobs_completed: 8,
+  },
+];
+
+export const SEED_BENCHMARK_JOBS: BenchmarkJob[] = [
+  {
+    id: "j1111111-1111-4111-8111-111111111111",
+    model_repository: "Qwen/Qwen2.5-32B-Instruct",
+    model_revision: "main",
+    runtime: "vllm",
+    runtime_version: "0.6.4",
+    precision: "fp8",
+    workload: {
+      prompt_tokens: 1024,
+      generated_tokens: 256,
+      context_length: 4096,
+      batch_size: 4,
+      concurrency: 4,
+    },
+    required_trust_tier: "community",
+    target_device: "NVIDIA L40S",
+    resource_limits: { timeout_s: 900, max_gpus: 1 },
+    status: "completed",
+    assigned_worker_id: "w2222222-2222-4222-8222-222222222222",
+    result_benchmark_id: "00000000-0000-0000-0000-000000000001",
+    priority_score: 95,
+    created_at: "2025-01-20T12:00:00Z",
+    completed_at: "2025-01-20T12:12:30Z",
+  },
+  {
+    id: "j2222222-2222-4222-8222-222222222222",
+    model_repository: "meta-llama/Llama-3.3-70B-Instruct",
+    model_revision: "main",
+    runtime: "tensorrt-llm",
+    runtime_version: "0.16.0",
+    precision: "fp8",
+    workload: {
+      prompt_tokens: 2048,
+      generated_tokens: 512,
+      context_length: 8192,
+      batch_size: 8,
+      concurrency: 8,
+    },
+    required_trust_tier: "trusted",
+    target_device: "NVIDIA H100 SXM5 80GB",
+    resource_limits: { timeout_s: 1800, max_gpus: 2 },
+    status: "queued",
+    priority_score: 120,
+    created_at: new Date().toISOString(),
+  },
+];
+
+export const SEED_FLEET_RESOURCES: FleetResource[] = [
+  {
+    id: "fl111111-1111-4111-8111-111111111111",
+    organization_id: "org_enterprise_alpha",
+    node_id: "cluster-hopper-node-01",
+    device: "NVIDIA H100 SXM5 80GB",
+    device_count: 8,
+    vram_bytes_per_device: 80000000000,
+    interconnect: "nvlink_4",
+    region: "us-east-1",
+    hourly_cost_usd: 24.0,
+    is_reserved: true,
+    status: "allocated",
+    allocated_workload_ids: ["dep_qwen_prod"],
+  },
+  {
+    id: "fl222222-2222-4222-8222-222222222222",
+    organization_id: "org_enterprise_alpha",
+    node_id: "cluster-ada-node-01",
+    device: "NVIDIA L40S",
+    device_count: 8,
+    vram_bytes_per_device: 48000000000,
+    interconnect: "pcie",
+    region: "us-east-1",
+    hourly_cost_usd: 10.0,
+    is_reserved: true,
+    status: "available",
+    allocated_workload_ids: [],
+  },
+  {
+    id: "fl333333-3333-4333-8333-333333333333",
+    organization_id: "org_enterprise_alpha",
+    node_id: "cluster-rtx-node-01",
+    device: "NVIDIA GeForce RTX 4090 24GB",
+    device_count: 4,
+    vram_bytes_per_device: 24000000000,
+    interconnect: "pcie",
+    region: "us-central-1",
+    hourly_cost_usd: 4.0,
+    is_reserved: false,
+    status: "available",
+    allocated_workload_ids: [],
+  },
+];
+
+export const SEED_PRODUCTION_DEPLOYMENTS: ProductionDeployment[] = [
+  {
+    id: "dep11111-1111-4111-8111-111111111111",
+    organization_id: "org_enterprise_alpha",
+    workload_name: "Customer Support Reasoning Agent",
+    model_repository: "Qwen/Qwen2.5-32B-Instruct",
+    model_revision: "main",
+    accelerator: "NVIDIA H100 SXM5 80GB",
+    device_count: 2,
+    runtime: "vllm",
+    precision: "fp8",
+    replica_count: 2,
+    expected_metrics: {
+      ttft_ms: 20.0,
+      tpot_ms: 15.0,
+      throughput_tok_s: 60.0,
+      cost_per_hour_usd: 6.0,
+    },
+    created_at: "2025-01-01T00:00:00Z",
+  },
+];
+
+export const SEED_TELEMETRY_WINDOWS: TelemetryWindow[] = [
+  {
+    id: "tel11111-1111-4111-8111-111111111111",
+    deployment_id: "dep11111-1111-4111-8111-111111111111",
+    organization_id: "org_enterprise_alpha",
+    window_start: "2025-01-28T00:00:00Z",
+    window_end: "2025-01-28T23:59:59Z",
+    request_count: 45000,
+    p95_ttft_ms: 22.4,
+    mean_tpot_ms: 16.8,
+    actual_throughput_tok_s: 58.4,
+    mean_concurrency: 4.2,
+    error_rate_pct: 0.02,
+    gpu_utilization_pct: 78.5,
+    total_cost_usd: 144.0,
+  },
+  {
+    id: "tel22222-2222-4222-8222-222222222222",
+    deployment_id: "dep11111-1111-4111-8111-111111111111",
+    organization_id: "org_enterprise_alpha",
+    window_start: "2025-01-29T00:00:00Z",
+    window_end: "2025-01-29T23:59:59Z",
+    request_count: 98000,
+    p95_ttft_ms: 38.2, // +70% latency drift due to traffic surge
+    mean_tpot_ms: 21.5,
+    actual_throughput_tok_s: 44.0,
+    mean_concurrency: 12.8,
+    error_rate_pct: 0.45,
+    gpu_utilization_pct: 94.2,
+    total_cost_usd: 144.0,
+  },
+];
+
+export const SEED_DRIFT_EVENTS: DriftEvent[] = [
+  {
+    id: "dr111111-1111-4111-8111-111111111111",
+    deployment_id: "dep11111-1111-4111-8111-111111111111",
+    status: "action_recommended",
+    ttft_delta_pct: 70.5,
+    tpot_delta_pct: 28.0,
+    throughput_delta_pct: -24.6,
+    cost_delta_pct: 0.0,
+    slo_attainment_pct: 84.5,
+    detected_at: "2025-01-30T02:15:00Z",
+    suggested_action:
+      "Latency drift detected under concurrency surge. Migrate serving runtime from vLLM to TensorRT-LLM or deploy NVIDIA Dynamo disaggregated prefill/decode.",
+  },
+];
+
+export const SEED_RECOMMENDATIONS: OptimizationRecommendation[] = [
+  {
+    id: "rec11111-1111-4111-8111-111111111111",
+    deployment_id: "dep11111-1111-4111-8111-111111111111",
+    organization_id: "org_enterprise_alpha",
+    current_config: {
+      accelerator: "NVIDIA H100 SXM5 80GB",
+      device_count: 2,
+      runtime: "vllm",
+      precision: "fp8",
+      cost_per_hour_usd: 6.0,
+      p95_ttft_ms: 38.2,
+    },
+    recommended_config: {
+      accelerator: "NVIDIA L40S",
+      device_count: 2,
+      runtime: "tensorrt-llm",
+      precision: "fp8",
+      cost_per_hour_usd: 2.5,
+      projected_p95_ttft_ms: 24.0,
+    },
+    projected_monthly_savings_usd: 2520.0,
+    projected_p95_latency_improvement_pct: 37.2,
+    confidence_score: 92,
+    evidence_summary:
+      "Empirical benchmark #00000000-0000-0000-0000-000000000001 proves Qwen 2.5 32B FP8 runs at 86.8 tok/s on L40S with TensorRT-LLM, satisfying your 30ms TTFT SLO at 58% lower hourly cost.",
+    status: "ready_for_review",
+    created_at: "2025-01-30T04:00:00Z",
+  },
+];
+
+export const SEED_VERIFIED_SAVINGS: VerifiedSavings[] = [
+  {
+    id: "sav11111-1111-4111-8111-111111111111",
+    recommendation_id: "rec11111-1111-4111-8111-111111111111",
+    organization_id: "org_enterprise_alpha",
+    baseline_monthly_cost_usd: 4320.0,
+    observed_monthly_cost_usd: 1800.0,
+    verified_monthly_savings_usd: 2520.0,
+    verified_at: "2025-02-01T12:00:00Z",
+    observation_days: 30,
+  },
+];
+
 export class ModelForgeDataLayer {
   private benchmarks: Map<string, OpenComputeBenchRecord> = new Map();
   private models: Map<string, ModelMetadata> = new Map();
@@ -1155,6 +1430,16 @@ export class ModelForgeDataLayer {
   private plans: Map<string, DeploymentPlan> = new Map();
   private softwareLift: SoftwareLiftMetric[] = SEED_SOFTWARE_LIFT;
   private failures: FailureRecord[] = SEED_FAILURES;
+
+  // Phase 4 Collections
+  private workers: Map<string, Worker> = new Map();
+  private jobs: Map<string, BenchmarkJob> = new Map();
+  private fleet: Map<string, FleetResource> = new Map();
+  private deployments: Map<string, ProductionDeployment> = new Map();
+  private telemetry: Map<string, TelemetryWindow[]> = new Map();
+  private driftEvents: Map<string, DriftEvent[]> = new Map();
+  private recommendations: Map<string, OptimizationRecommendation> = new Map();
+  private verifiedSavings: Map<string, VerifiedSavings> = new Map();
 
   constructor() {
     for (const b of SEED_BENCHMARKS) {
@@ -1165,6 +1450,34 @@ export class ModelForgeDataLayer {
     }
     for (const p of SEED_PASSPORTS) {
       this.passports.set(`${p.model_id}@${p.revision}`, p);
+    }
+    for (const w of SEED_WORKERS) {
+      this.workers.set(w.id, w);
+    }
+    for (const j of SEED_BENCHMARK_JOBS) {
+      this.jobs.set(j.id, j);
+    }
+    for (const fl of SEED_FLEET_RESOURCES) {
+      this.fleet.set(fl.id, fl);
+    }
+    for (const dep of SEED_PRODUCTION_DEPLOYMENTS) {
+      this.deployments.set(dep.id, dep);
+    }
+    for (const tel of SEED_TELEMETRY_WINDOWS) {
+      const list = this.telemetry.get(tel.deployment_id) || [];
+      list.push(tel);
+      this.telemetry.set(tel.deployment_id, list);
+    }
+    for (const dr of SEED_DRIFT_EVENTS) {
+      const list = this.driftEvents.get(dr.deployment_id) || [];
+      list.push(dr);
+      this.driftEvents.set(dr.deployment_id, list);
+    }
+    for (const rec of SEED_RECOMMENDATIONS) {
+      this.recommendations.set(rec.id, rec);
+    }
+    for (const sav of SEED_VERIFIED_SAVINGS) {
+      this.verifiedSavings.set(sav.id, sav);
     }
   }
 
@@ -1315,6 +1628,253 @@ export class ModelForgeDataLayer {
   // Support Matrix
   getSupportMatrix(): SupportMatrix {
     return SUPPORT_MATRIX;
+  }
+
+  // --- PHASE 4 METHODS: WORKERS, JOBS, COVERAGE, FLEET, CONTINUOUS OPS ---
+
+  // Workers
+  registerWorker(worker: Worker): Worker {
+    this.workers.set(worker.id, worker);
+    return worker;
+  }
+
+  getWorker(id: string): Worker | undefined {
+    return this.workers.get(id);
+  }
+
+  listWorkers(orgId?: string): Worker[] {
+    const all = Array.from(this.workers.values());
+    if (orgId) return all.filter((w) => w.organization_id === orgId || !w.organization_id);
+    return all.filter((w) => !w.organization_id || w.capabilities.privacy_mode === "public");
+  }
+
+  heartbeatWorker(id: string): boolean {
+    const worker = this.workers.get(id);
+    if (!worker) return false;
+    worker.last_heartbeat_at = new Date().toISOString();
+    worker.status = "ready";
+    return true;
+  }
+
+  // Benchmark Jobs
+  enqueueJob(job: BenchmarkJob): BenchmarkJob {
+    this.jobs.set(job.id, job);
+    return job;
+  }
+
+  getJob(id: string): BenchmarkJob | undefined {
+    return this.jobs.get(id);
+  }
+
+  claimJob(workerId: string, trustTier: WorkerTrustTier): BenchmarkJob | null {
+    const worker = this.workers.get(workerId);
+    if (!worker) return null;
+
+    const tierRanking: Record<WorkerTrustTier, number> = {
+      untrusted: 0,
+      community: 1,
+      trusted: 2,
+      organization: 3,
+      managed: 4,
+      attested: 5,
+    };
+    const workerRank = tierRanking[trustTier] ?? 1;
+
+    for (const job of this.jobs.values()) {
+      const requiredRank = tierRanking[job.required_trust_tier] ?? 1;
+      if (job.status === "queued" && workerRank >= requiredRank) {
+        job.status = "assigned";
+        job.assigned_worker_id = workerId;
+        job.assigned_at = new Date().toISOString();
+        return job;
+      }
+    }
+    return null;
+  }
+
+  completeJob(jobId: string, resultBenchmarkId: string): BenchmarkJob | null {
+    const job = this.jobs.get(jobId);
+    if (!job) return null;
+    job.status = "completed";
+    job.result_benchmark_id = resultBenchmarkId;
+    job.completed_at = new Date().toISOString();
+    return job;
+  }
+
+  failJob(jobId: string, error: string): BenchmarkJob | null {
+    const job = this.jobs.get(jobId);
+    if (!job) return null;
+    job.status = "failed";
+    job.error_message = error;
+    job.completed_at = new Date().toISOString();
+    return job;
+  }
+
+  listJobs(filters?: { status?: JobStatus; orgId?: string }): BenchmarkJob[] {
+    return Array.from(this.jobs.values()).filter((j) => {
+      if (filters?.status && j.status !== filters.status) return false;
+      if (filters?.orgId && j.organization_id && j.organization_id !== filters.orgId)
+        return false;
+      return true;
+    });
+  }
+
+  // Benchmark Coverage Matrix
+  getCoverageMatrix(modelId?: string): CoverageCell[] {
+    const cells: CoverageCell[] = [];
+    const models = modelId
+      ? this.listModels().filter((m) => m.id.toLowerCase().includes(modelId.toLowerCase()))
+      : this.listModels();
+
+    const accelerators = ["NVIDIA H100 SXM5 80GB", "NVIDIA L40S", "NVIDIA GeForce RTX 4090 24GB", "AMD Instinct MI300X 192GB"];
+    const runtimes = ["vllm", "tensorrt-llm", "sglang", "llama.cpp"];
+    const precisions = ["fp8", "fp16", "int4"];
+
+    for (const model of models) {
+      for (const accelerator of accelerators) {
+        for (const runtime of runtimes) {
+          for (const precision of precisions) {
+            // Find existing benchmark matching tuple
+            const match = Array.from(this.benchmarks.values()).find(
+              (b) =>
+                b.model.repository.toLowerCase() === model.id.toLowerCase() &&
+                b.hardware.device.toLowerCase() === accelerator.toLowerCase() &&
+                b.runtime.name.toLowerCase() === runtime.toLowerCase() &&
+                b.precision.type.toLowerCase() === precision.toLowerCase()
+            );
+
+            // Check if known failure
+            const failure = this.failures.find(
+              (f) =>
+                f.model_repository.toLowerCase() === model.id.toLowerCase() &&
+                f.accelerator.toLowerCase() === accelerator.toLowerCase()
+            );
+
+            let status: CoverageCell["status"] = "untested";
+            let gapPriority = 50;
+
+            if (match) {
+              const freshness = this.evaluateFreshness(match.provenance.completed_at);
+              status = freshness === "STALE" ? "stale" : "covered";
+              gapPriority = freshness === "STALE" ? 40 : 0;
+            } else if (failure) {
+              status = "failed";
+              gapPriority = 10;
+            } else {
+              // Higher priority for popular frontier models and H100/L40S
+              if (model.id.includes("70B") || model.id.includes("32B")) gapPriority += 25;
+              if (accelerator.includes("H100") || accelerator.includes("L40S")) gapPriority += 20;
+            }
+
+            cells.push({
+              model_repository: model.id,
+              model_revision: "main",
+              accelerator,
+              runtime,
+              precision,
+              status,
+              benchmark_ids: match ? [match.benchmark_id] : [],
+              last_tested_at: match?.provenance.completed_at,
+              measured_throughput_tok_s: match?.metrics.tokens_per_second,
+              gap_priority: Math.min(100, gapPriority),
+            });
+          }
+        }
+      }
+    }
+    return cells;
+  }
+
+  // Fleet Resources
+  registerFleetResource(res: FleetResource): FleetResource {
+    this.fleet.set(res.id, res);
+    return res;
+  }
+
+  listFleetResources(orgId?: string): FleetResource[] {
+    const list = Array.from(this.fleet.values());
+    if (orgId) return list.filter((f) => f.organization_id === orgId);
+    return list;
+  }
+
+  // Production Deployments & Telemetry
+  registerDeployment(dep: ProductionDeployment): ProductionDeployment {
+    this.deployments.set(dep.id, dep);
+    return dep;
+  }
+
+  getDeployment(id: string): ProductionDeployment | undefined {
+    return this.deployments.get(id);
+  }
+
+  listDeployments(orgId?: string): ProductionDeployment[] {
+    const list = Array.from(this.deployments.values());
+    if (orgId) return list.filter((d) => d.organization_id === orgId);
+    return list;
+  }
+
+  recordTelemetryWindow(tel: TelemetryWindow): TelemetryWindow {
+    const list = this.telemetry.get(tel.deployment_id) || [];
+    list.push(tel);
+    this.telemetry.set(tel.deployment_id, list);
+    return tel;
+  }
+
+  listTelemetryWindows(deploymentId: string): TelemetryWindow[] {
+    return this.telemetry.get(deploymentId) || [];
+  }
+
+  // Drift Events
+  recordDriftEvent(event: DriftEvent): DriftEvent {
+    const list = this.driftEvents.get(event.deployment_id) || [];
+    list.push(event);
+    this.driftEvents.set(event.deployment_id, list);
+    return event;
+  }
+
+  listDriftEvents(deploymentId: string): DriftEvent[] {
+    return this.driftEvents.get(deploymentId) || [];
+  }
+
+  // Recommendations & Verified Savings
+  createRecommendation(rec: OptimizationRecommendation): OptimizationRecommendation {
+    this.recommendations.set(rec.id, rec);
+    return rec;
+  }
+
+  approveRecommendation(id: string, approver = "admin"): OptimizationRecommendation | null {
+    const rec = this.recommendations.get(id);
+    if (!rec) return null;
+    rec.status = "approved";
+    rec.approved_by = approver;
+    rec.approved_at = new Date().toISOString();
+    return rec;
+  }
+
+  listRecommendations(orgId?: string): OptimizationRecommendation[] {
+    const list = Array.from(this.recommendations.values());
+    if (orgId) return list.filter((r) => r.organization_id === orgId);
+    return list;
+  }
+
+  recordVerifiedSavings(sav: VerifiedSavings): VerifiedSavings {
+    this.verifiedSavings.set(sav.id, sav);
+    return sav;
+  }
+
+  listVerifiedSavings(orgId?: string): VerifiedSavings[] {
+    const list = Array.from(this.verifiedSavings.values());
+    if (orgId) return list.filter((s) => s.organization_id === orgId);
+    return list;
+  }
+
+  // Benchmark Freshness Evaluator
+  evaluateFreshness(collectedAt: string): FreshnessStatus {
+    const ageDays =
+      (Date.now() - new Date(collectedAt).getTime()) / (1000 * 60 * 60 * 24);
+    if (ageDays > 180) return "STALE";
+    if (ageDays > 60) return "AGING";
+    return "CURRENT";
   }
 }
 

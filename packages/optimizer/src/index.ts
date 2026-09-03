@@ -357,3 +357,151 @@ export function solveWorkloadOptimization(
     unviable_configurations_count: unviableCount,
   };
 }
+
+// --- PHASE 4: ENTERPRISE FLEET PLACEMENT OPTIMIZER ---
+
+export interface FleetWorkloadInput {
+  id: string;
+  name: string;
+  model_id: string;
+  parameters_billions: number;
+  context_length: number;
+  concurrency: number;
+  target_ttft_ms?: number;
+}
+
+export interface FleetResourceInput {
+  id: string;
+  node_id: string;
+  device: string;
+  device_count: number;
+  vram_bytes_per_device: number;
+  hourly_cost_usd: number;
+  is_reserved: boolean;
+  status: "available" | "allocated" | "maintenance";
+}
+
+export interface FleetPlacementResult {
+  placements: Array<{
+    workload_id: string;
+    workload_name: string;
+    resource_id: string;
+    node_id: string;
+    device: string;
+    devices_used: number;
+    estimated_ttft_ms: number;
+    satisfies_slo: boolean;
+    hourly_cost_usd: number;
+  }>;
+  unplaced_workloads: Array<{
+    workload_id: string;
+    workload_name: string;
+    reason: string;
+  }>;
+  total_fleet_devices: number;
+  allocated_devices: number;
+  fleet_utilization_pct: number;
+  total_hourly_cost_usd: number;
+}
+
+export function optimizeFleetPlacement(
+  fleet: FleetResourceInput[],
+  workloads: FleetWorkloadInput[],
+): FleetPlacementResult {
+  const placements: FleetPlacementResult["placements"] = [];
+  const unplaced: FleetPlacementResult["unplaced_workloads"] = [];
+
+  // Track remaining devices on each node
+  const availableDevices = new Map<string, number>();
+  for (const res of fleet) {
+    if (res.status === "available" || res.status === "allocated") {
+      availableDevices.set(res.id, res.device_count);
+    }
+  }
+
+  // Sort workloads by priority/size (larger first for bin packing)
+  const sortedWorkloads = [...workloads].sort(
+    (a, b) => b.parameters_billions - a.parameters_billions
+  );
+
+  let totalAllocatedDevices = 0;
+  let totalCostUsd = 0;
+
+  for (const wl of sortedWorkloads) {
+    // Sizing: assume FP8 (1.0 byte/param) + KV cache
+    const weightGb = wl.parameters_billions * 1.0;
+    const kvGb = (2 * 48 * 8 * 128 * wl.context_length * 1 * wl.concurrency) / 1e9;
+    const requiredVramGb = weightGb + kvGb + 1.5;
+
+    let placed = false;
+
+    // Prefer reserved hardware first to maximize ROI
+    const sortedFleet = [...fleet].sort((a, b) => {
+      if (a.is_reserved && !b.is_reserved) return -1;
+      if (!a.is_reserved && b.is_reserved) return 1;
+      return a.hourly_cost_usd - b.hourly_cost_usd;
+    });
+
+    for (const res of sortedFleet) {
+      if (res.status === "maintenance") continue;
+      const rem = availableDevices.get(res.id) || 0;
+      if (rem <= 0) continue;
+
+      const deviceVramGb = res.vram_bytes_per_device / 1e9;
+      // Calculate how many devices needed to hold requiredVramGb
+      const devicesNeeded = Math.max(1, Math.ceil(requiredVramGb / (deviceVramGb * 0.9)));
+
+      if (rem >= devicesNeeded) {
+        // Evaluate latency
+        let estimatedTtft = 25.0;
+        if (res.device.includes("H100")) estimatedTtft = 18.0;
+        else if (res.device.includes("L40S")) estimatedTtft = 26.0;
+        else if (res.device.includes("4090")) estimatedTtft = 35.0;
+
+        const satisfiesSlo = wl.target_ttft_ms ? estimatedTtft <= wl.target_ttft_ms : true;
+
+        placements.push({
+          workload_id: wl.id,
+          workload_name: wl.name,
+          resource_id: res.id,
+          node_id: res.node_id,
+          device: res.device,
+          devices_used: devicesNeeded,
+          estimated_ttft_ms: estimatedTtft,
+          satisfies_slo: satisfiesSlo,
+          hourly_cost_usd: (res.hourly_cost_usd / res.device_count) * devicesNeeded,
+        });
+
+        availableDevices.set(res.id, rem - devicesNeeded);
+        totalAllocatedDevices += devicesNeeded;
+        totalCostUsd += (res.hourly_cost_usd / res.device_count) * devicesNeeded;
+        placed = true;
+        break;
+      }
+    }
+
+    if (!placed) {
+      unplaced.push({
+        workload_id: wl.id,
+        workload_name: wl.name,
+        reason: `Insufficient fleet VRAM or capacity for ${wl.parameters_billions}B model (requires ~${requiredVramGb.toFixed(1)} GB VRAM)`,
+      });
+    }
+  }
+
+  const totalFleetDevices = fleet.reduce((acc, r) => acc + r.device_count, 0);
+  const fleetUtilizationPct =
+    totalFleetDevices > 0
+      ? Number(((totalAllocatedDevices / totalFleetDevices) * 100).toFixed(1))
+      : 0;
+
+  return {
+    placements,
+    unplaced_workloads: unplaced,
+    total_fleet_devices: totalFleetDevices,
+    allocated_devices: totalAllocatedDevices,
+    fleet_utilization_pct: fleetUtilizationPct,
+    total_hourly_cost_usd: Number(totalCostUsd.toFixed(2)),
+  };
+}
+

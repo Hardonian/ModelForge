@@ -1,0 +1,22 @@
+{
+  "name": "@modelforge/performance-predictor",
+  "version": "1.0.0",
+  "description": "Predictive inference performance engine combining Level 0 analytical roofline and Level 1 nearest-neighbor interpolation with rigorous uncertainty estimation",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "test": "node --test dist/tests/*.test.js"
+  },
+  "dependencies": {
+    "@modelforge/benchmark-schema": "workspace:*",
+    "@modelforge/hardware-registry": "workspace:*",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@modelforge/config": "workspace:*",
+    "@types/node": "^22.13.4",
+    "typescript": "^5.7.3"
+  }
+}

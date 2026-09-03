@@ -371,4 +371,302 @@ export const SoftwareLiftMetricSchema = z.object({
 });
 export type SoftwareLiftMetric = z.infer<typeof SoftwareLiftMetricSchema>;
 
+// --- PHASE 4 SCHEMAS: DISTRIBUTED NETWORK & PREDICTIVE INTELLIGENCE ---
+
+export const WorkerTrustTierSchema = z.enum([
+  "untrusted",
+  "community",
+  "trusted",
+  "organization",
+  "managed",
+  "attested",
+]);
+export type WorkerTrustTier = z.infer<typeof WorkerTrustTierSchema>;
+
+export const WorkerStatusSchema = z.enum([
+  "ready",
+  "busy",
+  "offline",
+  "draining",
+]);
+export type WorkerStatus = z.infer<typeof WorkerStatusSchema>;
+
+export const WorkerCapabilitiesSchema = z.object({
+  hardware_device: z.string(),
+  device_count: z.number().int().positive().default(1),
+  vram_bytes: z.number().int().positive(),
+  cpu_cores: z.number().int().positive(),
+  ram_bytes: z.number().int().positive(),
+  os: z.string(),
+  driver_version: z.string().optional(),
+  cuda_version: z.string().optional(),
+  rocm_version: z.string().optional(),
+  supported_runtimes: z.array(z.string()),
+  container_runtime: z.enum(["docker", "podman", "none"]).default("docker"),
+  max_job_duration_s: z.number().int().positive().default(1800),
+  privacy_mode: z.enum(["public", "private"]).default("public"),
+  region: z.string().optional(),
+});
+export type WorkerCapabilities = z.infer<typeof WorkerCapabilitiesSchema>;
+
+export const WorkerSchema = z.object({
+  id: z.string().uuid(),
+  name: z.string().min(1),
+  trust_tier: WorkerTrustTierSchema.default("community"),
+  status: WorkerStatusSchema.default("ready"),
+  capabilities: WorkerCapabilitiesSchema,
+  organization_id: z.string().optional(),
+  token_hash: z.string(),
+  last_heartbeat_at: z.string().datetime(),
+  created_at: z.string().datetime(),
+  total_jobs_completed: z.number().int().nonnegative().default(0),
+});
+export type Worker = z.infer<typeof WorkerSchema>;
+
+export const JobStatusSchema = z.enum([
+  "queued",
+  "assigned",
+  "running",
+  "uploading",
+  "validating",
+  "completed",
+  "failed",
+  "canceled",
+  "timed_out",
+  "retryable",
+]);
+export type JobStatus = z.infer<typeof JobStatusSchema>;
+
+export const BenchmarkJobSchema = z.object({
+  id: z.string().uuid(),
+  model_repository: z.string(),
+  model_revision: z.string().default("main"),
+  runtime: z.string(),
+  runtime_version: z.string().default("latest"),
+  precision: z.string(),
+  workload: WorkloadSpecSchema,
+  required_trust_tier: WorkerTrustTierSchema.default("community"),
+  target_device: z.string().optional(),
+  resource_limits: z.object({
+    timeout_s: z.number().int().positive().default(900),
+    max_vram_gb: z.number().positive().optional(),
+    max_gpus: z.number().int().positive().default(1),
+  }).default({ timeout_s: 900, max_gpus: 1 }),
+  status: JobStatusSchema.default("queued"),
+  assigned_worker_id: z.string().uuid().optional(),
+  assigned_at: z.string().datetime().optional(),
+  completed_at: z.string().datetime().optional(),
+  organization_id: z.string().optional(),
+  result_benchmark_id: z.string().uuid().optional(),
+  error_message: z.string().optional(),
+  priority_score: z.number().default(100),
+  created_at: z.string().datetime(),
+});
+export type BenchmarkJob = z.infer<typeof BenchmarkJobSchema>;
+
+export const CoverageStatusSchema = z.enum([
+  "covered",
+  "partially_covered",
+  "stale",
+  "failed",
+  "untested",
+  "incompatible",
+]);
+export type CoverageStatus = z.infer<typeof CoverageStatusSchema>;
+
+export const CoverageCellSchema = z.object({
+  model_repository: z.string(),
+  model_revision: z.string(),
+  accelerator: z.string(),
+  runtime: z.string(),
+  precision: z.string(),
+  status: CoverageStatusSchema,
+  benchmark_ids: z.array(z.string().uuid()).default([]),
+  last_tested_at: z.string().datetime().optional(),
+  measured_throughput_tok_s: z.number().positive().optional(),
+  gap_priority: z.number().min(0).max(100).default(0),
+});
+export type CoverageCell = z.infer<typeof CoverageCellSchema>;
+
+export const UncertaintyTypeSchema = z.enum([
+  "interpolation",
+  "extrapolation",
+  "out_of_distribution",
+]);
+export type UncertaintyType = z.infer<typeof UncertaintyTypeSchema>;
+
+export const PredictionConfidenceSchema = z.enum(["high", "medium", "low"]);
+export type PredictionConfidence = z.infer<typeof PredictionConfidenceSchema>;
+
+export const PredictionResultSchema = z.object({
+  prediction_id: z.string().uuid(),
+  is_predicted: z.literal(true).default(true),
+  model_repository: z.string(),
+  model_revision: z.string().default("main"),
+  accelerator: z.string(),
+  device_count: z.number().int().positive().default(1),
+  runtime: z.string(),
+  precision: z.string(),
+  workload: WorkloadSpecSchema,
+  predicted_ttft_ms: z.number().positive(),
+  predicted_tpot_ms: z.number().positive(),
+  predicted_throughput_tok_s: z.number().positive(),
+  predicted_peak_vram_gb: z.number().positive(),
+  prediction_interval: z.object({
+    p10_throughput: z.number().positive(),
+    p90_throughput: z.number().positive(),
+    p10_ttft: z.number().positive(),
+    p90_ttft: z.number().positive(),
+  }),
+  uncertainty_type: UncertaintyTypeSchema,
+  confidence: PredictionConfidenceSchema,
+  nearest_evidence_benchmark_ids: z.array(z.string()).default([]),
+  predictor_version: z.string().default("predictor_v1.0.0"),
+  created_at: z.string().datetime(),
+});
+export type PredictionResult = z.infer<typeof PredictionResultSchema>;
+
+export const PredictionFeedbackSchema = z.object({
+  id: z.string().uuid(),
+  prediction_id: z.string().uuid(),
+  actual_benchmark_id: z.string().uuid(),
+  predicted_throughput: z.number().positive(),
+  actual_throughput: z.number().positive(),
+  absolute_error: z.number().nonnegative(),
+  percentage_error: z.number().nonnegative(),
+  predictor_version: z.string(),
+  created_at: z.string().datetime(),
+});
+export type PredictionFeedback = z.infer<typeof PredictionFeedbackSchema>;
+
+export const FleetResourceSchema = z.object({
+  id: z.string().uuid(),
+  organization_id: z.string(),
+  node_id: z.string(),
+  device: z.string(),
+  device_count: z.number().int().positive(),
+  vram_bytes_per_device: z.number().int().positive(),
+  interconnect: z.string().default("pcie"),
+  region: z.string().default("us-east-1"),
+  hourly_cost_usd: z.number().nonnegative(),
+  is_reserved: z.boolean().default(true),
+  status: z.enum(["available", "allocated", "maintenance"]).default("available"),
+  allocated_workload_ids: z.array(z.string()).default([]),
+});
+export type FleetResource = z.infer<typeof FleetResourceSchema>;
+
+export const ProductionDeploymentSchema = z.object({
+  id: z.string().uuid(),
+  organization_id: z.string(),
+  workload_name: z.string(),
+  model_repository: z.string(),
+  model_revision: z.string(),
+  accelerator: z.string(),
+  device_count: z.number().int().positive(),
+  runtime: z.string(),
+  precision: z.string(),
+  replica_count: z.number().int().positive().default(1),
+  expected_metrics: z.object({
+    ttft_ms: z.number().positive(),
+    tpot_ms: z.number().positive(),
+    throughput_tok_s: z.number().positive(),
+    cost_per_hour_usd: z.number().positive(),
+  }),
+  created_at: z.string().datetime(),
+});
+export type ProductionDeployment = z.infer<typeof ProductionDeploymentSchema>;
+
+export const TelemetryWindowSchema = z.object({
+  id: z.string().uuid(),
+  deployment_id: z.string().uuid(),
+  organization_id: z.string(),
+  window_start: z.string().datetime(),
+  window_end: z.string().datetime(),
+  request_count: z.number().int().nonnegative(),
+  p95_ttft_ms: z.number().positive(),
+  mean_tpot_ms: z.number().positive(),
+  actual_throughput_tok_s: z.number().positive(),
+  mean_concurrency: z.number().positive(),
+  error_rate_pct: z.number().min(0).max(100).default(0),
+  gpu_utilization_pct: z.number().min(0).max(100),
+  total_cost_usd: z.number().nonnegative(),
+  // Strict rule: No raw prompt or output content
+});
+export type TelemetryWindow = z.infer<typeof TelemetryWindowSchema>;
+
+export const DriftStatusSchema = z.enum([
+  "normal",
+  "watch",
+  "action_recommended",
+  "critical",
+]);
+export type DriftStatus = z.infer<typeof DriftStatusSchema>;
+
+export const DriftEventSchema = z.object({
+  id: z.string().uuid(),
+  deployment_id: z.string().uuid(),
+  status: DriftStatusSchema,
+  ttft_delta_pct: z.number(),
+  tpot_delta_pct: z.number(),
+  throughput_delta_pct: z.number(),
+  cost_delta_pct: z.number(),
+  slo_attainment_pct: z.number().min(0).max(100),
+  detected_at: z.string().datetime(),
+  suggested_action: z.string(),
+});
+export type DriftEvent = z.infer<typeof DriftEventSchema>;
+
+export const RecommendationStatusSchema = z.enum([
+  "draft",
+  "ready_for_review",
+  "approved",
+  "rejected",
+  "superseded",
+]);
+export type RecommendationStatus = z.infer<typeof RecommendationStatusSchema>;
+
+export const OptimizationRecommendationSchema = z.object({
+  id: z.string().uuid(),
+  deployment_id: z.string().uuid(),
+  organization_id: z.string(),
+  current_config: z.object({
+    accelerator: z.string(),
+    device_count: z.number().int().positive(),
+    runtime: z.string(),
+    precision: z.string(),
+    cost_per_hour_usd: z.number().positive(),
+    p95_ttft_ms: z.number().positive(),
+  }),
+  recommended_config: z.object({
+    accelerator: z.string(),
+    device_count: z.number().int().positive(),
+    runtime: z.string(),
+    precision: z.string(),
+    cost_per_hour_usd: z.number().positive(),
+    projected_p95_ttft_ms: z.number().positive(),
+  }),
+  projected_monthly_savings_usd: z.number().positive(),
+  projected_p95_latency_improvement_pct: z.number(),
+  confidence_score: z.number().min(0).max(100),
+  evidence_summary: z.string(),
+  status: RecommendationStatusSchema.default("ready_for_review"),
+  created_at: z.string().datetime(),
+  approved_by: z.string().optional(),
+  approved_at: z.string().datetime().optional(),
+});
+export type OptimizationRecommendation = z.infer<typeof OptimizationRecommendationSchema>;
+
+export const VerifiedSavingsSchema = z.object({
+  id: z.string().uuid(),
+  recommendation_id: z.string().uuid(),
+  organization_id: z.string(),
+  baseline_monthly_cost_usd: z.number().positive(),
+  observed_monthly_cost_usd: z.number().positive(),
+  verified_monthly_savings_usd: z.number(),
+  verified_at: z.string().datetime(),
+  observation_days: z.number().int().positive().default(30),
+});
+export type VerifiedSavings = z.infer<typeof VerifiedSavingsSchema>;
+
 export * from "./confidence";
+
