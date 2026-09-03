@@ -261,7 +261,7 @@ export default function PlannerPage() {
               </div>
               <div className="p-3 rounded-xl border border-slate-800 bg-[#070b14]">
                 <div className="text-[10px] font-mono text-slate-400">Evidence Provenance</div>
-                <div className="text-lg font-bold text-sky-400 mt-0.5">{plan.recommended_candidate.evidence_provenance}</div>
+                <div className="text-lg font-bold text-sky-400 mt-0.5">{plan.recommended_candidate.provenance}</div>
               </div>
             </div>
 
@@ -273,7 +273,7 @@ export default function PlannerPage() {
                   Disaggregated Prefill / Decode Topology Active
                 </div>
                 <p className="text-[11px] text-slate-300 leading-relaxed">
-                  Routing policy: <span className="font-mono text-white">{plan.recommended_candidate.disaggregated_topology.routing_policy}</span> across 
+                  Routing policy: <span className="font-mono text-white">{plan.recommended_candidate.disaggregated_topology.kv_routing_policy}</span> across 
                   Prefill workers ({plan.recommended_candidate.disaggregated_topology.prefill_workers}x) and 
                   Decode workers ({plan.recommended_candidate.disaggregated_topology.decode_workers}x).
                 </p>
@@ -297,7 +297,7 @@ export default function PlannerPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-800/60 text-slate-300">
-                  {plan.candidate_rankings.map((c, idx) => (
+                  {[plan.recommended_candidate, ...plan.alternative_candidates].map((c, idx) => (
                     <tr key={idx} className="hover:bg-slate-800/30">
                       <td className="py-2.5 font-semibold text-white uppercase">{c.runtime}</td>
                       <td className="py-2.5 font-mono text-[11px]">{c.accelerator} ({c.accelerator_count}x)</td>
@@ -306,7 +306,7 @@ export default function PlannerPage() {
                       <td className="py-2.5 font-mono text-slate-300">${c.cost_per_million_tokens_usd.toFixed(2)}</td>
                       <td className="py-2.5">
                         <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold ${
-                          c.meets_slo ? 'bg-emerald-500/10 text-emerald-300' : 'bg-red-500/10 text-red-300'
+                          c.slo_compliance_score >= 80 ? 'bg-emerald-500/10 text-emerald-300' : 'bg-red-500/10 text-red-300'
                         }`}>
                           {c.slo_compliance_score}%
                         </span>
