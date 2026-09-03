@@ -75,7 +75,7 @@ export default function PlannerPage() {
   const copyManifest = () => {
     let content = '';
     if (activeTab === 'dynamo') content = plan.generated_manifests.dynamo_config_yaml || '';
-    else if (activeTab === 'nim') content = plan.generated_manifests.docker_compose_yaml || '';
+    else if (activeTab === 'nim') content = plan.generated_manifests.nim_compose_yaml || '';
     else if (activeTab === 'vllm') content = plan.generated_manifests.vllm_docker_run || '';
     else content = JSON.stringify(plan, null, 2);
 
@@ -372,7 +372,7 @@ export default function PlannerPage() {
 
             <pre className="p-4 rounded-xl border border-slate-800 bg-[#060a12] text-xs font-mono text-slate-200 overflow-x-auto max-h-96">
               {activeTab === 'dynamo' && (plan.generated_manifests.dynamo_config_yaml || '# No Dynamo manifest')}
-              {activeTab === 'nim' && (plan.generated_manifests.docker_compose_yaml || '# No NIM manifest')}
+              {activeTab === 'nim' && (plan.generated_manifests.nim_compose_yaml || '# No NIM manifest')}
               {activeTab === 'vllm' && (plan.generated_manifests.vllm_docker_run || '# No vLLM script')}
               {activeTab === 'json' && JSON.stringify(plan, null, 2)}
             </pre>

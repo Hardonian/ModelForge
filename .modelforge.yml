@@ -1,0 +1,41 @@
+# ModelForge Performance CI Configuration
+# Schema Version: 1.0.0
+
+version: 1
+
+model:
+  repo: "Qwen/Qwen2.5-32B-Instruct"
+  revision: "main"
+  architecture: "Qwen2ForCausalLM"
+
+workloads:
+  - name: "customer-support-rag"
+    task_type: "rag"
+    context_length: 4096
+    concurrency: 8
+    target_ttft_ms: 350
+  - name: "code-autocomplete"
+    task_type: "code_completion"
+    context_length: 2048
+    concurrency: 16
+    target_tpot_ms: 25
+
+hardware:
+  primary: "NVIDIA L40S 48GB"
+  secondary: "NVIDIA H100 SXM5 80GB"
+
+runtimes:
+  - "vllm"
+  - "tensorrt-llm"
+  - "dynamo"
+
+thresholds:
+  throughput_regression_percent: 5.0
+  ttft_regression_percent: 10.0
+  vram_regression_percent: 8.0
+  allow_missing_baseline: false
+
+reporting:
+  github_pr_comment: true
+  badge_generation: true
+  publish_to_modelforge: true

@@ -1,0 +1,35 @@
+name: ModelForge Performance CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  performance-regression-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+
+      - name: Install ModelForge Benchmark CLI
+        run: |
+          uv pip install -e packages/benchmark-cli
+
+      - name: Run ModelForge Performance Regression Evaluation
+        run: |
+          modelforge ci check --config .modelforge.yml
+
+      - name: Verify Compute Passport Freshness
+        run: |
+          modelforge passport Qwen/Qwen2.5-32B-Instruct
+          modelforge badge Qwen/Qwen2.5-32B-Instruct
