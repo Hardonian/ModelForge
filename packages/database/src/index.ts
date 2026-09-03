@@ -138,6 +138,7 @@ function createSeedBenchmark(data: Omit<OpenComputeBenchRecord, 'provenance'> & 
 
   return {
     ...data,
+    golden: data.golden ?? false,
     provenance: {
       submitted_by: data.submitted_by,
       runner_version: data.runner_version,

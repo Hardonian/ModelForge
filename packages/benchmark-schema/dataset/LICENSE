@@ -1,0 +1,32 @@
+Community Data License Agreement – Permissive – Version 2.0
+
+This Community Data License Agreement – Permissive, Version 2.0 ("Agreement") is
+an agreement between You and the Data Provider(s) regarding the Data. Your use,
+modification, or distribution of the Data constitutes Your acceptance of this
+Agreement.
+
+1. Definitions
+   - "Data" means the information, datasets, benchmark records, or computational
+     measurements provided under this Agreement.
+   - "Data Provider" means any individual or entity that makes Data available
+     under this Agreement.
+   - "You" means an individual or entity exercising rights under this Agreement.
+
+2. Rights Granted
+   Subject to the terms of this Agreement, each Data Provider hereby grants You a
+   worldwide, royalty-free, non-exclusive, sublicensable license to use, reproduce,
+   modify, display, perform, and distribute the Data, in whole or in part, with or
+   without modifications, for any commercial, non-commercial, or academic purpose.
+
+3. Notice and Attribution
+   You must cause any Data You distribute to include this Agreement, or a link or
+   reference to this Agreement, along with reasonable attribution to the Data Provider(s)
+   or ModelForge OpenComputeBench Project.
+
+4. Disclaimer of Warranties and Limitation of Liability
+   THE DATA IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+   INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+   PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS, DATA PROVIDERS,
+   OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN
+   AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH
+   THE DATA OR THE USE OR OTHER DEALINGS IN THE DATA.

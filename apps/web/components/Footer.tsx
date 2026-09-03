@@ -31,6 +31,8 @@ export default function Footer() {
               <li><Link href="/optimizer" className="hover:text-white transition-colors">Workload Optimizer</Link></li>
               <li><Link href="/model-fit" className="hover:text-white transition-colors">ModelFit Calculator</Link></li>
               <li><Link href="/leaderboards" className="hover:text-white transition-colors">Leaderboards</Link></li>
+              <li><Link href="/support" className="hover:text-white transition-colors text-sky-400">Support Matrix</Link></li>
+              <li><Link href="/failures" className="hover:text-white transition-colors text-rose-400">Failure Corpus</Link></li>
             </ul>
           </div>
 
@@ -42,6 +44,7 @@ export default function Footer() {
               <li><Link href="/docs/cli" className="hover:text-white transition-colors">CLI Runner</Link></li>
               <li><Link href="/datasets" className="hover:text-white transition-colors">Hugging Face Dataset</Link></li>
               <li><Link href="/api" className="hover:text-white transition-colors">REST API</Link></li>
+              <li><Link href="/status" className="hover:text-white transition-colors">System Status</Link></li>
               <li><a href="https://github.com/Hardonian/ModelForge" target="_blank" rel="noreferrer" className="flex items-center gap-1 hover:text-white transition-colors">GitHub <ExternalLink className="h-3 w-3" /></a></li>
             </ul>
           </div>
@@ -60,10 +63,10 @@ export default function Footer() {
         <div className="mt-12 pt-6 border-t border-slate-900 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-slate-500">
           <p>© {new Date().getFullYear()} ModelForge Inc. Open source core under Apache-2.0.</p>
           <div className="flex items-center gap-4">
-            <span className="flex items-center gap-1.5">
+            <Link href="/status" className="flex items-center gap-1.5 hover:text-emerald-300 transition-colors">
               <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span>
               All Systems Operational
-            </span>
+            </Link>
           </div>
         </div>
       </div>
