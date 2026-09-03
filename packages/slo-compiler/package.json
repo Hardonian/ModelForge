@@ -1,0 +1,22 @@
+{
+  "name": "@modelforge/slo-compiler",
+  "version": "0.1.0",
+  "description": "Inference SLO compiler and deployment topology planner for ModelForge",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "node --test dist/tests/*.test.js"
+  },
+  "dependencies": {
+    "@modelforge/benchmark-schema": "workspace:*",
+    "@modelforge/hardware-registry": "workspace:*",
+    "@modelforge/model-fit": "workspace:*",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@modelforge/config": "workspace:*",
+    "@types/node": "^22.13.4",
+    "typescript": "^5.7.3"
+  }
+}
