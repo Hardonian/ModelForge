@@ -1089,4 +1089,30 @@ export const ControlAuditLogSchema = z.object({
 });
 export type ControlAuditLog = z.infer<typeof ControlAuditLogSchema>;
 
+// Normalized Security and Operational Error Taxonomy
+export const ModelForgeErrorCodeSchema = z.enum([
+  "VALIDATION_ERROR",
+  "AUTHORIZATION_ERROR",
+  "NOT_FOUND",
+  "POLICY_DENIED",
+  "EMERGENCY_FREEZE",
+  "INTEGRITY_VIOLATION",
+  "ROLLBACK_TRIGGERED",
+  "STATE_CONFLICT",
+  "RATE_LIMITED",
+  "PROVIDER_UNAVAILABLE",
+  "PROVIDER_REJECTED",
+  "INTERNAL_ERROR",
+]);
+export type ModelForgeErrorCode = z.infer<typeof ModelForgeErrorCodeSchema>;
+
+export const ModelForgeErrorResponseSchema = z.object({
+  error_code: ModelForgeErrorCodeSchema,
+  message: z.string(),
+  details: z.record(z.any()).optional(),
+  timestamp: z.string().datetime(),
+  request_id: z.string().optional(),
+});
+export type ModelForgeErrorResponse = z.infer<typeof ModelForgeErrorResponseSchema>;
+
 export * from "./confidence";
