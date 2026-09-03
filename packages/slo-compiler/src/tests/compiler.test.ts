@@ -99,4 +99,128 @@ describe("SLO Compiler & Topology Planner", () => {
       );
     }
   });
+
+  test("simulates What-If capacity growth and hardware migration scenarios", async () => {
+    const { simulateCapacityScenario } = await import("../capacity_planner.js");
+    const base = {
+      model_id: "Qwen/Qwen2.5-32B-Instruct",
+      parameters_billions: 32.5,
+      accelerator: "NVIDIA L40S",
+      device_count: 1,
+      runtime: "vllm",
+      precision: "fp8",
+      context_length: 4096,
+      concurrency: 4,
+      hourly_cost_usd: 1.25,
+      baseline_ttft_ms: 25.0,
+      baseline_throughput_tok_s: 58.0,
+    };
+
+    const res = simulateCapacityScenario(base, {
+      name: "Traffic Surge 2x",
+      traffic_growth_pct: 100,
+      context_growth_pct: 50,
+      target_accelerator: "NVIDIA H100 SXM5 80GB",
+      target_runtime: "tensorrt-llm",
+    });
+
+    assert.strictEqual(res.scenario_name, "Traffic Surge 2x");
+    assert.ok(res.required_devices >= 1);
+    assert.ok(res.projected_throughput_tok_s > base.baseline_throughput_tok_s);
+    assert.ok(res.confidence_score > 0);
+  });
+
+  test("evaluates observed vs expected performance drift and verifies savings", async () => {
+    const {
+      compareObservedVsExpected,
+      detectDrift,
+      generateOptimizationRecommendation,
+      verifySavings,
+    } = await import("../continuous_optimizer.js");
+
+    const deployment = {
+      id: "dep-1",
+      organization_id: "org-1",
+      workload_name: "Chatbot",
+      model_repository: "Qwen/Qwen2.5-32B-Instruct",
+      model_revision: "main",
+      accelerator: "NVIDIA H100 SXM5 80GB",
+      device_count: 2,
+      runtime: "vllm",
+      precision: "fp8",
+      replica_count: 2,
+      expected_metrics: {
+        ttft_ms: 20.0,
+        tpot_ms: 15.0,
+        throughput_tok_s: 60.0,
+        cost_per_hour_usd: 6.0,
+      },
+      created_at: new Date().toISOString(),
+    };
+
+    const windowBaseline = {
+      id: "win-1",
+      deployment_id: "dep-1",
+      organization_id: "org-1",
+      window_start: "2025-01-01T00:00:00Z",
+      window_end: "2025-01-01T23:59:59Z",
+      request_count: 50000,
+      p95_ttft_ms: 21.0,
+      mean_tpot_ms: 15.5,
+      actual_throughput_tok_s: 59.0,
+      mean_concurrency: 4.0,
+      error_rate_pct: 0.01,
+      gpu_utilization_pct: 75.0,
+      total_cost_usd: 144.0,
+    };
+
+    const windowDrifted = {
+      id: "win-2",
+      deployment_id: "dep-1",
+      organization_id: "org-1",
+      window_start: "2025-01-02T00:00:00Z",
+      window_end: "2025-01-02T23:59:59Z",
+      request_count: 90000,
+      p95_ttft_ms: 38.0, // Significant latency drift
+      mean_tpot_ms: 21.0,
+      actual_throughput_tok_s: 42.0,
+      mean_concurrency: 14.0,
+      error_rate_pct: 0.2,
+      gpu_utilization_pct: 95.0,
+      total_cost_usd: 144.0,
+    };
+
+    const cmp = compareObservedVsExpected(deployment, windowDrifted);
+    assert.strictEqual(cmp.is_drift_detected, true);
+    assert.ok(cmp.ttft_delta_pct > 50);
+
+    const driftStatus = detectDrift([windowBaseline, windowDrifted]);
+    assert.ok(["watch", "action_recommended", "critical"].includes(driftStatus));
+
+    const rec = generateOptimizationRecommendation(deployment, windowDrifted);
+    assert.ok(rec.projected_monthly_savings_usd >= 0);
+    assert.strictEqual(rec.status, "ready_for_review");
+
+    // After migration to optimized configuration
+    const windowOptimized = {
+      id: "win-3",
+      deployment_id: "dep-1",
+      organization_id: "org-1",
+      window_start: "2025-01-10T00:00:00Z",
+      window_end: "2025-01-10T23:59:59Z",
+      request_count: 90000,
+      p95_ttft_ms: 24.0,
+      mean_tpot_ms: 16.0,
+      actual_throughput_tok_s: 68.0,
+      mean_concurrency: 12.0,
+      error_rate_pct: 0.01,
+      gpu_utilization_pct: 82.0,
+      total_cost_usd: 80.0, // Observed lower cost!
+    };
+
+    const verified = verifySavings(windowBaseline, windowOptimized, rec.id, "org-1");
+    assert.ok(verified.verified_monthly_savings_usd > 0);
+    assert.strictEqual(verified.observation_days, 30);
+  });
 });
+

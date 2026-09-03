@@ -2,7 +2,6 @@ import {
   ProductionDeployment,
   TelemetryWindow,
   DriftStatus,
-  DriftEvent,
   OptimizationRecommendation,
   VerifiedSavings,
 } from "@modelforge/benchmark-schema";
