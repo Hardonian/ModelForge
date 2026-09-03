@@ -38,9 +38,23 @@ export default function PlannerPage() {
   const [copied, setCopied] = useState(false);
 
   // Compile SLO
+  const modelInfo = {
+    repository: modelRepo,
+    revision: modelRevision,
+    parameters_billions: modelRepo.includes('70') ? 70.6 : 32.5,
+    architecture: 'TransformerForCausalLM'
+  };
+
+  let mappedTask: 'rag' | 'custom' | 'conversational' | 'code_completion' | 'reasoning' | 'summarization' | 'embedding' = 'rag';
+  if (taskType === 'code_generation') mappedTask = 'code_completion';
+  else if (taskType === 'general_chat') mappedTask = 'conversational';
+  else if (taskType === 'batch_eval') mappedTask = 'custom';
+
   const workload: WorkloadFingerprint = {
     fingerprint_id: 'wf-demo',
-    task_type: taskType,
+    model_repo: modelRepo,
+    model_revision: modelRevision,
+    task_type: mappedTask,
     prompt_token_mean: Math.round(contextLength * 0.75),
     output_token_mean: Math.round(contextLength * 0.25),
     context_length_target: contextLength,
@@ -50,14 +64,13 @@ export default function PlannerPage() {
     arrival_pattern: 'bursty'
   };
 
-  const slo: SLOSpec = {
-    max_p95_ttft_ms: maxTtftMs,
-    max_p95_tpot_ms: 30,
-    max_cost_per_1m_tokens_usd: maxCost1m,
-    require_disaggregated_prefill_decode: concurrency >= 8
+  const slo: Partial<SLOSpec> = {
+    p95_ttft_ms: maxTtftMs,
+    target_tpot_ms: 30,
+    max_cost_per_million_tokens_usd: maxCost1m
   };
 
-  const plan: DeploymentPlan = compileSLOToDeploymentPlan(modelRepo, modelRevision, workload, slo);
+  const plan: DeploymentPlan = compileSLOToDeploymentPlan(modelInfo, workload, slo);
 
   const copyManifest = () => {
     let content = '';
