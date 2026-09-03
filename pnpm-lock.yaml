@@ -238,6 +238,28 @@ importers:
         specifier: ^5.7.3
         version: 5.9.3
 
+  packages/reconciler:
+    dependencies:
+      '@modelforge/benchmark-schema':
+        specifier: workspace:*
+        version: link:../benchmark-schema
+      '@modelforge/hardware-registry':
+        specifier: workspace:*
+        version: link:../hardware-registry
+      zod:
+        specifier: ^3.24.2
+        version: 3.25.76
+    devDependencies:
+      '@modelforge/config':
+        specifier: workspace:*
+        version: link:../config
+      '@types/node':
+        specifier: ^22.13.4
+        version: 22.20.1
+      typescript:
+        specifier: ^5.7.3
+        version: 5.9.3
+
   packages/slo-compiler:
     dependencies:
       '@modelforge/benchmark-schema':
