@@ -1,6 +1,10 @@
 -- ModelForge Phase 2: Deployment Intelligence Layer Migration
 -- Schema Version: 2.0.0
 
+-- Add golden column to benchmarks table
+ALTER TABLE public.benchmarks ADD COLUMN IF NOT EXISTS golden BOOLEAN NOT NULL DEFAULT false;
+CREATE INDEX IF NOT EXISTS idx_benchmarks_golden ON public.benchmarks(golden);
+
 -- 1. Compute Passports Table
 CREATE TABLE IF NOT EXISTS public.compute_passports (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -108,6 +112,20 @@ CREATE TABLE IF NOT EXISTS public.failure_records (
     created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
+-- Helper function for organization membership check in RLS
+CREATE OR REPLACE FUNCTION public.is_org_member(target_org_id UUID)
+RETURNS BOOLEAN
+LANGUAGE sql
+SECURITY DEFINER
+STABLE
+AS $$
+    SELECT EXISTS (
+        SELECT 1 FROM public.memberships
+        WHERE organization_id = target_org_id
+        AND user_id = auth.uid()
+    );
+$$;
+
 -- RLS Policies
 ALTER TABLE public.compute_passports ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.workload_fingerprints ENABLE ROW LEVEL SECURITY;
@@ -123,7 +141,13 @@ CREATE POLICY "Public read benchmark reproductions" ON public.benchmark_reproduc
 CREATE POLICY "Public read failure records" ON public.failure_records FOR SELECT USING (true);
 
 -- Workload fingerprints and deployment plans: organization isolation
+CREATE POLICY "Org members read workload fingerprints" ON public.workload_fingerprints
+    FOR SELECT USING (org_id IS NULL OR is_org_member(org_id));
+CREATE POLICY "Org members write workload fingerprints" ON public.workload_fingerprints
+    FOR INSERT WITH CHECK (org_id IS NULL OR is_org_member(org_id));
+
 CREATE POLICY "Org members read deployment plans" ON public.deployment_plans
     FOR SELECT USING (org_id IS NULL OR is_org_member(org_id));
 CREATE POLICY "Org members write deployment plans" ON public.deployment_plans
     FOR INSERT WITH CHECK (org_id IS NULL OR is_org_member(org_id));
+

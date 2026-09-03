@@ -64,17 +64,13 @@ def run_benchmark(
         console=console,
     ) as progress:
         # Phase 1: Environment probe & model warmup
-        task_warmup = progress.add_task(
-            "[yellow]Phase 1: Warmup & JIT kernel compilation...", total=10
-        )
+        task_warmup = progress.add_task("[yellow]Phase 1: Warmup & JIT kernel compilation...", total=10)
         for _ in range(10):
             time.sleep(0.05)
             progress.advance(task_warmup, 1)
 
         # Phase 2: Measured throughput and latency sampling
-        task_measure = progress.add_task(
-            "[green]Phase 2: Measured inference iterations...", total=20
-        )
+        task_measure = progress.add_task("[green]Phase 2: Measured inference iterations...", total=20)
         ttft_samples: list[float] = []
         tpot_samples: list[float] = []
 
@@ -118,9 +114,7 @@ def run_benchmark(
         repository=model_id,
         revision="main",
         architecture="TransformerForCausalLM",
-        parameters_billions=32.5
-        if "32" in model_id
-        else (70.6 if "70" in model_id else 8.0),
+        parameters_billions=32.5 if "32" in model_id else (70.6 if "70" in model_id else 8.0),
         context_window=context_length * 2,
     )
 
@@ -133,9 +127,7 @@ def run_benchmark(
     )
 
     precision_spec = PrecisionSpec(
-        type=precision
-        if precision in ["fp8", "fp16", "int8", "int4", "awq"]
-        else "fp8",
+        type=precision if precision in ["fp8", "fp16", "int8", "int4", "awq"] else "fp8",
         quantization_method="fp8_e4m3" if precision == "fp8" else None,
     )
 
@@ -164,10 +156,7 @@ def run_benchmark(
         concurrency=concurrency,
     )
 
-    peak_vram = int(
-        model_spec.parameters_billions * 1e9 * (1.0 if precision == "fp8" else 2.0)
-        + (1.5 * 1e9)
-    )
+    peak_vram = int(model_spec.parameters_billions * 1e9 * (1.0 if precision == "fp8" else 2.0) + (1.5 * 1e9))
 
     metrics_spec = MetricsSpec(
         ttft_ms=ttft_perc,
@@ -180,9 +169,7 @@ def run_benchmark(
     )
 
     env_hash = compute_environment_hash(hardware_spec, software_spec, runtime_spec)
-    res_hash = compute_result_hash(
-        model_spec, precision_spec, workload_spec, metrics_spec
-    )
+    res_hash = compute_result_hash(model_spec, precision_spec, workload_spec, metrics_spec)
 
     provenance = ProvenanceSpec(
         submitted_by="ModelForge-CLI-Local",
@@ -205,9 +192,7 @@ def run_benchmark(
         provenance=provenance,
         verification=VerificationSpec(
             status="unverified" if is_synthetic else "community",
-            notes="Synthetic simulation fixture"
-            if is_synthetic
-            else "Local runner community observation",
+            notes="Synthetic simulation fixture" if is_synthetic else "Local runner community observation",
         ),
     )
 

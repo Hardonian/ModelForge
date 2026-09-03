@@ -109,6 +109,7 @@ class OpenComputeBenchRecord(BaseModel):
     benchmark_id: str = Field(default_factory=lambda: str(uuid4()))
     schema_version: Literal["1.0.0"] = "1.0.0"
     synthetic_fixture: bool = False
+    golden: bool = False
     model: ModelSpec
     runtime: RuntimeSpec
     precision: PrecisionSpec
@@ -132,9 +133,7 @@ def compute_sha256(data: Any) -> str:
     return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
 
 
-def compute_environment_hash(
-    hardware: HardwareSpec, software: SoftwareSpec, runtime: RuntimeSpec
-) -> str:
+def compute_environment_hash(hardware: HardwareSpec, software: SoftwareSpec, runtime: RuntimeSpec) -> str:
     payload = {
         "hardware": {
             "vendor": hardware.vendor,
@@ -196,25 +195,15 @@ def validate_benchmark_integrity(
     record: OpenComputeBenchRecord,
 ) -> tuple[bool, list[str]]:
     errors: list[str] = []
-    expected_env = compute_environment_hash(
-        record.hardware, record.software, record.runtime
-    )
+    expected_env = compute_environment_hash(record.hardware, record.software, record.runtime)
     if record.provenance.environment_hash != expected_env:
-        errors.append(
-            f"Environment hash mismatch: got {record.provenance.environment_hash}, expected {expected_env}"
-        )
+        errors.append(f"Environment hash mismatch: got {record.provenance.environment_hash}, expected {expected_env}")
 
-    expected_result = compute_result_hash(
-        record.model, record.precision, record.workload, record.metrics
-    )
+    expected_result = compute_result_hash(record.model, record.precision, record.workload, record.metrics)
     if record.provenance.result_hash != expected_result:
-        errors.append(
-            f"Result hash mismatch: got {record.provenance.result_hash}, expected {expected_result}"
-        )
+        errors.append(f"Result hash mismatch: got {record.provenance.result_hash}, expected {expected_result}")
 
     if record.synthetic_fixture and record.verification.status == "verified":
-        errors.append(
-            "CRITICAL INVARIANT VIOLATION: Synthetic fixtures cannot be marked as verified."
-        )
+        errors.append("CRITICAL INVARIANT VIOLATION: Synthetic fixtures cannot be marked as verified.")
 
     return len(errors) == 0, errors

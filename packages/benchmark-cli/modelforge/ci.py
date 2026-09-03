@@ -75,9 +75,9 @@ def run_ci_check(config_path: Path, console: Console) -> bool:
     all_passed = tps_pass and ttft_pass and vram_pass
 
     if all_passed:
-        console.print("[bold green]✓ Performance CI Passed:[/] No performance regressions detected.")
+        console.print("[bold green][PASS] Performance CI Passed:[/] No performance regressions detected.")
     else:
-        console.print("[bold red]✗ Performance CI Failed:[/] Regressions breached configured thresholds.")
+        console.print("[bold red][FAIL] Performance CI Failed:[/] Regressions breached configured thresholds.")
 
     return all_passed
 
@@ -96,4 +96,4 @@ def run_ci_baseline(model_repo: str, console: Console, out_path: Path = Path("mo
     with open(out_path, "w", encoding="utf-8") as f:
         json.dump(baseline_data, f, indent=2)
 
-    console.print(f"[bold green]✓ Baseline recorded in:[/] {out_path.resolve()}")
+    console.print(f"[bold green][OK] Baseline recorded in:[/] {out_path.resolve()}")

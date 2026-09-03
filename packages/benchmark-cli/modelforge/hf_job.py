@@ -34,8 +34,12 @@ def submit_hf_job_benchmark(
         return {"status": "error", "message": "Missing HF_TOKEN"}
 
     job_id = f"job-{uuid.uuid4().hex[:12]}"
-    console.print(Panel(f"[bold cyan]Launching Hugging Face Job:[/] [bold white]{job_id}[/]\n"
-                        f"Model: {model_id} | Hardware: {hardware} | Runtime: {runtime}"))
+    console.print(
+        Panel(
+            f"[bold cyan]Launching Hugging Face Job:[/] [bold white]{job_id}[/]\n"
+            f"Model: {model_id} | Hardware: {hardware} | Runtime: {runtime}"
+        )
+    )
 
     return {
         "status": "submitted",

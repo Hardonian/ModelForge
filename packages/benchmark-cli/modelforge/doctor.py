@@ -13,9 +13,7 @@ from modelforge.adapters.hardware import detect_system_environment
 def run_doctor(console: Console) -> bool:
     """Performs deep health and compatibility diagnostics on the local environment."""
     env = detect_system_environment()
-    table = Table(
-        title="ModelForge System Health & Hardware Diagnostics", show_lines=True
-    )
+    table = Table(title="ModelForge System Health & Hardware Diagnostics", show_lines=True)
     table.add_column("Category", style="cyan", width=16)
     table.add_column("Component", style="bold white", width=22)
     table.add_column("Detected Value", style="white", width=36)
@@ -39,11 +37,7 @@ def run_doctor(console: Console) -> bool:
     )
 
     # 2. Python Version
-    py_status = (
-        "[bold green]PASS[/]"
-        if sys.version_info >= (3, 12)
-        else "[bold red]FAIL (Need 3.12+)[/]"
-    )
+    py_status = "[bold green]PASS[/]" if sys.version_info >= (3, 12) else "[bold red]FAIL (Need 3.12+)[/]"
     table.add_row(
         "Runtime",
         "Python Interpreter",
@@ -56,9 +50,7 @@ def run_doctor(console: Console) -> bool:
     # 3. System RAM & Disk
     ram_gb = round(env.system_ram_bytes / (1024**3), 1)
     avail_ram_gb = round(env.available_ram_bytes / (1024**3), 1)
-    ram_status = (
-        "[bold green]PASS[/]" if ram_gb >= 16 else "[bold yellow]WARN (<16GB)[/]"
-    )
+    ram_status = "[bold green]PASS[/]" if ram_gb >= 16 else "[bold yellow]WARN (<16GB)[/]"
     table.add_row(
         "Memory",
         "System RAM",
@@ -66,14 +58,8 @@ def run_doctor(console: Console) -> bool:
         ram_status,
     )
 
-    disk_status = (
-        "[bold green]PASS[/]"
-        if env.disk_free_gb >= 20
-        else "[bold yellow]WARN (<20GB)[/]"
-    )
-    table.add_row(
-        "Storage", "Working Disk Space", f"{env.disk_free_gb} GB available", disk_status
-    )
+    disk_status = "[bold green]PASS[/]" if env.disk_free_gb >= 20 else "[bold yellow]WARN (<20GB)[/]"
+    table.add_row("Storage", "Working Disk Space", f"{env.disk_free_gb} GB available", disk_status)
 
     # 4. Accelerators
     for acc in env.accelerators:
@@ -98,9 +84,7 @@ def run_doctor(console: Console) -> bool:
     table.add_row(
         "Runtimes",
         "vLLM Engine",
-        "Installed in PATH"
-        if vllm_installed
-        else "Not detected (Simulated / CPU fallback available)",
+        "Installed in PATH" if vllm_installed else "Not detected (Simulated / CPU fallback available)",
         "[bold green]READY[/]" if vllm_installed else "[bold yellow]OPTIONAL[/]",
     )
 

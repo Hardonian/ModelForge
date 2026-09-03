@@ -1,0 +1,18 @@
+# ModelForge Inference Workload Specification
+# Canonical Example for v1.0 Launch
+
+model: "Qwen/Qwen2.5-32B-Instruct"
+revision: "main"
+
+workload:
+  task_type: "rag"
+  context_length: 4096
+  target_concurrency: 8
+  prompt_token_mean: 2048
+  output_token_mean: 512
+  requests_per_day: 50000
+
+slo:
+  max_p95_ttft_ms: 400
+  target_tpot_ms: 35
+  max_cost_per_1m_tokens_usd: 1.50

@@ -111,4 +111,39 @@ describe('OpenComputeBench Schema & Integrity', () => {
     assert.strictEqual(integrity.isValid, false);
     assert.ok(integrity.errors.some((e) => e.includes('Synthetic fixtures cannot be marked as verified')));
   });
+
+  it('calculates deterministic evidence confidence with algorithm 1.0.0', async () => {
+    const { calculateEvidenceConfidence, CONFIDENCE_ALGORITHM_VERSION } = await import('../confidence.js');
+    assert.strictEqual(CONFIDENCE_ALGORITHM_VERSION, '1.0.0');
+
+    // Test vector 1: Production Golden setup (Exact revision, exact runtime, exact HW, 5 runs, 3 repros, 10d old, low variance)
+    const golden = calculateEvidenceConfidence({
+      exactRevisionMatch: true,
+      runtimeMatch: 'EXACT',
+      hardwareMatch: 'EXACT',
+      benchmarkRunCount: 5,
+      reproductionCount: 3,
+      ageDays: 10,
+      measurementVariancePercent: 2.1
+    });
+    // 25 + 20 + 20 + 10 + 15 + 5 + 5 = 100
+    assert.strictEqual(golden.score, 100);
+    assert.strictEqual(golden.grade, 'A+');
+    assert.strictEqual(golden.algorithm_version, '1.0.0');
+
+    // Test vector 2: Stale, unverified fallback branch
+    const weak = calculateEvidenceConfidence({
+      exactRevisionMatch: false,
+      runtimeMatch: 'ESTIMATED',
+      hardwareMatch: 'DIFFERENT_ARCH',
+      benchmarkRunCount: 1,
+      reproductionCount: 0,
+      ageDays: 200,
+      measurementVariancePercent: 18.0
+    });
+    // 10 + 4 + 4 + 2 + 0 + 0 + 0 = 20
+    assert.strictEqual(weak.score, 20);
+    assert.strictEqual(weak.grade, 'D');
+  });
 });
+

@@ -102,9 +102,7 @@ def detect_accelerators() -> list[DetectedAccelerator]:
     if platform.system() == "Windows":
         try:
             cmd = 'powershell -NoProfile -Command "Get-CimInstance Win32_VideoController | Select-Object -Property Name, AdapterRAM, DriverVersion | ConvertTo-Json -Compress"'
-            res = subprocess.check_output(
-                cmd, shell=True, text=True, stderr=subprocess.DEVNULL, timeout=6
-            ).strip()
+            res = subprocess.check_output(cmd, shell=True, text=True, stderr=subprocess.DEVNULL, timeout=6).strip()
             if res:
                 import json
 
@@ -120,9 +118,7 @@ def detect_accelerators() -> list[DetectedAccelerator]:
                                 vendor="amd",
                                 name=gpu_name,
                                 count=1,
-                                vram_bytes=int(adapter_ram)
-                                if adapter_ram > 0
-                                else 8 * 1024**3,
+                                vram_bytes=int(adapter_ram) if adapter_ram > 0 else 8 * 1024**3,
                                 driver_version=str(driver_ver),
                                 interconnect="system_bus",
                             )

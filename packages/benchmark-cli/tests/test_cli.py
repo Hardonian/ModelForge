@@ -146,4 +146,3 @@ thresholds:
     assert res.exit_code == 0
     assert "Performance Regression Evaluation" in res.stdout
     assert "Performance CI Passed" in res.stdout
-

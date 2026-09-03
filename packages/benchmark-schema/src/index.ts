@@ -113,6 +113,7 @@ export const OpenComputeBenchSchema = z.object({
   benchmark_id: z.string().uuid(),
   schema_version: z.literal('1.0.0'),
   synthetic_fixture: z.boolean().default(false),
+  golden: z.boolean().default(false).optional(),
   model: ModelSpecSchema,
   runtime: RuntimeSpecSchema,
   precision: PrecisionSpecSchema,
@@ -334,3 +335,5 @@ export const SoftwareLiftMetricSchema = z.object({
   )
 });
 export type SoftwareLiftMetric = z.infer<typeof SoftwareLiftMetricSchema>;
+
+export * from './confidence';

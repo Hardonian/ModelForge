@@ -1,6 +1,6 @@
 [project]
 name = "modelforge"
-version = "0.1.0"
+version = "1.0.0"
 description = "OpenComputeBench inference benchmark CLI and hardware intelligence runner"
 readme = "README.md"
 authors = [{ name = "ModelForge Team" }]

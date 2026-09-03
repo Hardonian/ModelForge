@@ -19,9 +19,7 @@ def compare_benchmarks(file1: Path, file2: Path, console: Console) -> None:
     b1 = OpenComputeBenchRecord.model_validate(data1)
     b2 = OpenComputeBenchRecord.model_validate(data2)
 
-    table = Table(
-        title=f"Benchmark Comparison: {file1.name} vs {file2.name}", show_lines=True
-    )
+    table = Table(title=f"Benchmark Comparison: {file1.name} vs {file2.name}", show_lines=True)
     table.add_column("Dimension", style="cyan", width=22)
     table.add_column(f"Run A ({b1.benchmark_id[:8]})", style="white", width=28)
     table.add_column(f"Run B ({b2.benchmark_id[:8]})", style="white", width=28)
