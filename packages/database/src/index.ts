@@ -151,6 +151,7 @@ function createSeedBenchmark(data: Omit<OpenComputeBenchRecord, 'provenance'> & 
 
 export const SEED_BENCHMARKS: OpenComputeBenchRecord[] = [
   createSeedBenchmark({
+    golden: true,
     benchmark_id: 'a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d',
     schema_version: '1.0.0',
     synthetic_fixture: false,
@@ -218,6 +219,7 @@ export const SEED_BENCHMARKS: OpenComputeBenchRecord[] = [
     }
   }),
   createSeedBenchmark({
+    golden: true,
     benchmark_id: 'b2c3d4e5-f6a7-4b5c-9d0e-1f2a3b4c5d6e',
     schema_version: '1.0.0',
     synthetic_fixture: false,
@@ -339,6 +341,7 @@ export const SEED_BENCHMARKS: OpenComputeBenchRecord[] = [
     }
   }),
   createSeedBenchmark({
+    golden: true,
     benchmark_id: 'd4e5f6a7-b8c9-4d0e-1f2a-3b4c5d6e7f80',
     schema_version: '1.0.0',
     synthetic_fixture: false,
@@ -632,12 +635,283 @@ export const SEED_SOFTWARE_LIFT: SoftwareLiftMetric[] = [
   }
 ];
 
+export interface FailureRecord {
+  id: string;
+  model_repository: string;
+  model_revision: string;
+  runtime: string;
+  accelerator: string;
+  failure_category:
+    | 'OUT_OF_MEMORY'
+    | 'UNSUPPORTED_ARCHITECTURE'
+    | 'RUNTIME_ERROR'
+    | 'BUILD_FAILURE'
+    | 'DRIVER_INCOMPATIBILITY'
+    | 'INVALID_CONFIGURATION';
+  normalized_reason: string;
+  min_vram_required_gb?: number;
+  available_vram_gb?: number;
+  mitigation: string;
+  created_at: string;
+}
+
+export const SEED_FAILURES: FailureRecord[] = [
+  {
+    id: 'fail-001',
+    model_repository: 'meta-llama/Llama-3.3-70B-Instruct',
+    model_revision: 'main',
+    runtime: 'vllm',
+    accelerator: 'NVIDIA GeForce RTX 4090 24GB (1x)',
+    failure_category: 'OUT_OF_MEMORY',
+    normalized_reason: 'Model parameters (70.6B FP16) require ~141.2 GB VRAM, exceeding single RTX 4090 capacity (24 GB).',
+    min_vram_required_gb: 150.0,
+    available_vram_gb: 24.0,
+    mitigation: 'Use multi-GPU tensor parallelism (e.g. 2x H100 80GB or 4x L40S 48GB), or apply INT4/AWQ quantization.',
+    created_at: '2025-01-22T08:14:00Z'
+  },
+  {
+    id: 'fail-002',
+    model_repository: 'meta-llama/Llama-3.3-70B-Instruct',
+    model_revision: 'main',
+    runtime: 'transformers',
+    accelerator: 'NVIDIA L40S 48GB (1x)',
+    failure_category: 'OUT_OF_MEMORY',
+    normalized_reason: 'CUDA out of memory during model weight allocation in FP16 on single 48GB accelerator.',
+    min_vram_required_gb: 142.0,
+    available_vram_gb: 48.0,
+    mitigation: 'Distribute across at least 4x L40S devices using TensorRT-LLM or vLLM tensor parallelism.',
+    created_at: '2025-01-23T11:30:00Z'
+  },
+  {
+    id: 'fail-003',
+    model_repository: 'Qwen/Qwen2.5-32B-Instruct',
+    model_revision: 'main',
+    runtime: 'vllm',
+    accelerator: 'NVIDIA GeForce RTX 4090 24GB (1x)',
+    failure_category: 'OUT_OF_MEMORY',
+    normalized_reason: 'Weights in FP16 require 65.0 GB VRAM. Exceeds 24.0 GB physical device memory.',
+    min_vram_required_gb: 65.0,
+    available_vram_gb: 24.0,
+    mitigation: 'Serve with FP8 precision on L40S 48GB (requires 36GB), or use INT4 GPTQ/AWQ to fit on single 24GB device.',
+    created_at: '2025-01-24T14:45:00Z'
+  },
+  {
+    id: 'fail-004',
+    model_repository: 'deepseek-ai/DeepSeek-R1-Distill-Qwen-32B',
+    model_revision: 'main',
+    runtime: 'tensorrt-llm',
+    accelerator: 'NVIDIA L40S 48GB (1x)',
+    failure_category: 'DRIVER_INCOMPATIBILITY',
+    normalized_reason: 'TensorRT-LLM v0.16.0 requires NVIDIA driver >= 535.86 and CUDA 12.2+. Host had driver 525.105.',
+    mitigation: 'Upgrade host NVIDIA display driver to version >= 550.54 with CUDA 12.4 runtime.',
+    created_at: '2025-01-25T16:20:00Z'
+  },
+  {
+    id: 'fail-005',
+    model_repository: 'google/gemma-2-27b-it',
+    model_revision: 'main',
+    runtime: 'transformers',
+    accelerator: 'Hugging Face ZeroGPU (16GB)',
+    failure_category: 'INVALID_CONFIGURATION',
+    normalized_reason: 'Gemma-2-27B requires 34GB+ VRAM, exceeding standard ZeroGPU 16GB allocation limit.',
+    min_vram_required_gb: 34.0,
+    available_vram_gb: 16.0,
+    mitigation: 'Deploy to dedicated A10G (24GB) with 4-bit bitsandbytes quantization or dedicated A100 (40GB/80GB).',
+    created_at: '2025-01-26T09:05:00Z'
+  }
+];
+
+export const SUPPORT_MATRIX = {
+  version: '1.0.0',
+  last_updated: '2025-02-01T00:00:00Z',
+  model_families: [
+    {
+      family: 'Qwen-family',
+      description: 'Alibaba Qwen 2.5 dense and coder architectures',
+      verified_architectures: ['Qwen2ForCausalLM'],
+      models: ['Qwen/Qwen2.5-32B-Instruct', 'Qwen/Qwen2.5-7B-Instruct', 'Qwen/Qwen2.5-Coder-32B-Instruct'],
+      status: 'SUPPORTED' as const
+    },
+    {
+      family: 'Llama-family',
+      description: 'Meta Llama 3.1 and Llama 3.3 architectures',
+      verified_architectures: ['LlamaForCausalLM'],
+      models: ['meta-llama/Llama-3.3-70B-Instruct', 'meta-llama/Llama-3.1-8B-Instruct'],
+      status: 'SUPPORTED' as const
+    },
+    {
+      family: 'DeepSeek-family',
+      description: 'DeepSeek R1 distilled reasoning models',
+      verified_architectures: ['Qwen2ForCausalLM', 'LlamaForCausalLM'],
+      models: ['deepseek-ai/DeepSeek-R1-Distill-Qwen-32B', 'deepseek-ai/DeepSeek-R1-Distill-Llama-8B'],
+      status: 'SUPPORTED' as const
+    },
+    {
+      family: 'Mistral-family',
+      description: 'Mistral AI Nemo and large language architectures',
+      verified_architectures: ['MistralForCausalLM'],
+      models: ['mistralai/Mistral-Nemo-Instruct-2407', 'mistralai/Mistral-7B-Instruct-v0.3'],
+      status: 'SUPPORTED' as const
+    },
+    {
+      family: 'Gemma-family',
+      description: 'Google Gemma 2 architectures with sliding window attention',
+      verified_architectures: ['Gemma2ForCausalLM'],
+      models: ['google/gemma-2-27b-it', 'google/gemma-2-9b-it'],
+      status: 'SUPPORTED' as const
+    }
+  ],
+  runtimes: [
+    {
+      name: 'vllm',
+      category: 'HIGH_THROUGHPUT_SERVING',
+      status: 'SUPPORTED' as const,
+      supported_accelerators: ['NVIDIA Hopper', 'NVIDIA Ada', 'NVIDIA Ampere', 'AMD CDNA 3'],
+      notes: 'PagedAttention with continuous batching and native FP8 support'
+    },
+    {
+      name: 'tensorrt-llm',
+      category: 'MAX_PERFORMANCE_OPTIMIZED',
+      status: 'SUPPORTED' as const,
+      supported_accelerators: ['NVIDIA Hopper (H100/H200)', 'NVIDIA Ada (L40S/RTX 4090)'],
+      notes: 'Fused multi-head attention kernels, in-flight batching, FP8 Tensor Cores'
+    },
+    {
+      name: 'nvidia-dynamo',
+      category: 'DISAGGREGATED_SERVING',
+      status: 'SUPPORTED' as const,
+      supported_accelerators: ['NVIDIA Hopper', 'NVIDIA Ada (Multi-Node / Multi-GPU)'],
+      notes: 'Disaggregated Prefill and Decode with KV-cache affinity routing'
+    },
+    {
+      name: 'nvidia-nim',
+      category: 'ENTERPRISE_CONTAINER',
+      status: 'SUPPORTED' as const,
+      supported_accelerators: ['NVIDIA Hopper', 'NVIDIA Ada', 'NVIDIA Ampere'],
+      notes: 'Turnkey NGC microservice with enterprise SLA and calibrated engines'
+    },
+    {
+      name: 'sglang',
+      category: 'HIGH_THROUGHPUT_SERVING',
+      status: 'SUPPORTED' as const,
+      supported_accelerators: ['NVIDIA Hopper', 'NVIDIA Ada', 'AMD CDNA 3'],
+      notes: 'RadixAttention for structured decoding and multi-turn prefix caching'
+    },
+    {
+      name: 'llama.cpp',
+      category: 'LIGHTWEIGHT_LOCAL',
+      status: 'SUPPORTED' as const,
+      supported_accelerators: ['Apple Silicon (Metal)', 'NVIDIA (CUDA)', 'x86_64 AVX2/AVX-512'],
+      notes: 'GGUF quantization (Q4_K_M, Q8_0) for edge and workstation deployments'
+    },
+    {
+      name: 'transformers',
+      category: 'REFERENCE_BASELINE',
+      status: 'SUPPORTED' as const,
+      supported_accelerators: ['All Accelerators', 'CPU'],
+      notes: 'PyTorch native execution used strictly as the unoptimized performance baseline'
+    },
+    {
+      name: 'simulation',
+      category: 'DEVELOPMENT_HARNESS',
+      status: 'EXPERIMENTAL' as const,
+      supported_accelerators: ['Virtual'],
+      notes: 'Deterministic hardware simulation for development and offline testing only'
+    }
+  ],
+  execution_backends: [
+    {
+      name: 'LOCAL',
+      status: 'SUPPORTED' as const,
+      description: 'Direct local GPU execution via ModelForge CLI agent'
+    },
+    {
+      name: 'HF_JOB',
+      status: 'SUPPORTED' as const,
+      description: 'Automated remote execution on Hugging Face Jobs infrastructure'
+    },
+    {
+      name: 'REMOTE_WORKER',
+      status: 'EXPERIMENTAL' as const,
+      description: 'Distributed network workers reporting cryptographically signed benchmark telemetry'
+    }
+  ],
+  deployment_targets: [
+    {
+      name: 'Docker Compose',
+      manifest_format: 'docker-compose.yaml',
+      status: 'SUPPORTED' as const
+    },
+    {
+      name: 'vLLM Service',
+      manifest_format: 'run-vllm.sh',
+      status: 'SUPPORTED' as const
+    },
+    {
+      name: 'NVIDIA NIM',
+      manifest_format: 'docker-compose.yaml (NGC image)',
+      status: 'SUPPORTED' as const
+    },
+    {
+      name: 'NVIDIA Dynamo',
+      manifest_format: 'DynamoServingDeployment (K8s CRD)',
+      status: 'SUPPORTED' as const
+    },
+    {
+      name: 'Kubernetes',
+      manifest_format: 'k8s-deployment.yaml',
+      status: 'SUPPORTED' as const
+    }
+  ],
+  accelerator_support: [
+    {
+      device: 'NVIDIA H100 SXM5 80GB',
+      vendor: 'NVIDIA',
+      status: 'DEEP_SUPPORT' as const,
+      tested_precisions: ['fp8', 'fp16', 'int4']
+    },
+    {
+      device: 'NVIDIA H200 141GB',
+      vendor: 'NVIDIA',
+      status: 'DEEP_SUPPORT' as const,
+      tested_precisions: ['fp8', 'fp16', 'int4']
+    },
+    {
+      device: 'NVIDIA L40S 48GB',
+      vendor: 'NVIDIA',
+      status: 'DEEP_SUPPORT' as const,
+      tested_precisions: ['fp8', 'fp16', 'int4']
+    },
+    {
+      device: 'NVIDIA GeForce RTX 4090 24GB',
+      vendor: 'NVIDIA',
+      status: 'DEEP_SUPPORT' as const,
+      tested_precisions: ['fp8', 'fp16', 'int4']
+    },
+    {
+      device: 'AMD Instinct MI300X 192GB',
+      vendor: 'AMD',
+      status: 'COMMUNITY_SUPPORT' as const,
+      tested_precisions: ['fp8', 'fp16']
+    },
+    {
+      device: 'Apple M3 Ultra 192GB',
+      vendor: 'Apple',
+      status: 'COMMUNITY_SUPPORT' as const,
+      tested_precisions: ['int4', 'int8', 'fp16']
+    }
+  ]
+};
+
+export type SupportMatrix = typeof SUPPORT_MATRIX;
+
 export class ModelForgeDataLayer {
   private benchmarks: Map<string, OpenComputeBenchRecord> = new Map();
   private models: Map<string, ModelMetadata> = new Map();
   private passports: Map<string, ComputePassport> = new Map();
   private plans: Map<string, DeploymentPlan> = new Map();
   private softwareLift: SoftwareLiftMetric[] = SEED_SOFTWARE_LIFT;
+  private failures: FailureRecord[] = SEED_FAILURES;
 
   constructor() {
     for (const b of SEED_BENCHMARKS) {
@@ -735,6 +1009,26 @@ export class ModelForgeDataLayer {
     if (ageDays > 180) return 'STALE';
     if (ageDays > 60) return 'AGING';
     return 'CURRENT';
+  }
+
+  // Golden Benchmarks
+  listGoldenBenchmarks(): OpenComputeBenchRecord[] {
+    return Array.from(this.benchmarks.values()).filter((b) => b.golden === true);
+  }
+
+  // Failure Corpus methods
+  listFailures(filters?: { model?: string; category?: string; runtime?: string }): FailureRecord[] {
+    return this.failures.filter((f) => {
+      if (filters?.model && !f.model_repository.toLowerCase().includes(filters.model.toLowerCase())) return false;
+      if (filters?.category && f.failure_category !== filters.category) return false;
+      if (filters?.runtime && !f.runtime.toLowerCase().includes(filters.runtime.toLowerCase())) return false;
+      return true;
+    });
+  }
+
+  // Support Matrix
+  getSupportMatrix(): SupportMatrix {
+    return SUPPORT_MATRIX;
   }
 }
 
