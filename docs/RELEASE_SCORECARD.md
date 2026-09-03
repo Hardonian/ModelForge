@@ -36,7 +36,7 @@
 
 ### Monorepo TypeScript Packages & Web Application
 
-```
+```text
 Tasks:    13 successful, 13 total
 Cached:   6 cached, 13 total
 Time:     14.099s
@@ -53,7 +53,7 @@ Time:     14.099s
 
 ### Python Benchmark CLI & MCP Server
 
-```
+```text
 tests/test_cli.py ...........                                            [ 52%]
 tests/test_mcp.py .......                                                [ 85%]
 tests/test_schema.py ...                                                 [100%]

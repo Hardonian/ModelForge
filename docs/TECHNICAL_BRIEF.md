@@ -1,6 +1,6 @@
 # ModelForge Technical Architecture Brief
 
-**System Architecture, Cryptographic Verification, and Mathematical Optimization Specification**
+## System Architecture, Cryptographic Verification, and Mathematical Optimization Specification
 
 ---
 

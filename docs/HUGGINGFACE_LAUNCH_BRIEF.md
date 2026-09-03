@@ -1,6 +1,6 @@
 # ModelForge: Hugging Face Ecosystem Launch Brief
 
-**Empowering Model Creators & Deployers with Verifiable Compute Intelligence**
+## Empowering Model Creators & Deployers with Verifiable Compute Intelligence
 
 ---
 

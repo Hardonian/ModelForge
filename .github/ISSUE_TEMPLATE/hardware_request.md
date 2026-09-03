@@ -6,7 +6,7 @@ labels: ["hardware", "registry"]
 assignees: ""
 ---
 
-**Device Specification**
+### Device Specification
 
 - Manufacturer / Vendor: (e.g. NVIDIA, AMD, Intel, Apple, Qualcomm)
 - Device Name: (e.g. NVIDIA RTX 5090 32GB)
@@ -16,5 +16,6 @@ assignees: ""
 - Supported Precisions: (e.g. FP16, FP8, INT4)
 - Supported Serving Runtimes: (e.g. vLLM, TensorRT-LLM, llama.cpp)
 
-**Manufacturer Data Sheet / Documentation**
+### Manufacturer Data Sheet / Documentation
+
 Link to official documentation or architectural whitepaper.

@@ -24,4 +24,4 @@ When you choose to submit a benchmark result to the OpenComputeBench network:
 ## Questions & Contact
 
 For inquiries regarding privacy practices or data handling, contact:
-**privacy@modelforge.dev**
+[privacy@modelforge.dev](mailto:privacy@modelforge.dev)

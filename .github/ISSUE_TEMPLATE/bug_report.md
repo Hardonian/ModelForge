@@ -6,10 +6,11 @@ labels: ["bug"]
 assignees: ""
 ---
 
-**Describe the bug**
+### Describe the Bug
+
 A clear and concise description of what the bug is.
 
-**Environment Telemetry**
+### Environment Telemetry
 
 - ModelForge CLI Version: (e.g. `modelforge --version`)
 - Operating System: (e.g. Ubuntu 22.04 LTS, Windows 11)
@@ -18,18 +19,20 @@ A clear and concise description of what the bug is.
 - CUDA Version: (e.g. 12.4)
 - Runtime & Version: (e.g. vLLM 0.6.4, TensorRT-LLM 0.16.0)
 
-**To Reproduce**
+### To Reproduce
+
 Steps to reproduce the behavior:
 
 1. Run command '...'
 2. With workload configuration '...'
 3. See error
 
-**Expected behavior**
+### Expected Behavior
+
 A clear description of what you expected to happen.
 
-**Logs & Terminal Output**
+### Logs & Terminal Output
 
-```
+```text
 Paste terminal logs or modelforge doctor output here
 ```

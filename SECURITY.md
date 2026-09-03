@@ -14,7 +14,7 @@ ModelForge takes security, multi-tenant isolation, and benchmark cryptographic i
 If you discover a security vulnerability or sensitive data leak in ModelForge, please do **NOT** open a public GitHub issue.
 
 Instead, please send a detailed report via encrypted email to:
-**security@modelforge.dev**
+[security@modelforge.dev](mailto:security@modelforge.dev)
 
 Include:
 

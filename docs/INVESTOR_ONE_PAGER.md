@@ -1,6 +1,6 @@
 # ModelForge: Investor One-Pager
 
-**The Open Deployment Intelligence Layer Between AI Models and Production Compute**
+## The Open Deployment Intelligence Layer Between AI Models and Production Compute
 
 ---
 
@@ -20,12 +20,12 @@ Today, there are over **1.5 million open models on Hugging Face**. When an enter
 
 ModelForge is the **deployment intelligence layer** that translates model architectures and latency SLOs into mathematically optimal, reproducible deployment configurations.
 
-```
+```text
 HUGGING FACE MODEL → EXACT REVISION → COMPUTE PASSPORT → WORKLOAD → SLO
   → DEPLOYMENT PLAN → EVIDENCE → ARTIFACT → BENCHMARK → REPRODUCTION
 ```
 
-### Core Product Capabilities:
+### Core Product Capabilities
 
 1. **Compute Passports**: Revision-specific hardware compatibility, memory footprints, and deterministic confidence scoring.
 2. **Inference SLO Compiler**: Multi-objective Pareto optimizer ranking hardware topologies by cost and latency.

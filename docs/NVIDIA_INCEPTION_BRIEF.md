@@ -1,6 +1,6 @@
 # ModelForge: NVIDIA Inception & Ecosystem Partner Brief
 
-**The Open Deployment Intelligence Layer Between Hugging Face Models and NVIDIA AI Compute**
+## The Open Deployment Intelligence Layer Between Hugging Face Models and NVIDIA AI Compute
 
 ---
 
