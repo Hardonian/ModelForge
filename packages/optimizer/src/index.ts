@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { HARDWARE_CATALOG, HardwareDevice, getHardwareDevice } from '@modelforge/hardware-registry';
+import { HARDWARE_CATALOG } from '@modelforge/hardware-registry';
 import { computeModelFit, ModelFitResult } from '@modelforge/model-fit';
 
 export const ObjectiveTypeSchema = z.enum([
@@ -18,7 +18,8 @@ export const OptimizerQuerySchema = z.object({
     context_window: z.number().int().positive().default(32768),
     layers: z.number().int().positive().default(32),
     kv_heads: z.number().int().positive().default(8),
-    head_dim: z.number().int().positive().default(128)
+    head_dim: z.number().int().positive().default(128),
+    architecture: z.string().default('transformer')
   }),
   workload: z.object({
     context_length: z.number().int().positive().default(4096),
