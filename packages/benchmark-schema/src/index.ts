@@ -255,3 +255,82 @@ export function validateBenchmarkIntegrity(record: OpenComputeBenchRecord): {
     errors
   };
 }
+
+export const FreshnessStatusSchema = z.enum(['CURRENT', 'AGING', 'STALE', 'INVALIDATED']);
+export type FreshnessStatus = z.infer<typeof FreshnessStatusSchema>;
+
+export const CompatibilityProvenanceSchema = z.enum([
+  'DOCUMENTED',
+  'MEASURED',
+  'DERIVED',
+  'PREDICTED',
+  'UNKNOWN'
+]);
+export type CompatibilityProvenance = z.infer<typeof CompatibilityProvenanceSchema>;
+
+export const CompatibilityClaimSchema = z.object({
+  status: z.enum(['supported', 'unsupported', 'unknown', 'experimental']),
+  provenance: CompatibilityProvenanceSchema,
+  notes: z.string().optional()
+});
+export type CompatibilityClaim = z.infer<typeof CompatibilityClaimSchema>;
+
+export const ComputePassportSchema = z.object({
+  passport_id: z.string().uuid(),
+  schema_version: z.literal('2.0.0'),
+  model_id: z.string().min(1),
+  revision: z.string().default('main'),
+  hf_url: z.string().url(),
+  architecture: z.string().min(1),
+  parameters_billions: z.number().positive(),
+  context_window: z.number().int().positive(),
+  license: z.string(),
+  gated: z.boolean().default(false),
+  compatibility: z.record(CompatibilityClaimSchema),
+  memory_profile: z.object({
+    weights_fp16_gb: z.number().positive(),
+    weights_fp8_gb: z.number().positive(),
+    weights_int4_gb: z.number().positive(),
+    min_vram_gb: z.number().positive(),
+    recommended_vram_gb: z.number().positive()
+  }),
+  coverage: z.object({
+    accelerators_tested: z.array(z.string()),
+    runtimes_tested: z.array(z.string()),
+    total_benchmarks: z.number().int().nonnegative(),
+    total_reproductions: z.number().int().nonnegative(),
+    freshness_status: FreshnessStatusSchema
+  }),
+  deployment_profiles: z.object({
+    local_inference: z.string().optional(),
+    lowest_cost: z.string().optional(),
+    lowest_latency: z.string().optional(),
+    highest_throughput: z.string().optional(),
+    nvidia_optimized: z.string().optional()
+  }),
+  confidence: z.object({
+    score: z.number().min(0).max(100),
+    explanation: z.string()
+  })
+});
+export type ComputePassport = z.infer<typeof ComputePassportSchema>;
+
+export const SoftwareLiftMetricSchema = z.object({
+  accelerator: z.string(),
+  model_id: z.string(),
+  model_revision: z.string(),
+  precision: z.string(),
+  context_length: z.number().int().positive(),
+  baseline_runtime: z.literal('transformers'),
+  baseline_tps: z.number().positive(),
+  comparisons: z.array(
+    z.object({
+      runtime: z.string(),
+      tps: z.number().positive(),
+      throughput_lift: z.number().positive(),
+      ttft_reduction_percent: z.number(),
+      provenance: CompatibilityProvenanceSchema
+    })
+  )
+});
+export type SoftwareLiftMetric = z.infer<typeof SoftwareLiftMetricSchema>;

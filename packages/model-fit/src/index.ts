@@ -26,7 +26,8 @@ export const ModelFitInputSchema = z.object({
     generated_tokens: z.number().int().positive().default(256),
     concurrency: z.number().int().positive().default(1),
     target_ttft_ms: z.number().positive().optional(),
-    target_tpot_ms: z.number().positive().optional()
+    target_tpot_ms: z.number().positive().optional(),
+    workload_name: z.string().optional()
   }),
   benchmark_provenance: z.enum(['verified', 'community', 'reproduced', 'synthetic', 'estimated']).default('estimated')
 });
@@ -54,9 +55,14 @@ export const MemoryBreakdownSchema = z.object({
 export type MemoryBreakdown = z.infer<typeof MemoryBreakdownSchema>;
 
 export const ModelFitResultSchema = z.object({
-  algorithm_version: z.literal('1.0.0'),
+  algorithm_version: z.union([z.literal('1.0.0'), z.literal('2.0.0')]),
   overall_score: z.number().min(0).max(100),
   grade: z.enum(['A+', 'A', 'B', 'C', 'D', 'F']),
+  workload_fit: z.object({
+    workload_name: z.string(),
+    score: z.number().min(0).max(100),
+    grade: z.enum(['A+', 'A', 'B', 'C', 'D', 'F'])
+  }).optional(),
   dimensions: ModelFitDimensionsSchema,
   memory_breakdown: MemoryBreakdownSchema,
   performance_estimates: z.object({
@@ -249,6 +255,35 @@ export function computeModelFit(rawInput: ModelFitInput): ModelFitResult {
   else if (overallScore >= 60) grade = 'C';
   else if (overallScore >= 45) grade = 'D';
 
+  let workloadFit: { workload_name: string; score: number; grade: 'A+' | 'A' | 'B' | 'C' | 'D' | 'F' } | undefined = undefined;
+  if (input.workload.workload_name) {
+    // Workload-Aware ModelFit scoring
+    const isRag = input.workload.workload_name.toLowerCase().includes('rag');
+    const isCode = input.workload.workload_name.toLowerCase().includes('code');
+    let wScore = overallScore;
+
+    if (isRag) {
+      // RAG emphasizes context headroom and prefill latency
+      wScore = Math.round(memoryFit * 0.40 + contextFit * 0.25 + performanceFit * 0.20 + runtimeFit * 0.15);
+    } else if (isCode) {
+      // Code generation emphasizes fast decode TPOT and concurrency
+      wScore = Math.round(performanceFit * 0.45 + memoryFit * 0.25 + runtimeFit * 0.20 + efficiencyFit * 0.10);
+    }
+    const finalWScore = memory.is_oom ? Math.min(30, wScore) : Math.min(100, Math.max(0, wScore));
+    let wGrade: 'A+' | 'A' | 'B' | 'C' | 'D' | 'F' = 'F';
+    if (finalWScore >= 93) wGrade = 'A+';
+    else if (finalWScore >= 85) wGrade = 'A';
+    else if (finalWScore >= 75) wGrade = 'B';
+    else if (finalWScore >= 60) wGrade = 'C';
+    else if (finalWScore >= 45) wGrade = 'D';
+
+    workloadFit = {
+      workload_name: input.workload.workload_name,
+      score: finalWScore,
+      grade: wGrade
+    };
+  }
+
   let recommendation = `Configuration is fully viable for production serving.`;
   if (memory.is_oom) {
     recommendation = `Not viable due to VRAM exhaustion. Consider quantizing to FP8/INT4 or adding accelerator nodes.`;
@@ -257,9 +292,10 @@ export function computeModelFit(rawInput: ModelFitInput): ModelFitResult {
   }
 
   return {
-    algorithm_version: '1.0.0',
+    algorithm_version: '2.0.0',
     overall_score: overallScore,
     grade,
+    workload_fit: workloadFit,
     dimensions: {
       memory_fit: memoryFit,
       performance_fit: performanceFit,

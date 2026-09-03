@@ -21,16 +21,26 @@ export interface ModelTargetInfo {
 
 export function compileSLOToDeploymentPlan(
   model: ModelTargetInfo,
-  workload: WorkloadFingerprint,
-  slo: SLOSpec
+  workloadInput: WorkloadFingerprint,
+  sloInput: Partial<SLOSpec>
 ): DeploymentPlan {
+  const slo = {
+    availability_target: 99.9,
+    quality_floor: 0.95,
+    energy_optimization_preference: 'neutral' as const,
+    optimize_for: 'balanced' as const,
+    ...sloInput
+  };
+  const workload = workloadInput;
+
   const planId = crypto.randomUUID();
   const candidates: CandidateDeployment[] = [];
 
   // Generate candidates across accelerators and runtimes
   for (const device of HARDWARE_CATALOG) {
     const isNvidia = device.vendor === 'nvidia';
-    const isHopperOrBlackwell = device.architecture === 'Hopper' || device.architecture === 'Blackwell';
+    const arch = device.manufacturer.architecture;
+    const isHopperOrBlackwell = arch === 'Hopper' || arch === 'Blackwell';
     const vramGb = device.manufacturer.vram_bytes / 1e9;
 
     // Precisions to evaluate
@@ -47,17 +57,18 @@ export function compileSLOToDeploymentPlan(
       if (deviceCount > 8) continue; // exceed single node limit for this prototype
 
       // Baseline speed estimation
-      const bandwidthRatio = device.observed.memory_bandwidth_gb_s / 1000;
+      const bandwidthGb = device.observed.observed_effective_bandwidth_gb_s || device.manufacturer.memory_bandwidth_gb_s;
+      const bandwidthRatio = bandwidthGb / 1000;
       const baseTps = (bandwidthRatio * 45) / (bpp * 1.2) * (deviceCount > 1 ? deviceCount * 0.85 : 1);
       const ttftMs = Math.max(80, Math.round((workload.prompt_token_mean / (bandwidthRatio * 30)) * 100));
       const tpotMs = Number((1000 / (baseTps / workload.target_concurrency)).toFixed(1));
 
-      const hourlyCost = (device.pricing?.cloud_hourly_usd ?? 1.5) * deviceCount;
+      const hourlyCost = (device.typical_cloud_cost_per_hour_usd ?? 1.5) * deviceCount;
       const totalTokensHour = baseTps * 3600;
       const costPerMillion = totalTokensHour > 0 ? Number(((hourlyCost / totalTokensHour) * 1e6).toFixed(2)) : 1.0;
 
       // 1. Evaluate NVIDIA Dynamo Target (if NVIDIA Hopper or Ada and High Concurrency)
-      if (isNvidia && (isHopperOrBlackwell || device.architecture === 'Ada') && workload.target_concurrency >= 8) {
+      if (isNvidia && (isHopperOrBlackwell || arch === 'Ada') && workload.target_concurrency >= 8) {
         const dynamoTps = Number((baseTps * 1.35).toFixed(1)); // Dynamo disaggregation throughput lift
         const dynamoTtft = Math.round(ttftMs * 0.75); // Lower TTFT via dedicated prefill
         const isDisaggregated = deviceCount >= 2;
