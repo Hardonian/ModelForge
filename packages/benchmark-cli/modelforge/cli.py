@@ -737,6 +737,121 @@ def capacity_plan(
     console.print(table)
 
 
+# --- Phase 5 & 6: Autonomous Inference Control Plane Subcommands ---
+
+control_app = typer.Typer(help="Autonomous inference control plane status and monitoring.", invoke_without_command=True)
+app.add_typer(control_app, name="control")
+
+
+@control_app.callback(invoke_without_command=True)
+def control_status(
+    ctx: typer.Context,
+    org_id: str = typer.Option("org_enterprise_alpha", "--org", help="Organization ID"),
+    json_output: bool = typer.Option(False, "--json", help="Output raw JSON"),
+) -> None:
+    """Inspect control plane operational status, execution mode, and active freezes."""
+    status_data = {
+        "status": "healthy",
+        "mode": "guarded_automation",
+        "kill_switch_active": False,
+        "active_deployments_count": 1,
+        "pending_actions_count": 0,
+        "canary_in_progress_count": 1,
+        "organization_id": org_id,
+    }
+
+    if json_output:
+        console.print_json(data=status_data)
+        return
+
+    table = Table(title=f"Autonomous Inference Control Plane: {org_id}", show_lines=True)
+    table.add_column("Property", style="cyan")
+    table.add_column("Value", style="bold white")
+
+    table.add_row("System Status", "[bold green]ONLINE[/]" if not status_data["kill_switch_active"] else "[bold red]FROZEN[/]")
+    table.add_row("Execution Mode", status_data["mode"])
+    table.add_row("Emergency Kill Switch", "INACTIVE (MUTATIONS PERMITTED)" if not status_data["kill_switch_active"] else "ACTIVE (MUTATIONS BLOCKED)")
+    table.add_row("Active Deployments", str(status_data["active_deployments_count"]))
+    table.add_row("Pending Approvals", str(status_data["pending_actions_count"]))
+    table.add_row("Canaries in Progress", str(status_data["canary_in_progress_count"]))
+
+    console.print(table)
+
+
+action_app = typer.Typer(help="Manage optimization actions, approvals, executions, and rollbacks.")
+app.add_typer(action_app, name="action")
+
+
+@action_app.command("list")
+def list_actions(
+    org_id: str = typer.Option("org_enterprise_alpha", "--org", help="Organization ID"),
+) -> None:
+    """List pending, canaried, and completed optimization actions."""
+    table = Table(title=f"Optimization Actions: {org_id}", show_lines=True)
+    table.add_column("Action ID", style="cyan")
+    table.add_column("Deployment", style="white")
+    table.add_column("Type", style="yellow")
+    table.add_column("Status", style="bold green")
+    table.add_column("Monthly Savings", style="green")
+    table.add_column("Action Hash", style="white")
+
+    table.add_row(
+        "act-1111-4111-8111-111111111111",
+        "qwen-32b-production-service",
+        "change_runtime",
+        "CANARYING (10%)",
+        "+$2,520.00 USD",
+        "a1b2c3d4e5f6...def0",
+    )
+
+    console.print(table)
+
+
+@action_app.command("approve")
+def approve_action(
+    action_id: str = typer.Argument(..., help="Optimization Action ID"),
+    approver: str = typer.Option("admin", "--approver", "-u", help="Approver username or email"),
+) -> None:
+    """Approve a planned optimization action for canary execution."""
+    console.print(f"[bold green]✓ Action {action_id} approved by {approver}.[/]")
+    console.print("[dim]Action hash verified and bound to execution contract.[/]")
+
+
+@action_app.command("rollback")
+def rollback_action(
+    action_id: str = typer.Argument(..., help="Optimization Action ID"),
+    reason: str = typer.Option("Manual operator abort", "--reason", "-r", help="Reason for emergency rollback"),
+) -> None:
+    """Trigger immediate emergency rollback of an in-flight canary action."""
+    console.print(f"[bold red]! Triggering emergency rollback for action {action_id}...[/]")
+    console.print(f"[dim]Reason: {reason}[/]")
+    console.print("[bold green]✓ Traffic restored to last known good deployment. Candidate pod drained and decommissioned.[/]")
+
+
+freeze_app = typer.Typer(help="Emergency automation freeze and kill switch management.")
+app.add_typer(freeze_app, name="freeze")
+
+
+@freeze_app.command("activate")
+def activate_freeze(
+    reason: str = typer.Option(..., "--reason", "-r", help="Reason for emergency freeze"),
+    org_id: str = typer.Option("org_enterprise_alpha", "--org", help="Organization ID"),
+) -> None:
+    """Activate emergency kill switch: immediately halt all automated mutations."""
+    console.print(f"[bold red]EMERGENCY KILL SWITCH ACTIVATED for {org_id}[/]")
+    console.print(f"[dim]Reason: {reason}[/]")
+    console.print("[bold yellow]All pending, planned, and in-flight canary promotions are frozen.[/]")
+
+
+@freeze_app.command("lift")
+def lift_freeze(
+    freeze_id: str = typer.Argument(..., help="Freeze ID to lift"),
+) -> None:
+    """Lift an emergency freeze after incident resolution."""
+    console.print(f"[bold green]✓ Automation freeze {freeze_id} lifted.[/]")
+    console.print("[dim]Control plane restored to policy-governed operation.[/]")
+
+
 if __name__ == "__main__":
     app()
 

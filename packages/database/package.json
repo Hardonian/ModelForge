@@ -6,7 +6,8 @@
   "types": "./dist/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "node --test dist/tests/*.test.js"
   },
   "dependencies": {
     "@modelforge/benchmark-schema": "workspace:*",

@@ -31,6 +31,12 @@ export class ShadowTrafficEngine {
         reason: "Shadow traffic MUST suppress persistent database writes",
       };
     }
+    if (!config.suppress_payments) {
+      return {
+        safe: false,
+        reason: "Shadow traffic MUST suppress payments and financial transactions",
+      };
+    }
     return { safe: true };
   }
 

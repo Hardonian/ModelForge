@@ -145,9 +145,8 @@ describe("Phase 6 Adversarial Security & Control Plane Hardening", () => {
 
   test("ADVERSARIAL: Rollback failure handles unrecoverable state safely without masking", async () => {
     // Inject failure into provider rollback
-    const failingProvider = new SimulatedExecutionProvider({
-      failRollback: true,
-    });
+    const failingProvider = new SimulatedExecutionProvider();
+    failingProvider.injectFailure("rollback");
     const engine = new ExecutionEngine(failingProvider);
 
     const action = Reconciler.planReconciliation({
@@ -181,7 +180,7 @@ describe("Phase 6 Adversarial Security & Control Plane Hardening", () => {
 
     const check1 = ShadowTrafficEngine.evaluateShadowSafety(unsafeConfig);
     assert.equal(check1.safe, false);
-    assert.ok(check1.violations.some((v) => v.includes("Database writes")));
+    assert.ok(check1.reason?.includes("database"));
 
     // Configuration attempting real payments
     const unsafePaymentConfig = {
@@ -195,7 +194,7 @@ describe("Phase 6 Adversarial Security & Control Plane Hardening", () => {
 
     const check2 = ShadowTrafficEngine.evaluateShadowSafety(unsafePaymentConfig);
     assert.equal(check2.safe, false);
-    assert.ok(check2.violations.some((v) => v.includes("Payment")));
+    assert.ok(check2.reason?.includes("payments"));
   });
 
   test("ADVERSARIAL: Model ID and YAML input fuzzing prevents injection", () => {
