@@ -4,297 +4,236 @@ import {
   ArrowRight, 
   Terminal, 
   CheckCircle2, 
-  Gauge, 
   Cpu, 
-  Database, 
+  Layers, 
   TrendingUp, 
+  ShieldCheck, 
   Zap, 
-  ShieldCheck,
-  Layers,
-  Scale
+  Server, 
+  Activity,
+  Workflow
 } from 'lucide-react';
 import { dataLayer } from '@modelforge/database';
 import { HARDWARE_CATALOG } from '@modelforge/hardware-registry';
-import { ModelFitBadge, VerificationBadge } from '@/components/Badges';
 
 export default function HomePage() {
-  const models = dataLayer.listModels();
-  const benchmarks = dataLayer.listBenchmarks().slice(0, 4);
-  const hardwareCount = HARDWARE_CATALOG.length;
+  const passports = dataLayer.listComputePassports();
+  const softwareLift = dataLayer.listSoftwareLift();
 
   return (
-    <div className="relative overflow-hidden pb-20">
+    <div className="relative overflow-hidden pb-24">
       {/* Hero Section */}
-      <section className="relative pt-16 pb-20 md:pt-24 md:pb-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div className="text-center max-w-3xl mx-auto space-y-6">
-          <div className="inline-flex items-center gap-2 rounded-full border border-sky-500/30 bg-sky-500/10 px-3.5 py-1 text-xs font-medium text-sky-300 backdrop-blur-sm">
+      <section className="relative pt-14 pb-20 md:pt-20 md:pb-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div className="text-center max-w-4xl mx-auto space-y-6">
+          <div className="inline-flex items-center gap-2 rounded-full border border-sky-500/30 bg-sky-500/10 px-4 py-1.5 text-xs font-medium text-sky-300 backdrop-blur-sm">
             <Sparkles className="h-3.5 w-3.5 text-sky-400" />
-            <span>OpenComputeBench Graph v1.0.0 Now Live</span>
+            <span>ModelForge Phase 2 &bull; Deployment Intelligence Layer</span>
           </div>
 
-          <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight text-white leading-[1.15]">
-            Find the best way to run <br className="hidden sm:inline" />
+          <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight text-white leading-[1.12]">
+            From Hugging Face model to <br className="hidden sm:inline" />
             <span className="bg-gradient-to-r from-sky-400 via-indigo-300 to-emerald-400 bg-clip-text text-transparent">
-              any AI model.
+              production infrastructure.
             </span>
           </h1>
 
-          <p className="text-base sm:text-lg text-slate-300 leading-relaxed max-w-2xl mx-auto">
-            Compare models, GPUs, runtimes, and precisions using reproducible real-world inference benchmarks.
-            Eliminate guesswork, avoid OOMs, and minimize token costs.
+          <p className="text-base sm:text-xl text-slate-300 leading-relaxed max-w-3xl mx-auto font-normal">
+            Evidence-backed deployment intelligence for open AI. Automatically compile workload SLOs into
+            optimal topologies across NVIDIA Dynamo, NIM, vLLM, and TensorRT-LLM.
           </p>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
-            <Link
-              href="/optimizer"
-              className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-lg bg-sky-500 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-sky-500/25 hover:bg-sky-400 transition-all hover:scale-[1.02]"
-            >
-              <Sparkles className="h-4 w-4" />
-              <span>Optimize a Workload</span>
-            </Link>
-
-            <Link
-              href="/benchmarks"
-              className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-lg border border-slate-700 bg-slate-900/60 px-6 py-3 text-sm font-semibold text-slate-200 hover:border-slate-500 hover:text-white transition-all"
-            >
-              <span>Explore Benchmarks</span>
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-          </div>
-
-          {/* Terminal Command Teaser */}
-          <div className="pt-6 max-w-md mx-auto">
-            <div className="flex items-center justify-between rounded-lg border border-slate-800 bg-[#060a12]/90 px-4 py-2.5 font-mono text-xs text-slate-300 shadow-inner">
-              <div className="flex items-center gap-2">
-                <Terminal className="h-4 w-4 text-sky-400" />
-                <span>uv tool install modelforge</span>
-              </div>
-              <span className="text-[10px] text-slate-500">v0.1.0</span>
+          {/* Above-The-Fold Hugging Face Paste Experience */}
+          <div className="pt-4 max-w-2xl mx-auto">
+            <div className="rounded-2xl border border-slate-700/80 bg-slate-900/90 p-3 shadow-2xl backdrop-blur-xl transition-all focus-within:border-sky-500/80 focus-within:ring-2 focus-within:ring-sky-500/20">
+              <form action="/planner" method="GET" className="flex flex-col sm:flex-row items-center gap-2">
+                <div className="flex items-center gap-2 w-full px-3 py-2">
+                  <span className="text-slate-500 font-mono text-sm hidden sm:inline">huggingface.co/</span>
+                  <input
+                    type="text"
+                    name="model"
+                    defaultValue="Qwen/Qwen2.5-32B-Instruct"
+                    placeholder="org/model@revision (e.g. meta-llama/Llama-3.3-70B-Instruct)"
+                    className="w-full bg-transparent text-sm font-mono text-white placeholder-slate-500 focus:outline-none"
+                  />
+                </div>
+                <div className="flex items-center gap-2 w-full sm:w-auto">
+                  <button
+                    type="submit"
+                    className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 px-5 py-2.5 text-xs font-bold text-white shadow-lg shadow-sky-500/20 hover:from-sky-400 hover:to-indigo-500 transition-all whitespace-nowrap"
+                  >
+                    <Sparkles className="h-3.5 w-3.5" />
+                    <span>Build Plan</span>
+                  </button>
+                  <Link
+                    href="/passports"
+                    className="hidden md:flex items-center gap-1 rounded-xl border border-slate-700 bg-slate-800/80 px-4 py-2.5 text-xs font-semibold text-slate-300 hover:text-white hover:border-slate-600 transition-all whitespace-nowrap"
+                  >
+                    <span>Passports</span>
+                  </Link>
+                </div>
+              </form>
             </div>
-          </div>
-        </div>
 
-        {/* Live Interactive Teaser Card */}
-        <div className="mt-16 rounded-2xl border border-slate-800 bg-slate-900/40 p-6 backdrop-blur-xl shadow-2xl max-w-4xl mx-auto">
-          <div className="flex flex-col md:flex-row items-start md:items-center justify-between pb-6 border-b border-slate-800/80 gap-4">
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="h-2.5 w-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                <h3 className="font-semibold text-sm text-white">Live ModelFit & Benchmark Provenance</h3>
-              </div>
-              <p className="text-xs text-slate-400 mt-1">
-                Real empirical telemetry from reproducible multi-run benchmark workers.
-              </p>
-            </div>
-            <div className="flex items-center gap-2">
+            {/* Quick Suggestion Chips */}
+            <div className="flex flex-wrap items-center justify-center gap-2 pt-3 text-xs text-slate-400">
+              <span className="text-slate-500">Popular:</span>
               <Link
-                href="/compare"
-                className="text-xs font-medium text-sky-400 hover:text-sky-300 flex items-center gap-1"
+                href="/planner?model=Qwen/Qwen2.5-32B-Instruct"
+                className="rounded-full border border-slate-800 bg-slate-900/60 px-2.5 py-1 text-slate-300 hover:border-sky-500/40 hover:text-sky-300 font-mono text-[11px] transition-colors"
               >
-                Side-by-side comparison <ArrowRight className="h-3 w-3" />
+                Qwen2.5-32B
+              </Link>
+              <Link
+                href="/planner?model=meta-llama/Llama-3.3-70B-Instruct"
+                className="rounded-full border border-slate-800 bg-slate-900/60 px-2.5 py-1 text-slate-300 hover:border-sky-500/40 hover:text-sky-300 font-mono text-[11px] transition-colors"
+              >
+                Llama-3.3-70B
+              </Link>
+              <Link
+                href="/planner?model=deepseek-ai/DeepSeek-R1-Distill-Qwen-32B"
+                className="rounded-full border border-slate-800 bg-slate-900/60 px-2.5 py-1 text-slate-300 hover:border-sky-500/40 hover:text-sky-300 font-mono text-[11px] transition-colors"
+              >
+                DeepSeek-R1-32B
               </Link>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-6">
-            <div className="rounded-xl border border-slate-800/80 bg-[#090d16]/80 p-4 space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-[10px] font-mono text-slate-400 uppercase">Production Workhorse</span>
-                <ModelFitBadge score={94} grade="A+" />
-              </div>
-              <div>
-                <h4 className="font-bold text-sm text-white">Qwen 2.5 32B Instruct</h4>
-                <p className="text-xs text-slate-400">NVIDIA L40S 48GB · FP8 · vLLM</p>
-              </div>
-              <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-800/60 text-xs font-mono">
-                <div>
-                  <span className="text-slate-500 block text-[10px]">Throughput</span>
-                  <span className="text-sky-400 font-semibold">72.4 tok/s</span>
+          {/* Pipeline Diagram */}
+          <div className="pt-8 max-w-4xl mx-auto">
+            <div className="rounded-xl border border-slate-800/80 bg-[#090d16]/70 p-4 backdrop-blur-md">
+              <div className="grid grid-cols-2 sm:grid-cols-5 items-center gap-2 text-center text-xs">
+                <div className="p-2.5 rounded-lg border border-slate-800 bg-slate-900/80">
+                  <div className="text-[10px] text-slate-400 uppercase font-mono">1. Source</div>
+                  <div className="font-semibold text-white mt-0.5">HF Model</div>
                 </div>
-                <div>
-                  <span className="text-slate-500 block text-[10px]">P95 TTFT</span>
-                  <span className="text-slate-200">330 ms</span>
+                <div className="hidden sm:block text-slate-600 font-mono">→</div>
+                <div className="p-2.5 rounded-lg border border-sky-500/30 bg-sky-500/10">
+                  <div className="text-[10px] text-sky-400 uppercase font-mono">2. Evidence</div>
+                  <div className="font-semibold text-white mt-0.5">Compute Passport</div>
                 </div>
-              </div>
-              <div className="flex items-center justify-between pt-1">
-                <VerificationBadge status="verified" />
-                <span className="text-[10px] font-mono text-slate-400">$0.32 / 1M tok</span>
-              </div>
-            </div>
-
-            <div className="rounded-xl border border-slate-800/80 bg-[#090d16]/80 p-4 space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-[10px] font-mono text-slate-400 uppercase">Frontier Reasoning</span>
-                <ModelFitBadge score={96} grade="A+" />
-              </div>
-              <div>
-                <h4 className="font-bold text-sm text-white">Llama 3.3 70B Instruct</h4>
-                <p className="text-xs text-slate-400">NVIDIA H100 SXM5 · FP8 · vLLM</p>
-              </div>
-              <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-800/60 text-xs font-mono">
-                <div>
-                  <span className="text-slate-500 block text-[10px]">Throughput</span>
-                  <span className="text-sky-400 font-semibold">88.6 tok/s</span>
+                <div className="hidden sm:block text-slate-600 font-mono">→</div>
+                <div className="p-2.5 rounded-lg border border-indigo-500/30 bg-indigo-500/10">
+                  <div className="text-[10px] text-indigo-400 uppercase font-mono">3. Topology</div>
+                  <div className="font-semibold text-white mt-0.5">Dynamo / NIM / vLLM</div>
                 </div>
-                <div>
-                  <span className="text-slate-500 block text-[10px]">P95 TTFT</span>
-                  <span className="text-slate-200">235 ms</span>
-                </div>
-              </div>
-              <div className="flex items-center justify-between pt-1">
-                <VerificationBadge status="verified" />
-                <span className="text-[10px] font-mono text-slate-400">$0.85 / 1M tok</span>
-              </div>
-            </div>
-
-            <div className="rounded-xl border border-slate-800/80 bg-[#090d16]/80 p-4 space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-[10px] font-mono text-slate-400 uppercase">Local Champion</span>
-                <ModelFitBadge score={88} grade="A" />
-              </div>
-              <div>
-                <h4 className="font-bold text-sm text-white">DeepSeek R1 Distill 32B</h4>
-                <p className="text-xs text-slate-400">RTX 4090 24GB · INT4 · llama.cpp</p>
-              </div>
-              <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-800/60 text-xs font-mono">
-                <div>
-                  <span className="text-slate-500 block text-[10px]">Throughput</span>
-                  <span className="text-sky-400 font-semibold">44.2 tok/s</span>
-                </div>
-                <div>
-                  <span className="text-slate-500 block text-[10px]">P95 TTFT</span>
-                  <span className="text-slate-200">490 ms</span>
-                </div>
-              </div>
-              <div className="flex items-center justify-between pt-1">
-                <VerificationBadge status="community" />
-                <span className="text-[10px] font-mono text-slate-400">$0.45 / 1M tok</span>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Stats Counter Bar */}
-      <section className="border-y border-slate-800/80 bg-[#060a12]/70 py-10 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-          <div>
-            <div className="text-3xl font-extrabold font-mono text-sky-400">14,280+</div>
-            <div className="text-xs text-slate-400 mt-1 uppercase tracking-wider">Benchmark Observations</div>
-          </div>
-          <div>
-            <div className="text-3xl font-extrabold font-mono text-white">{hardwareCount}</div>
-            <div className="text-xs text-slate-400 mt-1 uppercase tracking-wider">Cataloged Accelerators</div>
-          </div>
-          <div>
-            <div className="text-3xl font-extrabold font-mono text-emerald-400">6</div>
-            <div className="text-xs text-slate-400 mt-1 uppercase tracking-wider">Serving Runtimes</div>
-          </div>
-          <div>
-            <div className="text-3xl font-extrabold font-mono text-white">100%</div>
-            <div className="text-xs text-slate-400 mt-1 uppercase tracking-wider">Deterministic Provenance</div>
-          </div>
-        </div>
-      </section>
-
-      {/* The Core Problem & Moat Architecture Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div className="text-center max-w-3xl mx-auto mb-16 space-y-3">
-          <h2 className="text-xs font-mono font-bold uppercase tracking-widest text-sky-400">Why ModelForge</h2>
-          <p className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
-            The AI inference stack is combinatorial.
-          </p>
-          <p className="text-sm text-slate-400 leading-relaxed">
-            Every model revision, GPU architecture, runtime version, precision format, and context length dramatically affects TTFT, TPOT, VRAM exhaustion, and serving cost.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="rounded-xl border border-slate-800 bg-slate-900/30 p-6 space-y-4 hover:border-slate-700 transition-colors">
-            <div className="h-10 w-10 rounded-lg bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-400">
-              <Database className="h-5 w-5" />
+      {/* Flagship Pillars Section */}
+      <section className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-12">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Card 1: Compute Passports */}
+          <div className="rounded-2xl border border-slate-800 bg-slate-900/40 p-6 backdrop-blur-md flex flex-col justify-between space-y-6">
+            <div className="space-y-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-sky-500/10 border border-sky-500/20 text-sky-400">
+                <ShieldCheck className="h-5 w-5" />
+              </div>
+              <h3 className="text-lg font-bold text-white">Compute Passports</h3>
+              <p className="text-xs text-slate-300 leading-relaxed">
+                Revision-specific deployment specs (<span className="font-mono text-slate-200">org/model@revision</span>) with
+                empirical evidence provenance (<span className="text-sky-300 font-mono">MEASURED</span> vs <span className="text-slate-400 font-mono">DOCUMENTED</span>),
+                VRAM profiles, and multi-runtime compatibility.
+              </p>
             </div>
-            <h3 className="font-bold text-base text-white">The Open Compute Graph</h3>
-            <p className="text-xs text-slate-400 leading-relaxed">
-              Every benchmark is cryptographically hashed with its environment and result signatures. No fabricated metrics, no vendor-sponsored marketing claims.
-            </p>
+            <Link
+              href="/passports"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-sky-400 hover:text-sky-300 transition-colors"
+            >
+              Browse Compute Passports <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
           </div>
 
-          <div className="rounded-xl border border-slate-800 bg-slate-900/30 p-6 space-y-4 hover:border-slate-700 transition-colors">
-            <div className="h-10 w-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
-              <Gauge className="h-5 w-5" />
+          {/* Card 2: Inference SLO Compiler & Dynamo */}
+          <div className="rounded-2xl border border-slate-800 bg-slate-900/40 p-6 backdrop-blur-md flex flex-col justify-between space-y-6">
+            <div className="space-y-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-indigo-400">
+                <Workflow className="h-5 w-5" />
+              </div>
+              <h3 className="text-lg font-bold text-white">Inference SLO Compiler</h3>
+              <p className="text-xs text-slate-300 leading-relaxed">
+                Determines the exact topology for your SLA. Automatically synthesizes disaggregated prefill/decode
+                manifests for <strong className="text-white">NVIDIA Dynamo</strong> and turnkey <strong className="text-white">NIM</strong> compositions.
+              </p>
             </div>
-            <h3 className="font-bold text-base text-white">Explainable ModelFit</h3>
-            <p className="text-xs text-slate-400 leading-relaxed">
-              Not a black-box LLM score. ModelFit evaluates 6 independent mathematical dimensions: Memory fit, performance fit, runtime support, context limits, efficiency, and confidence.
-            </p>
+            <Link
+              href="/planner"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-400 hover:text-indigo-300 transition-colors"
+            >
+              Launch SLO Planner <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
           </div>
 
-          <div className="rounded-xl border border-slate-800 bg-slate-900/30 p-6 space-y-4 hover:border-slate-700 transition-colors">
-            <div className="h-10 w-10 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400">
-              <Scale className="h-5 w-5" />
+          {/* Card 3: Software Lift Metric */}
+          <div className="rounded-2xl border border-slate-800 bg-slate-900/40 p-6 backdrop-blur-md flex flex-col justify-between space-y-6">
+            <div className="space-y-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
+                <TrendingUp className="h-5 w-5" />
+              </div>
+              <h3 className="text-lg font-bold text-white">Software Lift Metric</h3>
+              <p className="text-xs text-slate-300 leading-relaxed">
+                How much throughput lift can you extract on identical hardware by upgrading your serving software?
+                Transformers (1.00x) &rarr; vLLM (1.78x) &rarr; TensorRT-LLM (2.31x) &rarr; Dynamo (2.71x).
+              </p>
             </div>
-            <h3 className="font-bold text-base text-white">Multi-Objective FinOps</h3>
-            <p className="text-xs text-slate-400 leading-relaxed">
-              Solve for lowest token cost, lowest P95 latency, or highest concurrency. Automatically generate battle-tested Docker and Kubernetes manifests.
-            </p>
+            <Link
+              href="/software-lift"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-400 hover:text-emerald-300 transition-colors"
+            >
+              View Software Lift Benchmarks <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
           </div>
         </div>
-      </section>
 
-      {/* Recent Benchmarks Table */}
-      <section className="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h3 className="text-lg font-bold text-white">Recent Verified Benchmarks</h3>
-            <p className="text-xs text-slate-400">Latest additions to the OpenComputeBench public dataset.</p>
+        {/* Live Software Lift Preview Banner */}
+        <div className="rounded-2xl border border-slate-800 bg-gradient-to-r from-slate-950 via-[#0a1122] to-slate-950 p-6 md:p-8 backdrop-blur-xl">
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 pb-6 border-b border-slate-800">
+            <div>
+              <span className="text-[11px] font-mono uppercase text-emerald-400 tracking-wider">Live Software Lift Analysis</span>
+              <h2 className="text-xl md:text-2xl font-bold text-white mt-1">
+                Hopper H100: Llama-3.3-70B Throughput Lift
+              </h2>
+              <p className="text-xs text-slate-400 mt-1">
+                Holding hardware (NVIDIA H100 SXM5 80GB) and workload (FP8, 4096 ctx) strictly identical.
+              </p>
+            </div>
+            <Link
+              href="/software-lift"
+              className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-2 text-xs font-semibold text-emerald-300 hover:bg-emerald-500/20 transition-all whitespace-nowrap"
+            >
+              Explore Full Comparison
+            </Link>
           </div>
-          <Link href="/benchmarks" className="text-xs font-semibold text-sky-400 hover:text-sky-300 flex items-center gap-1">
-            View all benchmarks <ArrowRight className="h-3 w-3" />
-          </Link>
-        </div>
 
-        <div className="overflow-x-auto rounded-xl border border-slate-800 bg-slate-900/20">
-          <table className="w-full text-left text-xs font-mono">
-            <thead className="bg-slate-900/80 text-slate-400 uppercase text-[10px] tracking-wider border-b border-slate-800">
-              <tr>
-                <th className="py-3 px-4">Model</th>
-                <th className="py-3 px-4">Accelerator</th>
-                <th className="py-3 px-4">Precision</th>
-                <th className="py-3 px-4">Runtime</th>
-                <th className="py-3 px-4 text-right">Throughput</th>
-                <th className="py-3 px-4 text-right">P50 TTFT</th>
-                <th className="py-3 px-4 text-right">VRAM</th>
-                <th className="py-3 px-4">Verification</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-800/60 text-slate-300">
-              {benchmarks.map((b) => (
-                <tr key={b.benchmark_id} className="hover:bg-slate-800/30 transition-colors">
-                  <td className="py-3 px-4 font-sans font-semibold text-white">
-                    <Link href={`/benchmarks/${b.benchmark_id}`} className="hover:text-sky-400">
-                      {b.model.repository}
-                    </Link>
-                  </td>
-                  <td className="py-3 px-4">{b.hardware.device}</td>
-                  <td className="py-3 px-4 uppercase">{b.precision.type}</td>
-                  <td className="py-3 px-4">{b.runtime.name} {b.runtime.version}</td>
-                  <td className="py-3 px-4 text-right font-bold text-sky-400">{b.metrics.tokens_per_second} tok/s</td>
-                  <td className="py-3 px-4 text-right">{b.metrics.ttft_ms.p50_ms} ms</td>
-                  <td className="py-3 px-4 text-right">{roundGb(b.metrics.peak_vram_bytes)} GB</td>
-                  <td className="py-3 px-4">
-                    <VerificationBadge status={b.verification.status} synthetic={b.synthetic_fixture} />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 pt-6">
+            <div className="rounded-xl border border-slate-800 bg-[#070b14] p-4 text-center">
+              <div className="text-[11px] text-slate-400 font-mono">Transformers (Baseline)</div>
+              <div className="text-2xl font-bold text-white mt-1">38.4 <span className="text-xs font-normal text-slate-400">tok/s</span></div>
+              <div className="text-[11px] text-slate-500 mt-1 font-mono">1.00x &bull; 0% TTFT red.</div>
+            </div>
+
+            <div className="rounded-xl border border-slate-800 bg-[#070b14] p-4 text-center">
+              <div className="text-[11px] text-sky-400 font-mono">vLLM v0.6.4</div>
+              <div className="text-2xl font-bold text-sky-300 mt-1">68.2 <span className="text-xs font-normal text-slate-400">tok/s</span></div>
+              <div className="text-[11px] text-emerald-400 mt-1 font-mono font-bold">+1.78x Lift &bull; -42% TTFT</div>
+            </div>
+
+            <div className="rounded-xl border border-slate-800 bg-[#070b14] p-4 text-center">
+              <div className="text-[11px] text-indigo-400 font-mono">TensorRT-LLM</div>
+              <div className="text-2xl font-bold text-indigo-300 mt-1">88.6 <span className="text-xs font-normal text-slate-400">tok/s</span></div>
+              <div className="text-[11px] text-emerald-400 mt-1 font-mono font-bold">+2.31x Lift &bull; -54% TTFT</div>
+            </div>
+
+            <div className="rounded-xl border border-emerald-500/30 bg-emerald-950/20 p-4 text-center">
+              <div className="text-[11px] text-emerald-400 font-mono font-bold">Dynamo + TRT-LLM</div>
+              <div className="text-2xl font-bold text-emerald-300 mt-1">104.2 <span className="text-xs font-normal text-slate-400">tok/s</span></div>
+              <div className="text-[11px] text-emerald-400 mt-1 font-mono font-bold">+2.71x Lift &bull; -62% TTFT</div>
+            </div>
+          </div>
         </div>
       </section>
     </div>
   );
-}
-
-function roundGb(bytes: number): string {
-  return (bytes / 1e9).toFixed(1);
 }

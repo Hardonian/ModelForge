@@ -21,9 +21,19 @@ export default function Navbar() {
             </div>
           </Link>
 
-          <nav className="hidden md:flex items-center gap-6 text-xs font-medium text-slate-300">
+          <nav className="hidden lg:flex items-center gap-5 text-xs font-medium text-slate-300">
             <Link href="/explore" className="hover:text-white transition-colors">
               Explore
+            </Link>
+            <Link href="/passports" className="flex items-center gap-1 text-sky-400 hover:text-sky-300 transition-colors font-semibold">
+              Passports
+            </Link>
+            <Link href="/planner" className="flex items-center gap-1 text-indigo-400 hover:text-indigo-300 transition-colors font-semibold">
+              <Sparkles className="h-3 w-3" />
+              SLO Planner
+            </Link>
+            <Link href="/software-lift" className="hover:text-white transition-colors">
+              Software Lift
             </Link>
             <Link href="/models" className="hover:text-white transition-colors">
               Models
@@ -34,21 +44,11 @@ export default function Navbar() {
             <Link href="/benchmarks" className="hover:text-white transition-colors">
               Benchmarks
             </Link>
-            <Link href="/optimizer" className="flex items-center gap-1 text-sky-400 hover:text-sky-300 transition-colors">
-              <Sparkles className="h-3 w-3" />
-              Optimizer
-            </Link>
-            <Link href="/model-fit" className="hover:text-white transition-colors">
-              ModelFit
-            </Link>
             <Link href="/leaderboards" className="hover:text-white transition-colors">
               Leaderboards
             </Link>
             <Link href="/docs" className="hover:text-white transition-colors">
               Docs
-            </Link>
-            <Link href="/pricing" className="hover:text-white transition-colors">
-              Pricing
             </Link>
           </nav>
         </div>

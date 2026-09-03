@@ -35,6 +35,9 @@ importers:
       '@modelforge/optimizer':
         specifier: workspace:*
         version: link:../../packages/optimizer
+      '@modelforge/slo-compiler':
+        specifier: workspace:*
+        version: link:../../packages/slo-compiler
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
@@ -130,6 +133,9 @@ importers:
       '@modelforge/hardware-registry':
         specifier: workspace:*
         version: link:../hardware-registry
+      '@modelforge/slo-compiler':
+        specifier: workspace:*
+        version: link:../slo-compiler
       zod:
         specifier: ^3.24.2
         version: 3.25.76

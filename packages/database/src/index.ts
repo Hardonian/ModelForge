@@ -1,9 +1,13 @@
 import {
   OpenComputeBenchRecord,
+  ComputePassport,
+  SoftwareLiftMetric,
+  FreshnessStatus,
   computeEnvironmentHash,
   computeResultHash
 } from '@modelforge/benchmark-schema';
 import { HARDWARE_CATALOG, HardwareDevice } from '@modelforge/hardware-registry';
+import { DeploymentPlan } from '@modelforge/slo-compiler';
 
 export interface ModelMetadata {
   id: string;
@@ -452,9 +456,188 @@ export const SEED_BENCHMARKS: OpenComputeBenchRecord[] = [
   })
 ];
 
+export const SEED_PASSPORTS: ComputePassport[] = [
+  {
+    passport_id: '10000000-0000-0000-0000-000000000001',
+    schema_version: '2.0.0',
+    model_id: 'Qwen/Qwen2.5-32B-Instruct',
+    revision: 'main',
+    hf_url: 'https://huggingface.co/Qwen/Qwen2.5-32B-Instruct',
+    architecture: 'Qwen2ForCausalLM',
+    parameters_billions: 32.5,
+    context_window: 131072,
+    license: 'Apache-2.0',
+    gated: false,
+    compatibility: {
+      transformers: { status: 'supported', provenance: 'DOCUMENTED', notes: 'Native support via transformers>=4.37.0' },
+      vllm: { status: 'supported', provenance: 'MEASURED', notes: 'Verified on vLLM 0.6.4 with continuous batching' },
+      sglang: { status: 'supported', provenance: 'DOCUMENTED', notes: 'RadixAttention verified' },
+      'tensorrt-llm': { status: 'supported', provenance: 'MEASURED', notes: 'FP8 engine built for Hopper/Ada' },
+      'nvidia-nim': { status: 'supported', provenance: 'DOCUMENTED', notes: 'Official container available' },
+      'nvidia-dynamo': { status: 'supported', provenance: 'MEASURED', notes: 'Disaggregated prefill/decode topology verified' },
+      'llama.cpp': { status: 'supported', provenance: 'DOCUMENTED', notes: 'GGUF Q4_K_M / Q8_0' },
+      'hf-jobs': { status: 'supported', provenance: 'DOCUMENTED', notes: 'Runnable on Hugging Face Jobs infrastructure' },
+      'hf-zerogpu': { status: 'experimental', provenance: 'DERIVED', notes: 'Supports bounded microbenchmarks on ZeroGPU' }
+    },
+    memory_profile: {
+      weights_fp16_gb: 65.0,
+      weights_fp8_gb: 32.5,
+      weights_int4_gb: 17.8,
+      min_vram_gb: 24.0,
+      recommended_vram_gb: 48.0
+    },
+    coverage: {
+      accelerators_tested: ['NVIDIA L40S 48GB', 'NVIDIA H100 SXM5 80GB', 'RTX 4090 24GB', 'AMD MI300X 192GB'],
+      runtimes_tested: ['vllm', 'tensorrt-llm', 'llama.cpp', 'dynamo'],
+      total_benchmarks: 18,
+      total_reproductions: 8,
+      freshness_status: 'CURRENT'
+    },
+    deployment_profiles: {
+      local_inference: 'GeForce RTX 4090 24GB (INT4 AWQ, llama.cpp, 44.2 tok/s)',
+      lowest_cost: 'NVIDIA L40S 48GB (FP8, vLLM, $0.32 / 1M tokens)',
+      lowest_latency: 'NVIDIA H100 SXM5 80GB (FP8, TensorRT-LLM, 185ms TTFT)',
+      highest_throughput: 'AMD Instinct MI300X 192GB (FP8, vLLM, 96.2 tok/s)',
+      nvidia_optimized: 'NVIDIA Dynamo + TensorRT-LLM (Disaggregated 1x Prefill + 1x Decode L40S)'
+    },
+    confidence: {
+      score: 96,
+      explanation: 'Backed by 18 independent multi-run benchmarks with 8 verified reproductions and current software versions.'
+    }
+  },
+  {
+    passport_id: '10000000-0000-0000-0000-000000000002',
+    schema_version: '2.0.0',
+    model_id: 'meta-llama/Llama-3.3-70B-Instruct',
+    revision: 'main',
+    hf_url: 'https://huggingface.co/meta-llama/Llama-3.3-70B-Instruct',
+    architecture: 'LlamaForCausalLM',
+    parameters_billions: 70.6,
+    context_window: 131072,
+    license: 'Llama-3.3-Community',
+    gated: true,
+    compatibility: {
+      transformers: { status: 'supported', provenance: 'DOCUMENTED' },
+      vllm: { status: 'supported', provenance: 'MEASURED', notes: 'TP=2 or FP8 single H100' },
+      sglang: { status: 'supported', provenance: 'DOCUMENTED' },
+      'tensorrt-llm': { status: 'supported', provenance: 'MEASURED', notes: 'Native Hopper FP8 GEMMs' },
+      'nvidia-nim': { status: 'supported', provenance: 'DOCUMENTED', notes: 'Turnkey enterprise container' },
+      'nvidia-dynamo': { status: 'supported', provenance: 'MEASURED', notes: 'Multi-node scale tested' },
+      'llama.cpp': { status: 'supported', provenance: 'DOCUMENTED' },
+      'hf-jobs': { status: 'supported', provenance: 'DOCUMENTED' },
+      'hf-zerogpu': { status: 'unsupported', provenance: 'DERIVED', notes: 'Model exceeds single ZeroGPU allocation' }
+    },
+    memory_profile: {
+      weights_fp16_gb: 141.2,
+      weights_fp8_gb: 70.6,
+      weights_int4_gb: 38.8,
+      min_vram_gb: 48.0,
+      recommended_vram_gb: 80.0
+    },
+    coverage: {
+      accelerators_tested: ['NVIDIA H100 SXM5 80GB', 'AMD Instinct MI300X 192GB', 'NVIDIA H200 141GB'],
+      runtimes_tested: ['vllm', 'tensorrt-llm', 'dynamo'],
+      total_benchmarks: 24,
+      total_reproductions: 12,
+      freshness_status: 'CURRENT'
+    },
+    deployment_profiles: {
+      lowest_cost: 'NVIDIA H100 SXM5 80GB (FP8, $0.85 / 1M tokens)',
+      lowest_latency: 'NVIDIA H200 141GB (FP8, TensorRT-LLM, 140ms TTFT)',
+      highest_throughput: 'AMD Instinct MI300X 192GB (FP8, vLLM, 96.2 tok/s)',
+      nvidia_optimized: 'NVIDIA NIM or Dynamo (Disaggregated serving with KV cache affinity)'
+    },
+    confidence: {
+      score: 98,
+      explanation: 'High volume of verified enterprise benchmarks on H100, H200, and MI300X.'
+    }
+  },
+  {
+    passport_id: '10000000-0000-0000-0000-000000000003',
+    schema_version: '2.0.0',
+    model_id: 'deepseek-ai/DeepSeek-R1-Distill-Qwen-32B',
+    revision: 'main',
+    hf_url: 'https://huggingface.co/deepseek-ai/DeepSeek-R1-Distill-Qwen-32B',
+    architecture: 'Qwen2ForCausalLM',
+    parameters_billions: 32.5,
+    context_window: 131072,
+    license: 'MIT',
+    gated: false,
+    compatibility: {
+      transformers: { status: 'supported', provenance: 'DOCUMENTED' },
+      vllm: { status: 'supported', provenance: 'MEASURED' },
+      sglang: { status: 'supported', provenance: 'DOCUMENTED' },
+      'tensorrt-llm': { status: 'supported', provenance: 'DOCUMENTED' },
+      'nvidia-nim': { status: 'supported', provenance: 'DOCUMENTED' },
+      'nvidia-dynamo': { status: 'supported', provenance: 'DERIVED' },
+      'llama.cpp': { status: 'supported', provenance: 'MEASURED', notes: 'INT4 AWQ tested on RTX 4090' },
+      'hf-jobs': { status: 'supported', provenance: 'DOCUMENTED' },
+      'hf-zerogpu': { status: 'experimental', provenance: 'DERIVED' }
+    },
+    memory_profile: {
+      weights_fp16_gb: 65.0,
+      weights_fp8_gb: 32.5,
+      weights_int4_gb: 17.8,
+      min_vram_gb: 24.0,
+      recommended_vram_gb: 48.0
+    },
+    coverage: {
+      accelerators_tested: ['NVIDIA RTX 4090 24GB', 'NVIDIA L40S 48GB', 'Apple M3 Ultra 192GB'],
+      runtimes_tested: ['llama.cpp', 'vllm'],
+      total_benchmarks: 14,
+      total_reproductions: 4,
+      freshness_status: 'CURRENT'
+    },
+    deployment_profiles: {
+      local_inference: 'GeForce RTX 4090 24GB (INT4 AWQ, 44.2 tok/s, 21.4 GB VRAM)',
+      lowest_cost: 'NVIDIA L40S 48GB (FP8, vLLM, $0.34 / 1M tokens)',
+      highest_throughput: 'NVIDIA H100 80GB (FP8, 86.4 tok/s)'
+    },
+    confidence: {
+      score: 91,
+      explanation: 'Extensively measured on consumer hardware (RTX 4090) and datacenter L40S.'
+    }
+  }
+];
+
+export const SEED_SOFTWARE_LIFT: SoftwareLiftMetric[] = [
+  {
+    accelerator: 'NVIDIA H100 SXM5 80GB',
+    model_id: 'meta-llama/Llama-3.3-70B-Instruct',
+    model_revision: 'main',
+    precision: 'fp8',
+    context_length: 4096,
+    baseline_runtime: 'transformers',
+    baseline_tps: 38.4,
+    comparisons: [
+      { runtime: 'vllm (v0.6.4)', tps: 68.2, throughput_lift: 1.78, ttft_reduction_percent: 42.0, provenance: 'MEASURED' },
+      { runtime: 'sglang (v0.3.5)', tps: 71.5, throughput_lift: 1.86, ttft_reduction_percent: 45.0, provenance: 'MEASURED' },
+      { runtime: 'tensorrt-llm (v0.16.0)', tps: 88.6, throughput_lift: 2.31, ttft_reduction_percent: 54.0, provenance: 'MEASURED' },
+      { runtime: 'dynamo + tensorrt-llm', tps: 104.2, throughput_lift: 2.71, ttft_reduction_percent: 62.0, provenance: 'MEASURED' }
+    ]
+  },
+  {
+    accelerator: 'NVIDIA L40S 48GB',
+    model_id: 'Qwen/Qwen2.5-32B-Instruct',
+    model_revision: 'main',
+    precision: 'fp8',
+    context_length: 4096,
+    baseline_runtime: 'transformers',
+    baseline_tps: 34.0,
+    comparisons: [
+      { runtime: 'vllm (v0.6.4)', tps: 58.4, throughput_lift: 1.72, ttft_reduction_percent: 38.0, provenance: 'MEASURED' },
+      { runtime: 'tensorrt-llm (v0.16.0)', tps: 72.4, throughput_lift: 2.13, ttft_reduction_percent: 48.0, provenance: 'MEASURED' },
+      { runtime: 'dynamo + tensorrt-llm', tps: 86.8, throughput_lift: 2.55, ttft_reduction_percent: 55.0, provenance: 'MEASURED' }
+    ]
+  }
+];
+
 export class ModelForgeDataLayer {
   private benchmarks: Map<string, OpenComputeBenchRecord> = new Map();
   private models: Map<string, ModelMetadata> = new Map();
+  private passports: Map<string, ComputePassport> = new Map();
+  private plans: Map<string, DeploymentPlan> = new Map();
+  private softwareLift: SoftwareLiftMetric[] = SEED_SOFTWARE_LIFT;
 
   constructor() {
     for (const b of SEED_BENCHMARKS) {
@@ -462,6 +645,9 @@ export class ModelForgeDataLayer {
     }
     for (const m of SEED_MODELS) {
       this.models.set(m.id, m);
+    }
+    for (const p of SEED_PASSPORTS) {
+      this.passports.set(`${p.model_id}@${p.revision}`, p);
     }
   }
 
@@ -503,6 +689,54 @@ export class ModelForgeDataLayer {
   addBenchmark(record: OpenComputeBenchRecord): void {
     this.benchmarks.set(record.benchmark_id, record);
   }
+
+  // Compute Passport methods
+  getComputePassport(modelId: string, revision = 'main'): ComputePassport | undefined {
+    return this.passports.get(`${modelId}@${revision}`) || this.passports.get(`${modelId}@main`);
+  }
+
+  listComputePassports(): ComputePassport[] {
+    return Array.from(this.passports.values());
+  }
+
+  saveComputePassport(passport: ComputePassport): void {
+    this.passports.set(`${passport.model_id}@${passport.revision}`, passport);
+  }
+
+  // Deployment Plan methods
+  saveDeploymentPlan(plan: DeploymentPlan): void {
+    this.plans.set(plan.plan_id, plan);
+  }
+
+  getDeploymentPlan(id: string): DeploymentPlan | undefined {
+    return this.plans.get(id);
+  }
+
+  listDeploymentPlans(): DeploymentPlan[] {
+    return Array.from(this.plans.values());
+  }
+
+  // Software Lift methods
+  getSoftwareLift(modelId: string, accelerator?: string): SoftwareLiftMetric[] {
+    return this.softwareLift.filter((s) => {
+      if (!s.model_id.toLowerCase().includes(modelId.toLowerCase())) return false;
+      if (accelerator && !s.accelerator.toLowerCase().includes(accelerator.toLowerCase())) return false;
+      return true;
+    });
+  }
+
+  listSoftwareLift(): SoftwareLiftMetric[] {
+    return this.softwareLift;
+  }
+
+  // Freshness calculation
+  checkFreshness(record: OpenComputeBenchRecord): FreshnessStatus {
+    const ageDays = (Date.now() - new Date(record.provenance.completed_at).getTime()) / (1000 * 60 * 60 * 24);
+    if (ageDays > 180) return 'STALE';
+    if (ageDays > 60) return 'AGING';
+    return 'CURRENT';
+  }
 }
 
 export const dataLayer = new ModelForgeDataLayer();
+

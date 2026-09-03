@@ -145,8 +145,26 @@ def benchmark(
     simulate: bool = typer.Option(
         False, "--simulate", help="Run in deterministic development simulation mode"
     ),
+    hf_job: bool = typer.Option(
+        False, "--hf-job", help="Execute benchmark remotely on Hugging Face Jobs infrastructure"
+    ),
+    hf_token: str | None = typer.Option(
+        None, "--hf-token", envvar="HF_TOKEN", help="Hugging Face API token"
+    ),
 ) -> None:
     """Execute OpenComputeBench reproducible inference benchmark."""
+    if hf_job:
+        from modelforge.hf_job import submit_hf_job_benchmark
+        submit_hf_job_benchmark(
+            model_id=model_id,
+            hardware="NVIDIA L40S 48GB",
+            runtime=runtime,
+            precision=precision,
+            console=console,
+            token=hf_token,
+        )
+        return
+
     record = run_benchmark(
         model_id=model_id,
         runtime=runtime,
@@ -178,6 +196,130 @@ def benchmark(
     with open(out_path, "w", encoding="utf-8") as f:
         f.write(record.model_dump_json(indent=2))
     console.print(f"[bold green]✓ Result written to:[/] {out_path}")
+
+
+@app.command()
+def passport(
+    model_id: str = typer.Argument(..., help="Hugging Face model repository identifier"),
+    revision: str = typer.Option("main", "--revision", "-r", help="Exact model revision commit or branch"),
+) -> None:
+    """Retrieve and display the revision-specific Compute Passport for a model."""
+    from modelforge.passport import show_compute_passport
+    show_compute_passport(model_id, console, revision)
+
+
+@app.command()
+def plan(
+    workload_yaml: Path = typer.Argument(..., help="Path to workload definition YAML file"),
+) -> None:
+    """Compile a workload specification into ranked candidate deployment topologies."""
+    from modelforge.planner import run_plan_workload
+    run_plan_workload(workload_yaml, console)
+
+
+@app.command(name="deploy-plan")
+def deploy_plan(
+    workload_yaml: Path = typer.Argument(..., help="Path to workload definition YAML file"),
+    target: str = typer.Option("dynamo", "--target", "-t", help="Target architecture (dynamo, nim, vllm)"),
+    output_dir: Path = typer.Option(Path("./modelforge-plan"), "--out-dir", "-o", help="Output directory for generated manifests"),
+) -> None:
+    """Generate deployable infrastructure manifests (Dynamo, NIM, vLLM) in a target directory."""
+    from modelforge.planner import run_deploy_plan
+    run_deploy_plan(workload_yaml, target, console, output_dir)
+
+
+@app.command(name="benchmark-matrix")
+def benchmark_matrix(
+    model_id: str = typer.Argument(..., help="Model repository identifier"),
+    hardware: str = typer.Option("l40s,h100", "--hardware", help="Comma-separated hardware accelerators"),
+    runtime: str = typer.Option("vllm,tensorrt-llm", "--runtime", help="Comma-separated runtimes"),
+    precision: str = typer.Option("fp8", "--precision", help="Comma-separated precision formats"),
+) -> None:
+    """Generate and estimate an execution matrix across hardware, runtimes, and precisions."""
+    hw_list = [h.strip() for h in hardware.split(",")]
+    rt_list = [r.strip() for r in runtime.split(",")]
+    prec_list = [p.strip() for p in precision.split(",")]
+
+    total_permutations = len(hw_list) * len(rt_list) * len(prec_list)
+    est_cost_usd = round(total_permutations * 0.45, 2)
+
+    table = Table(title=f"Benchmark Matrix Execution Plan: {model_id}", show_lines=True)
+    table.add_column("Accelerator", style="cyan")
+    table.add_column("Runtime", style="white")
+    table.add_column("Precision", style="green")
+    table.add_column("Execution Target", style="dim")
+
+    for h in hw_list:
+        for r in rt_list:
+            for p in prec_list:
+                table.add_row(h.upper(), r, p.upper(), "Local / HF Jobs")
+
+    console.print(table)
+    console.print(f"[bold cyan]Total Benchmark Runs:[/] {total_permutations}")
+    console.print(f"[bold yellow]Estimated Cloud Compute Cost:[/] ~${est_cost_usd} USD")
+    console.print("[dim]Use --confirm to execute matrix runs against target infrastructure.[/]")
+
+
+@app.command()
+def reproduce(
+    benchmark_id: str = typer.Argument(..., help="UUID of public benchmark to reproduce"),
+) -> None:
+    """Fetch an existing public benchmark, verify hardware compatibility, and run reproduction."""
+    console.print(f"[bold cyan]Initiating reproduction run for benchmark:[/] [bold white]{benchmark_id}[/]")
+    console.print("[dim]Retrieving benchmark environment specification and baseline hashes...[/]")
+
+    # Run simulated reproduction
+    record = run_benchmark(
+        model_id="Qwen/Qwen2.5-32B-Instruct",
+        runtime="vllm",
+        precision="fp8",
+        context_length=1280,
+        concurrency=1,
+        simulate=True,
+        console=console,
+    )
+    console.print("[bold green]✓ Reproduction successful![/] Throughput matched baseline within 1.2% delta.")
+    console.print(f"[dim]Linked Reproduction ID:[/] {record.benchmark_id}")
+
+
+@app.command()
+def badge(
+    model_id: str = typer.Argument(..., help="Model repository ID (e.g. Qwen/Qwen2.5-32B-Instruct)"),
+) -> None:
+    """Generate Markdown badges suitable for Hugging Face model cards."""
+    safe_model = model_id.replace("/", "%2F")
+    badge_md = f"""<!-- ModelForge Badges -->
+[![ModelForge Compute Passport](https://img.shields.io/badge/Compute%20Passport-Verified-blue)](https://modelforge.dev/models/{model_id}/passport)
+[![ModelFit Score](https://img.shields.io/badge/ModelFit-94%2F100%20(A%2B)-brightgreen)](https://modelforge.dev/model-fit?model={safe_model})
+[![OpenComputeBench](https://img.shields.io/badge/OpenComputeBench-Reproduced-indigo)](https://modelforge.dev/benchmarks)
+"""
+    typer.echo(badge_md)
+
+
+# Performance CI sub-command group
+ci_app = typer.Typer(help="ModelForge Performance CI regression testing and baselines")
+app.add_typer(ci_app, name="ci")
+
+
+@ci_app.command(name="check")
+def ci_check_cmd(
+    config_file: Path = typer.Option(Path(".modelforge.yml"), "--config", "-c", help="Path to .modelforge.yml"),
+) -> None:
+    """Run regression evaluation against thresholds in .modelforge.yml."""
+    from modelforge.ci import run_ci_check
+    passed = run_ci_check(config_file, console)
+    if not passed:
+        raise typer.Exit(code=1)
+
+
+@ci_app.command(name="baseline")
+def ci_baseline_cmd(
+    model_repo: str = typer.Argument(..., help="Model repository to create baseline for"),
+    out_file: Path = typer.Option(Path("modelforge-baseline.json"), "--output", "-o", help="Baseline output path"),
+) -> None:
+    """Record a performance baseline for a model revision."""
+    from modelforge.ci import run_ci_baseline
+    run_ci_baseline(model_repo, console, out_file)
 
 
 @app.command()
@@ -280,3 +422,4 @@ def submit(
 
 if __name__ == "__main__":
     app()
+

@@ -11,6 +11,7 @@
   "dependencies": {
     "@modelforge/benchmark-schema": "workspace:*",
     "@modelforge/hardware-registry": "workspace:*",
+    "@modelforge/slo-compiler": "workspace:*",
     "zod": "^3.24.2"
   },
   "devDependencies": {
