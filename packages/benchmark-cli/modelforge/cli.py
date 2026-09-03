@@ -2,12 +2,12 @@
 
 import json
 from pathlib import Path
-from typing import Optional
+
 import httpx
+import typer
 from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
-import typer
 
 from modelforge.adapters.hardware import detect_system_environment
 from modelforge.comparator import compare_benchmarks
@@ -41,8 +41,14 @@ def inspect() -> None:
 
     table.add_row("Operating System", f"{env.os_name} {env.os_version}")
     table.add_row("CPU Architecture", env.cpu_architecture)
-    table.add_row("CPU Physical / Logical", f"{env.cpu_cores_physical} physical / {env.cpu_cores_logical} logical")
-    table.add_row("System RAM", f"{round(env.system_ram_bytes / (1024**3), 2)} GB total ({round(env.available_ram_bytes / (1024**3), 2)} GB free)")
+    table.add_row(
+        "CPU Physical / Logical",
+        f"{env.cpu_cores_physical} physical / {env.cpu_cores_logical} logical",
+    )
+    table.add_row(
+        "System RAM",
+        f"{round(env.system_ram_bytes / (1024**3), 2)} GB total ({round(env.available_ram_bytes / (1024**3), 2)} GB free)",
+    )
     table.add_row("Disk Space Free", f"{env.disk_free_gb} GB")
     table.add_row("Python Version", env.python_version)
     table.add_row("Accelerators Detected", str(len(env.accelerators)))
@@ -63,7 +69,9 @@ def hardware() -> None:
 
     for acc in env.accelerators:
         vram_gb = f"{round(acc.vram_bytes / (1024**3), 1)} GB"
-        driver = acc.driver_version or (f"CUDA {acc.cuda_version}" if acc.cuda_version else "N/A")
+        driver = acc.driver_version or (
+            f"CUDA {acc.cuda_version}" if acc.cuda_version else "N/A"
+        )
         table.add_row(acc.vendor.upper(), acc.name, vram_gb, acc.interconnect, driver)
 
     console.print(table)
@@ -72,7 +80,9 @@ def hardware() -> None:
 @app.command()
 def model(
     action: str = typer.Argument("inspect", help="Action to perform (inspect)"),
-    model_id: str = typer.Argument(..., help="Hugging Face model repository identifier"),
+    model_id: str = typer.Argument(
+        ..., help="Hugging Face model repository identifier"
+    ),
 ) -> None:
     """Inspect model architecture and calculate memory footprints across precisions."""
     params_b = 32.5 if "32" in model_id else (70.6 if "70" in model_id else 8.0)
@@ -88,7 +98,11 @@ def model(
     # FP16
     w_fp16 = round(params_b * 2.0, 1)
     min_fp16 = round(w_fp16 * 1.25, 1)
-    rec_fp16 = "H100 80GB, A100 80GB" if min_fp16 > 48 else ("L40S 48GB" if min_fp16 > 24 else "RTX 4090 24GB")
+    rec_fp16 = (
+        "H100 80GB, A100 80GB"
+        if min_fp16 > 48
+        else ("L40S 48GB" if min_fp16 > 24 else "RTX 4090 24GB")
+    )
     table.add_row("FP16 / BF16", f"{w_fp16} GB", f"{min_fp16} GB", rec_fp16)
 
     # FP8
@@ -100,7 +114,11 @@ def model(
     # INT4 / AWQ
     w_int4 = round(params_b * 0.55, 1)
     min_int4 = round(w_int4 * 1.25, 1)
-    rec_int4 = "RTX 4090 24GB, RTX 3090 24GB" if min_int4 > 16 else "Apple M3/M4, RTX 4080 16GB"
+    rec_int4 = (
+        "RTX 4090 24GB, RTX 3090 24GB"
+        if min_int4 > 16
+        else "Apple M3/M4, RTX 4080 16GB"
+    )
     table.add_row("INT4 / AWQ", f"{w_int4} GB", f"{min_int4} GB", rec_int4)
 
     console.print(table)
@@ -109,12 +127,24 @@ def model(
 @app.command()
 def benchmark(
     model_id: str = typer.Argument(..., help="Model repository ID to benchmark"),
-    runtime: str = typer.Option("vllm", "--runtime", "-r", help="Runtime engine (vllm, llama.cpp, transformers)"),
-    precision: str = typer.Option("fp8", "--precision", "-p", help="Precision (fp16, fp8, int4, awq)"),
-    context: int = typer.Option(4096, "--context", "-c", help="Workload context length tokens"),
-    concurrency: int = typer.Option(1, "--concurrency", help="Concurrent client requests"),
-    output: Optional[Path] = typer.Option(None, "--output", "-o", help="Output JSON path to save benchmark result"),
-    simulate: bool = typer.Option(False, "--simulate", help="Run in deterministic development simulation mode"),
+    runtime: str = typer.Option(
+        "vllm", "--runtime", "-r", help="Runtime engine (vllm, llama.cpp, transformers)"
+    ),
+    precision: str = typer.Option(
+        "fp8", "--precision", "-p", help="Precision (fp16, fp8, int4, awq)"
+    ),
+    context: int = typer.Option(
+        4096, "--context", "-c", help="Workload context length tokens"
+    ),
+    concurrency: int = typer.Option(
+        1, "--concurrency", help="Concurrent client requests"
+    ),
+    output: Path | None = typer.Option(
+        None, "--output", "-o", help="Output JSON path to save benchmark result"
+    ),
+    simulate: bool = typer.Option(
+        False, "--simulate", help="Run in deterministic development simulation mode"
+    ),
 ) -> None:
     """Execute OpenComputeBench reproducible inference benchmark."""
     record = run_benchmark(
@@ -136,10 +166,12 @@ def benchmark(
 [dim]P50 TTFT:[/] [bold yellow]{record.metrics.ttft_ms.p50_ms} ms[/] | [dim]P95:[/] {record.metrics.ttft_ms.p95_ms} ms
 [dim]P50 TPOT:[/] [bold yellow]{record.metrics.tpot_ms.p50_ms} ms[/] | [dim]P95:[/] {record.metrics.tpot_ms.p95_ms} ms
 [dim]Peak VRAM:[/] {round(record.metrics.peak_vram_bytes / (1024**3), 2)} GB
-[dim]Status:[/] [{ "yellow" if record.synthetic_fixture else "green" }]{record.verification.status.upper()}[/] { "(Synthetic Fixture)" if record.synthetic_fixture else "" }
+[dim]Status:[/] [{"yellow" if record.synthetic_fixture else "green"}]{record.verification.status.upper()}[/] {"(Synthetic Fixture)" if record.synthetic_fixture else ""}
 [dim]Environment Hash:[/] {record.provenance.environment_hash[:16]}...
 [dim]Result Hash:[/] {record.provenance.result_hash[:16]}..."""
-    console.print(Panel(card, title="ModelForge Benchmark Result Card", border_style="cyan"))
+    console.print(
+        Panel(card, title="ModelForge Benchmark Result Card", border_style="cyan")
+    )
 
     # Save to file
     out_path = output or Path(f"benchmark-{record.benchmark_id[:8]}.json")
@@ -149,21 +181,27 @@ def benchmark(
 
 
 @app.command()
-def validate(file_path: Path = typer.Argument(..., help="Path to benchmark JSON result file")) -> None:
+def validate(
+    file_path: Path = typer.Argument(..., help="Path to benchmark JSON result file"),
+) -> None:
     """Validate a benchmark result file against the OpenComputeBench schema and verify hashes."""
     if not file_path.exists():
         console.print(f"[bold red]Error:[/] File not found: {file_path}")
         raise typer.Exit(code=1)
 
     try:
-        with open(file_path, "r", encoding="utf-8") as f:
+        with open(file_path, encoding="utf-8") as f:
             data = json.load(f)
         record = OpenComputeBenchRecord.model_validate(data)
         is_valid, errors = validate_benchmark_integrity(record)
 
         if is_valid:
-            console.print(f"[bold green]✓ Schema & Hash Integrity Verified:[/] {file_path}")
-            console.print(f"[dim]Status:[/] {record.verification.status} | [dim]Synthetic:[/] {record.synthetic_fixture}")
+            console.print(
+                f"[bold green]✓ Schema & Hash Integrity Verified:[/] {file_path}"
+            )
+            console.print(
+                f"[dim]Status:[/] {record.verification.status} | [dim]Synthetic:[/] {record.synthetic_fixture}"
+            )
         else:
             console.print(f"[bold red]✗ Verification Failed:[/] {file_path}")
             for err in errors:
@@ -181,19 +219,27 @@ def compare(
 ) -> None:
     """Compare two benchmark results side-by-side with latency and throughput deltas."""
     if not file1.exists() or not file2.exists():
-        console.print(f"[bold red]Error:[/] One or both files not found.")
+        console.print("[bold red]Error:[/] One or both files not found.")
         raise typer.Exit(code=1)
     compare_benchmarks(file1, file2, console)
 
 
 @app.command()
 def submit(
-    file_path: Path = typer.Argument(..., help="Path to benchmark JSON result to submit"),
-    api_url: str = typer.Option("http://localhost:3000/api/v1/benchmark-submissions", "--api-url", help="API submission endpoint"),
-    api_key: Optional[str] = typer.Option(None, "--api-key", envvar="MODELFORGE_API_KEY", help="ModelForge API Key"),
+    file_path: Path = typer.Argument(
+        ..., help="Path to benchmark JSON result to submit"
+    ),
+    api_url: str = typer.Option(
+        "http://localhost:3000/api/v1/benchmark-submissions",
+        "--api-url",
+        help="API submission endpoint",
+    ),
+    api_key: str | None = typer.Option(
+        None, "--api-key", envvar="MODELFORGE_API_KEY", help="ModelForge API Key"
+    ),
 ) -> None:
     """Submit a validated benchmark result to the ModelForge OpenComputeBench network."""
-    with open(file_path, "r", encoding="utf-8") as f:
+    with open(file_path, encoding="utf-8") as f:
         data = json.load(f)
     record = OpenComputeBenchRecord.model_validate(data)
     is_valid, errors = validate_benchmark_integrity(record)
@@ -208,18 +254,28 @@ def submit(
         headers["Authorization"] = f"Bearer {api_key}"
 
     try:
-        with console.status("[cyan]Submitting benchmark observation to ModelForge...[/]"):
+        with console.status(
+            "[cyan]Submitting benchmark observation to ModelForge...[/]"
+        ):
             res = httpx.post(api_url, json=data, headers=headers, timeout=10.0)
         if res.status_code in [200, 201]:
             resp_data = res.json()
-            console.print(f"[bold green]✓ Benchmark accepted by network![/]")
-            console.print(f"[dim]Benchmark ID:[/] {resp_data.get('benchmark_id', record.benchmark_id)}")
-            console.print(f"[dim]Report URL:[/] {resp_data.get('url', f'https://modelforge.dev/benchmarks/{record.benchmark_id}')}")
+            console.print("[bold green]✓ Benchmark accepted by network![/]")
+            console.print(
+                f"[dim]Benchmark ID:[/] {resp_data.get('benchmark_id', record.benchmark_id)}"
+            )
+            console.print(
+                f"[dim]Report URL:[/] {resp_data.get('url', f'https://modelforge.dev/benchmarks/{record.benchmark_id}')}"
+            )
         else:
-            console.print(f"[bold red]Submission rejected ({res.status_code}):[/] {res.text}")
+            console.print(
+                f"[bold red]Submission rejected ({res.status_code}):[/] {res.text}"
+            )
     except httpx.ConnectError:
         console.print(f"[bold yellow]Submission endpoint unavailable at {api_url}.[/]")
-        console.print("[dim]Local result remains verified and saved. Start the web app to receive submissions.[/]")
+        console.print(
+            "[dim]Local result remains verified and saved. Start the web app to receive submissions.[/]"
+        )
 
 
 if __name__ == "__main__":

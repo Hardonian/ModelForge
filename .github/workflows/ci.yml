@@ -1,0 +1,62 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  node-workspace:
+    name: Node Packages & Apps
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.5.2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run Build & Typecheck
+        run: npx turbo run build
+
+      - name: Run Unit Tests
+        run: npx turbo run test
+
+  python-cli:
+    name: Python Benchmark CLI
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: "latest"
+
+      - name: Set up Python
+        run: uv python install 3.12
+
+      - name: Install dependencies
+        working-directory: packages/benchmark-cli
+        run: uv sync --extra dev
+
+      - name: Run Lint
+        working-directory: packages/benchmark-cli
+        run: uv run ruff check .
+
+      - name: Run Unit Tests
+        working-directory: packages/benchmark-cli
+        run: uv run pytest tests/

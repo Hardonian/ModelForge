@@ -1,11 +1,11 @@
 """OpenComputeBench Pydantic schema and deterministic hashing utilities."""
 
-from datetime import datetime
 import hashlib
 import json
-from typing import Any, Dict, List, Literal, Optional
-from uuid import UUID, uuid4
-from pydantic import BaseModel, Field, field_validator
+from typing import Any, Literal
+from uuid import uuid4
+
+from pydantic import BaseModel, Field
 
 
 class ModelSpec(BaseModel):
@@ -14,19 +14,27 @@ class ModelSpec(BaseModel):
     revision: str = "main"
     architecture: str
     parameters_billions: float
-    context_window: Optional[int] = None
-    vocab_size: Optional[int] = None
+    context_window: int | None = None
+    vocab_size: int | None = None
 
 
 class RuntimeSpec(BaseModel):
-    name: Literal["vllm", "tensorrt-llm", "llama.cpp", "sglang", "tgi", "transformers", "simulation"]
+    name: Literal[
+        "vllm",
+        "tensorrt-llm",
+        "llama.cpp",
+        "sglang",
+        "tgi",
+        "transformers",
+        "simulation",
+    ]
     version: str
-    engine_args: Dict[str, Any] = Field(default_factory=dict)
+    engine_args: dict[str, Any] = Field(default_factory=dict)
 
 
 class PrecisionSpec(BaseModel):
     type: Literal["fp32", "tf32", "fp16", "bf16", "fp8", "int8", "int4", "awq", "gptq"]
-    quantization_method: Optional[str] = None
+    quantization_method: str | None = None
 
 
 class HardwareSpec(BaseModel):
@@ -40,9 +48,9 @@ class HardwareSpec(BaseModel):
 
 class SoftwareSpec(BaseModel):
     os: str
-    driver_version: Optional[str] = None
-    cuda_version: Optional[str] = None
-    rocm_version: Optional[str] = None
+    driver_version: str | None = None
+    cuda_version: str | None = None
+    rocm_version: str | None = None
     python_version: str
 
 
@@ -60,7 +68,7 @@ class LatencyPercentiles(BaseModel):
     p95_ms: float
     p99_ms: float
     mean_ms: float
-    std_dev_ms: Optional[float] = None
+    std_dev_ms: float | None = None
 
 
 class MetricsSpec(BaseModel):
@@ -69,16 +77,16 @@ class MetricsSpec(BaseModel):
     tokens_per_second: float
     requests_per_second: float
     peak_vram_bytes: int
-    peak_ram_bytes: Optional[int] = None
-    power_watts_avg: Optional[float] = None
+    peak_ram_bytes: int | None = None
+    power_watts_avg: float | None = None
     sample_count: int = 1
 
 
 class QualitySpec(BaseModel):
-    benchmark: Optional[str] = None
-    score: Optional[float] = None
-    baseline_score: Optional[float] = None
-    retention: Optional[float] = None
+    benchmark: str | None = None
+    score: float | None = None
+    baseline_score: float | None = None
+    retention: float | None = None
 
 
 class ProvenanceSpec(BaseModel):
@@ -93,8 +101,8 @@ class ProvenanceSpec(BaseModel):
 class VerificationSpec(BaseModel):
     status: Literal["unverified", "community", "reproduced", "verified"] = "unverified"
     reproduction_count: int = 0
-    verified_by: Optional[str] = None
-    notes: Optional[str] = None
+    verified_by: str | None = None
+    notes: str | None = None
 
 
 class OpenComputeBenchRecord(BaseModel):
@@ -108,7 +116,7 @@ class OpenComputeBenchRecord(BaseModel):
     software: SoftwareSpec
     workload: WorkloadSpec
     metrics: MetricsSpec
-    quality: Optional[QualitySpec] = None
+    quality: QualitySpec | None = None
     provenance: ProvenanceSpec
     verification: VerificationSpec = Field(default_factory=VerificationSpec)
 
@@ -124,7 +132,9 @@ def compute_sha256(data: Any) -> str:
     return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
 
 
-def compute_environment_hash(hardware: HardwareSpec, software: SoftwareSpec, runtime: RuntimeSpec) -> str:
+def compute_environment_hash(
+    hardware: HardwareSpec, software: SoftwareSpec, runtime: RuntimeSpec
+) -> str:
     payload = {
         "hardware": {
             "vendor": hardware.vendor,
@@ -182,17 +192,29 @@ def compute_result_hash(
     return compute_sha256(payload)
 
 
-def validate_benchmark_integrity(record: OpenComputeBenchRecord) -> tuple[bool, List[str]]:
-    errors: List[str] = []
-    expected_env = compute_environment_hash(record.hardware, record.software, record.runtime)
+def validate_benchmark_integrity(
+    record: OpenComputeBenchRecord,
+) -> tuple[bool, list[str]]:
+    errors: list[str] = []
+    expected_env = compute_environment_hash(
+        record.hardware, record.software, record.runtime
+    )
     if record.provenance.environment_hash != expected_env:
-        errors.append(f"Environment hash mismatch: got {record.provenance.environment_hash}, expected {expected_env}")
+        errors.append(
+            f"Environment hash mismatch: got {record.provenance.environment_hash}, expected {expected_env}"
+        )
 
-    expected_result = compute_result_hash(record.model, record.precision, record.workload, record.metrics)
+    expected_result = compute_result_hash(
+        record.model, record.precision, record.workload, record.metrics
+    )
     if record.provenance.result_hash != expected_result:
-        errors.append(f"Result hash mismatch: got {record.provenance.result_hash}, expected {expected_result}")
+        errors.append(
+            f"Result hash mismatch: got {record.provenance.result_hash}, expected {expected_result}"
+        )
 
     if record.synthetic_fixture and record.verification.status == "verified":
-        errors.append("CRITICAL INVARIANT VIOLATION: Synthetic fixtures cannot be marked as verified.")
+        errors.append(
+            "CRITICAL INVARIANT VIOLATION: Synthetic fixtures cannot be marked as verified."
+        )
 
     return len(errors) == 0, errors

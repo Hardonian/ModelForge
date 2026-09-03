@@ -1,24 +1,31 @@
 """Benchmark runner and execution orchestrator."""
 
-from datetime import datetime, timezone
 import math
 import time
-from typing import Optional
+from datetime import UTC, datetime
+
 from rich.console import Console
-from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn, TimeElapsedColumn
+from rich.progress import (
+    BarColumn,
+    Progress,
+    SpinnerColumn,
+    TextColumn,
+    TimeElapsedColumn,
+)
+
 from modelforge.adapters.hardware import detect_system_environment
 from modelforge.schema import (
-    OpenComputeBenchRecord,
-    ModelSpec,
-    RuntimeSpec,
-    PrecisionSpec,
     HardwareSpec,
-    SoftwareSpec,
-    WorkloadSpec,
-    MetricsSpec,
     LatencyPercentiles,
-    VerificationSpec,
+    MetricsSpec,
+    ModelSpec,
+    OpenComputeBenchRecord,
+    PrecisionSpec,
     ProvenanceSpec,
+    RuntimeSpec,
+    SoftwareSpec,
+    VerificationSpec,
+    WorkloadSpec,
     compute_environment_hash,
     compute_result_hash,
 )
@@ -33,7 +40,7 @@ def run_benchmark(
     generated_tokens: int = 256,
     concurrency: int = 1,
     simulate: bool = False,
-    console: Optional[Console] = None,
+    console: Console | None = None,
 ) -> OpenComputeBenchRecord:
     """Executes multi-phase benchmark with warmup and measured runs."""
     console = console or Console()
@@ -42,10 +49,12 @@ def run_benchmark(
 
     is_synthetic = simulate or (acc is None or acc.vendor == "cpu")
 
-    started_at = datetime.now(timezone.utc).isoformat()
+    started_at = datetime.now(UTC).isoformat()
 
     console.print(f"[bold cyan]Starting benchmark for[/] [bold white]{model_id}[/]")
-    console.print(f"[dim]Runtime:[/] {runtime} | [dim]Precision:[/] {precision} | [dim]Context:[/] {context_length} | [dim]Concurrency:[/] {concurrency}")
+    console.print(
+        f"[dim]Runtime:[/] {runtime} | [dim]Precision:[/] {precision} | [dim]Context:[/] {context_length} | [dim]Concurrency:[/] {concurrency}"
+    )
 
     with Progress(
         SpinnerColumn(),
@@ -55,13 +64,17 @@ def run_benchmark(
         console=console,
     ) as progress:
         # Phase 1: Environment probe & model warmup
-        task_warmup = progress.add_task("[yellow]Phase 1: Warmup & JIT kernel compilation...", total=10)
+        task_warmup = progress.add_task(
+            "[yellow]Phase 1: Warmup & JIT kernel compilation...", total=10
+        )
         for _ in range(10):
             time.sleep(0.05)
             progress.advance(task_warmup, 1)
 
         # Phase 2: Measured throughput and latency sampling
-        task_measure = progress.add_task("[green]Phase 2: Measured inference iterations...", total=20)
+        task_measure = progress.add_task(
+            "[green]Phase 2: Measured inference iterations...", total=20
+        )
         ttft_samples: list[float] = []
         tpot_samples: list[float] = []
 
@@ -77,7 +90,7 @@ def run_benchmark(
             tpot_samples.append(max(1.0, base_tpot + (jitter * 0.1)))
             progress.advance(task_measure, 1)
 
-    completed_at = datetime.now(timezone.utc).isoformat()
+    completed_at = datetime.now(UTC).isoformat()
 
     ttft_samples.sort()
     tpot_samples.sort()
@@ -105,18 +118,24 @@ def run_benchmark(
         repository=model_id,
         revision="main",
         architecture="TransformerForCausalLM",
-        parameters_billions=32.5 if "32" in model_id else (70.6 if "70" in model_id else 8.0),
+        parameters_billions=32.5
+        if "32" in model_id
+        else (70.6 if "70" in model_id else 8.0),
         context_window=context_length * 2,
     )
 
     runtime_spec = RuntimeSpec(
-        name="simulation" if is_synthetic else (runtime if runtime in ["vllm", "llama.cpp", "tensorrt-llm"] else "vllm"),
+        name="simulation"
+        if is_synthetic
+        else (runtime if runtime in ["vllm", "llama.cpp", "tensorrt-llm"] else "vllm"),
         version="0.6.4" if not is_synthetic else "1.0.0-sim",
         engine_args={"gpu_memory_utilization": 0.90},
     )
 
     precision_spec = PrecisionSpec(
-        type=precision if precision in ["fp8", "fp16", "int8", "int4", "awq"] else "fp8",
+        type=precision
+        if precision in ["fp8", "fp16", "int8", "int4", "awq"]
+        else "fp8",
         quantization_method="fp8_e4m3" if precision == "fp8" else None,
     )
 
@@ -145,7 +164,10 @@ def run_benchmark(
         concurrency=concurrency,
     )
 
-    peak_vram = int(model_spec.parameters_billions * 1e9 * (1.0 if precision == "fp8" else 2.0) + (1.5 * 1e9))
+    peak_vram = int(
+        model_spec.parameters_billions * 1e9 * (1.0 if precision == "fp8" else 2.0)
+        + (1.5 * 1e9)
+    )
 
     metrics_spec = MetricsSpec(
         ttft_ms=ttft_perc,
@@ -158,7 +180,9 @@ def run_benchmark(
     )
 
     env_hash = compute_environment_hash(hardware_spec, software_spec, runtime_spec)
-    res_hash = compute_result_hash(model_spec, precision_spec, workload_spec, metrics_spec)
+    res_hash = compute_result_hash(
+        model_spec, precision_spec, workload_spec, metrics_spec
+    )
 
     provenance = ProvenanceSpec(
         submitted_by="ModelForge-CLI-Local",
@@ -181,7 +205,9 @@ def run_benchmark(
         provenance=provenance,
         verification=VerificationSpec(
             status="unverified" if is_synthetic else "community",
-            notes="Synthetic simulation fixture" if is_synthetic else "Local runner community observation",
+            notes="Synthetic simulation fixture"
+            if is_synthetic
+            else "Local runner community observation",
         ),
     )
 

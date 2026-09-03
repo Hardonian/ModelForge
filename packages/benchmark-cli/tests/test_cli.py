@@ -1,7 +1,7 @@
 """Integration tests for Typer CLI commands."""
 
-import json
 from typer.testing import CliRunner
+
 from modelforge.cli import app
 
 runner = CliRunner()
@@ -58,8 +58,20 @@ def test_cli_compare(tmp_path):
     f1 = tmp_path / "run1.json"
     f2 = tmp_path / "run2.json"
 
-    runner.invoke(app, ["benchmark", "Qwen/Qwen2.5-32B-Instruct", "--simulate", "--output", str(f1)])
-    runner.invoke(app, ["benchmark", "meta-llama/Llama-3.3-70B-Instruct", "--simulate", "--output", str(f2)])
+    runner.invoke(
+        app,
+        ["benchmark", "Qwen/Qwen2.5-32B-Instruct", "--simulate", "--output", str(f1)],
+    )
+    runner.invoke(
+        app,
+        [
+            "benchmark",
+            "meta-llama/Llama-3.3-70B-Instruct",
+            "--simulate",
+            "--output",
+            str(f2),
+        ],
+    )
 
     res = runner.invoke(app, ["compare", str(f1), str(f2)])
     assert res.exit_code == 0

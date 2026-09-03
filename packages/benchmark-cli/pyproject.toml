@@ -22,6 +22,13 @@ dev = [
     "ruff>=0.9.6",
 ]
 
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+ignore = ["B008", "BLE001", "S110", "UP036", "E501", "B904"]
+
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"

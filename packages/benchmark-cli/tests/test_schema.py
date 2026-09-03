@@ -1,18 +1,17 @@
 """Unit tests for Python OpenComputeBench schema and deterministic hashing."""
 
-import pytest
 from modelforge.schema import (
-    OpenComputeBenchRecord,
-    ModelSpec,
-    RuntimeSpec,
-    PrecisionSpec,
     HardwareSpec,
-    SoftwareSpec,
-    WorkloadSpec,
-    MetricsSpec,
     LatencyPercentiles,
+    MetricsSpec,
+    ModelSpec,
+    OpenComputeBenchRecord,
+    PrecisionSpec,
     ProvenanceSpec,
+    RuntimeSpec,
+    SoftwareSpec,
     VerificationSpec,
+    WorkloadSpec,
     compute_environment_hash,
     compute_result_hash,
     validate_benchmark_integrity,
@@ -45,8 +44,12 @@ def create_sample_record():
     )
     w = WorkloadSpec(prompt_tokens=1024, generated_tokens=256, context_length=1280)
     metrics = MetricsSpec(
-        ttft_ms=LatencyPercentiles(p50_ms=280.0, p90_ms=310.0, p95_ms=330.0, p99_ms=360.0, mean_ms=285.0),
-        tpot_ms=LatencyPercentiles(p50_ms=13.8, p90_ms=14.5, p95_ms=15.1, p99_ms=16.0, mean_ms=14.0),
+        ttft_ms=LatencyPercentiles(
+            p50_ms=280.0, p90_ms=310.0, p95_ms=330.0, p99_ms=360.0, mean_ms=285.0
+        ),
+        tpot_ms=LatencyPercentiles(
+            p50_ms=13.8, p90_ms=14.5, p95_ms=15.1, p99_ms=16.0, mean_ms=14.0
+        ),
         tokens_per_second=72.4,
         requests_per_second=0.28,
         peak_vram_bytes=38654705664,

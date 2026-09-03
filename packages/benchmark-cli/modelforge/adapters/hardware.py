@@ -4,9 +4,10 @@ import os
 import platform
 import shutil
 import subprocess
-from typing import Dict, List, Literal, Optional
-from pydantic import BaseModel
+from typing import Literal
+
 import psutil
+from pydantic import BaseModel
 
 
 class DetectedAccelerator(BaseModel):
@@ -14,9 +15,9 @@ class DetectedAccelerator(BaseModel):
     name: str
     count: int = 1
     vram_bytes: int
-    driver_version: Optional[str] = None
-    cuda_version: Optional[str] = None
-    rocm_version: Optional[str] = None
+    driver_version: str | None = None
+    cuda_version: str | None = None
+    rocm_version: str | None = None
     interconnect: str = "pcie"
 
 
@@ -30,7 +31,7 @@ class SystemEnvironment(BaseModel):
     available_ram_bytes: int
     disk_free_gb: float
     python_version: str
-    accelerators: List[DetectedAccelerator]
+    accelerators: list[DetectedAccelerator]
 
 
 def detect_system_environment() -> SystemEnvironment:
@@ -59,15 +60,19 @@ def detect_system_environment() -> SystemEnvironment:
     )
 
 
-def detect_accelerators() -> List[DetectedAccelerator]:
+def detect_accelerators() -> list[DetectedAccelerator]:
     """Detects available accelerators with vendor fallback chain: NVIDIA -> AMD -> Apple -> CPU."""
-    detected: List[DetectedAccelerator] = []
+    detected: list[DetectedAccelerator] = []
 
     # 1. Check NVIDIA via nvidia-smi
     if shutil.which("nvidia-smi"):
         try:
             output = subprocess.check_output(
-                ["nvidia-smi", "--query-gpu=gpu_name,memory.total,driver_version", "--format=csv,noheader,nounits"],
+                [
+                    "nvidia-smi",
+                    "--query-gpu=gpu_name,memory.total,driver_version",
+                    "--format=csv,noheader,nounits",
+                ],
                 text=True,
                 stderr=subprocess.DEVNULL,
                 timeout=5,
@@ -96,10 +101,13 @@ def detect_accelerators() -> List[DetectedAccelerator]:
     # 2. Check Windows WMI video controller for AMD or other GPUs
     if platform.system() == "Windows":
         try:
-            cmd = "powershell -NoProfile -Command \"Get-CimInstance Win32_VideoController | Select-Object -Property Name, AdapterRAM, DriverVersion | ConvertTo-Json -Compress\""
-            res = subprocess.check_output(cmd, shell=True, text=True, stderr=subprocess.DEVNULL, timeout=6).strip()
+            cmd = 'powershell -NoProfile -Command "Get-CimInstance Win32_VideoController | Select-Object -Property Name, AdapterRAM, DriverVersion | ConvertTo-Json -Compress"'
+            res = subprocess.check_output(
+                cmd, shell=True, text=True, stderr=subprocess.DEVNULL, timeout=6
+            ).strip()
             if res:
                 import json
+
                 data = json.loads(res)
                 controllers = data if isinstance(data, list) else [data]
                 for c in controllers:
@@ -112,7 +120,9 @@ def detect_accelerators() -> List[DetectedAccelerator]:
                                 vendor="amd",
                                 name=gpu_name,
                                 count=1,
-                                vram_bytes=int(adapter_ram) if adapter_ram > 0 else 8 * 1024**3,
+                                vram_bytes=int(adapter_ram)
+                                if adapter_ram > 0
+                                else 8 * 1024**3,
                                 driver_version=str(driver_ver),
                                 interconnect="system_bus",
                             )
@@ -151,7 +161,7 @@ def detect_accelerators() -> List[DetectedAccelerator]:
     return detected
 
 
-def detect_cuda_version() -> Optional[str]:
+def detect_cuda_version() -> str | None:
     """Inspects nvcc or environment for CUDA version."""
     if shutil.which("nvcc"):
         try:
