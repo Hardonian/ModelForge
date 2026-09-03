@@ -28,7 +28,13 @@ The OpenComputeBench specification standardizes inference telemetry into an immu
     "synthetic_fixture": { "type": "boolean", "default": false },
     "model": {
       "type": "object",
-      "required": ["provider", "repository", "revision", "architecture", "parameters_billions"],
+      "required": [
+        "provider",
+        "repository",
+        "revision",
+        "architecture",
+        "parameters_billions"
+      ],
       "properties": {
         "provider": { "type": "string" },
         "repository": { "type": "string" },
@@ -42,7 +48,18 @@ The OpenComputeBench specification standardizes inference telemetry into an immu
       "type": "object",
       "required": ["name", "version"],
       "properties": {
-        "name": { "type": "string", "enum": ["vllm", "tensorrt-llm", "llama.cpp", "sglang", "tgi", "transformers", "simulation"] },
+        "name": {
+          "type": "string",
+          "enum": [
+            "vllm",
+            "tensorrt-llm",
+            "llama.cpp",
+            "sglang",
+            "tgi",
+            "transformers",
+            "simulation"
+          ]
+        },
         "version": { "type": "string" },
         "engine_args": { "type": "object" }
       }
@@ -51,15 +68,38 @@ The OpenComputeBench specification standardizes inference telemetry into an immu
       "type": "object",
       "required": ["type"],
       "properties": {
-        "type": { "type": "string", "enum": ["fp32", "tf32", "fp16", "bf16", "fp8", "int8", "int4", "awq", "gptq"] },
+        "type": {
+          "type": "string",
+          "enum": [
+            "fp32",
+            "tf32",
+            "fp16",
+            "bf16",
+            "fp8",
+            "int8",
+            "int4",
+            "awq",
+            "gptq"
+          ]
+        },
         "quantization_method": { "type": "string" }
       }
     },
     "hardware": {
       "type": "object",
-      "required": ["vendor", "device", "count", "vram_bytes_per_device", "total_vram_bytes", "interconnect"],
+      "required": [
+        "vendor",
+        "device",
+        "count",
+        "vram_bytes_per_device",
+        "total_vram_bytes",
+        "interconnect"
+      ],
       "properties": {
-        "vendor": { "type": "string", "enum": ["nvidia", "amd", "apple", "intel", "cpu", "other"] },
+        "vendor": {
+          "type": "string",
+          "enum": ["nvidia", "amd", "apple", "intel", "cpu", "other"]
+        },
         "device": { "type": "string" },
         "count": { "type": "integer", "minimum": 1 },
         "vram_bytes_per_device": { "type": "integer" },
@@ -69,9 +109,20 @@ The OpenComputeBench specification standardizes inference telemetry into an immu
     },
     "provenance": {
       "type": "object",
-      "required": ["submitted_by", "runner_version", "started_at", "completed_at", "environment_hash", "result_hash"],
+      "required": [
+        "submitted_by",
+        "runner_version",
+        "started_at",
+        "completed_at",
+        "environment_hash",
+        "result_hash"
+      ],
       "properties": {
-        "environment_hash": { "type": "string", "minLength": 64, "maxLength": 64 },
+        "environment_hash": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64
+        },
         "result_hash": { "type": "string", "minLength": 64, "maxLength": 64 }
       }
     }

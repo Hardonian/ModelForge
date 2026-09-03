@@ -10,6 +10,7 @@
 TensorRT-LLM provides NVIDIA's lowest latency and highest throughput inference execution engine. It compiles neural network graphs with fused multi-head attention (FMHA), in-flight batching, FP8 / NVFP4 quantization kernels, and custom CUDA tensor operations.
 
 ModelForge models TensorRT-LLM performance mathematically and empirically:
+
 - **Hopper Transformer Engine:** Models FP8 GEMM acceleration and native hardware FP8 tensor cores.
 - **In-Flight Batching (IFB):** Dynamically inserts new request tokens into active batch iteration loops without padding overhead.
 - **Paged KV Cache:** Allocates non-contiguous memory blocks for attention caches, eliminating fragmentation.
@@ -40,6 +41,7 @@ trtllm-build \
 ## 3. Disaggregated Serving with Dynamo
 
 ModelForge couples TensorRT-LLM with NVIDIA Dynamo:
+
 - Dynamo handles disaggregated prefill/decode routing and inter-node KV cache distribution.
 - TensorRT-LLM executes the optimized kernel engine inside each Dynamo worker pod.
 - Result: **+2.71x Software Lift** over standard Transformers on H100.

@@ -1,36 +1,36 @@
-import type { Metadata } from 'next';
-import './globals.css';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
+import type { Metadata } from "next";
+import "./globals.css";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
-  title: 'ModelForge — The Open Compute Intelligence Layer for AI',
+  title: "ModelForge — The Open Compute Intelligence Layer for AI",
   description:
-    'Find the optimal model + accelerator + runtime + precision + serving configuration for any AI workload. Powered by OpenComputeBench reproducible inference benchmarks.',
+    "Find the optimal model + accelerator + runtime + precision + serving configuration for any AI workload. Powered by OpenComputeBench reproducible inference benchmarks.",
   keywords: [
-    'LLM inference benchmarks',
-    'GPU optimizer',
-    'vLLM performance',
-    'ModelFit',
-    'NVIDIA H100 benchmarks',
-    'L40S benchmarks',
-    'RTX 4090 inference',
-    'OpenComputeBench',
-    'AI FinOps'
+    "LLM inference benchmarks",
+    "GPU optimizer",
+    "vLLM performance",
+    "ModelFit",
+    "NVIDIA H100 benchmarks",
+    "L40S benchmarks",
+    "RTX 4090 inference",
+    "OpenComputeBench",
+    "AI FinOps",
   ],
-  authors: [{ name: 'ModelForge Team' }],
+  authors: [{ name: "ModelForge Team" }],
   openGraph: {
-    title: 'ModelForge — The Open Compute Intelligence Layer for AI',
+    title: "ModelForge — The Open Compute Intelligence Layer for AI",
     description:
-      'Given an AI model, workload, latency target, and budget, determine the optimal hardware + runtime configuration with reproducible empirical proof.',
-    url: 'https://modelforge.dev',
-    siteName: 'ModelForge',
-    type: 'website'
-  }
+      "Given an AI model, workload, latency target, and budget, determine the optimal hardware + runtime configuration with reproducible empirical proof.",
+    url: "https://modelforge.dev",
+    siteName: "ModelForge",
+    type: "website",
+  },
 };
 
 export default function RootLayout({
-  children
+  children,
 }: {
   children: React.ReactNode;
 }) {

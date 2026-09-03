@@ -44,6 +44,7 @@ The Next.js application in `apps/web` is production-ready for deployment on Verc
 ### 4. Docker Compose Local Development
 
 For running PostgreSQL locally:
+
 ```bash
 docker compose -f infra/docker/docker-compose.yml up -d
 ```

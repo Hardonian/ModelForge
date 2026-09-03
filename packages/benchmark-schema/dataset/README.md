@@ -1,99 +1,99 @@
 ---
 annotations_creators:
-- machine-generated
+  - machine-generated
 language:
-- en
+  - en
 license: cdla-permissive-2.0
 size_categories:
-- n<1K
+  - n<1K
 task_categories:
-- text-generation
-- conversational
-- question-answering
+  - text-generation
+  - conversational
+  - question-answering
 tags:
-- opencomputebench
-- modelforge
-- llm-inference
-- compute-passports
-- gpu-benchmarks
-- inference-benchmarks
+  - opencomputebench
+  - modelforge
+  - llm-inference
+  - compute-passports
+  - gpu-benchmarks
+  - inference-benchmarks
 pretty_name: OpenComputeBench v1.0 Inference Benchmark Dataset
 dataset_info:
   features:
-  - name: benchmark_id
-    dtype: string
-  - name: schema_version
-    dtype: string
-  - name: golden
-    dtype: bool
-  - name: model
-    struct:
-    - name: provider
+    - name: benchmark_id
       dtype: string
-    - name: repository
+    - name: schema_version
       dtype: string
-    - name: revision
-      dtype: string
-    - name: architecture
-      dtype: string
-    - name: parameters_billions
-      dtype: float64
-  - name: hardware
-    struct:
-    - name: vendor
-      dtype: string
-    - name: device
-      dtype: string
-    - name: count
-      dtype: int64
-    - name: vram_bytes_per_device
-      dtype: int64
-    - name: interconnect
-      dtype: string
-  - name: runtime
-    struct:
-    - name: name
-      dtype: string
-    - name: version
-      dtype: string
-  - name: precision
-    struct:
-    - name: type
-      dtype: string
-    - name: quantization_method
-      dtype: string
-  - name: workload
-    struct:
-    - name: prompt_tokens
-      dtype: int64
-    - name: generated_tokens
-      dtype: int64
-    - name: context_length
-      dtype: int64
-    - name: concurrency
-      dtype: int64
-  - name: metrics
-    struct:
-    - name: tokens_per_second
-      dtype: float64
-    - name: requests_per_second
-      dtype: float64
-    - name: peak_vram_bytes
-      dtype: int64
-    - name: ttft_ms
-      dtype: struct
-    - name: tpot_ms
-      dtype: struct
-  - name: provenance
-    struct:
-    - name: submitted_by
-      dtype: string
-    - name: runner_version
-      dtype: string
-    - name: environment_hash
-      dtype: string
-    - name: result_hash
-      dtype: string
+    - name: golden
+      dtype: bool
+    - name: model
+      struct:
+        - name: provider
+          dtype: string
+        - name: repository
+          dtype: string
+        - name: revision
+          dtype: string
+        - name: architecture
+          dtype: string
+        - name: parameters_billions
+          dtype: float64
+    - name: hardware
+      struct:
+        - name: vendor
+          dtype: string
+        - name: device
+          dtype: string
+        - name: count
+          dtype: int64
+        - name: vram_bytes_per_device
+          dtype: int64
+        - name: interconnect
+          dtype: string
+    - name: runtime
+      struct:
+        - name: name
+          dtype: string
+        - name: version
+          dtype: string
+    - name: precision
+      struct:
+        - name: type
+          dtype: string
+        - name: quantization_method
+          dtype: string
+    - name: workload
+      struct:
+        - name: prompt_tokens
+          dtype: int64
+        - name: generated_tokens
+          dtype: int64
+        - name: context_length
+          dtype: int64
+        - name: concurrency
+          dtype: int64
+    - name: metrics
+      struct:
+        - name: tokens_per_second
+          dtype: float64
+        - name: requests_per_second
+          dtype: float64
+        - name: peak_vram_bytes
+          dtype: int64
+        - name: ttft_ms
+          dtype: struct
+        - name: tpot_ms
+          dtype: struct
+    - name: provenance
+      struct:
+        - name: submitted_by
+          dtype: string
+        - name: runner_version
+          dtype: string
+        - name: environment_hash
+          dtype: string
+        - name: result_hash
+          dtype: string
 ---
 
 # OpenComputeBench v1.0 Public Dataset

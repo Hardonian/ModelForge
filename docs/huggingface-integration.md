@@ -42,7 +42,8 @@ Add this block to your model card:
 
 ```markdown
 <!-- ModelForge Compute Intelligence -->
+
 [![ModelForge Compute Passport](https://img.shields.io/badge/Compute%20Passport-Verified-blue)](https://modelforge.dev/models/Qwen/Qwen2.5-32B-Instruct/passport)
-[![ModelFit Score](https://img.shields.io/badge/ModelFit-96%2F100%20(A%2B)-brightgreen)](https://modelforge.dev/model-fit?model=Qwen%2FQwen2.5-32B-Instruct)
+[![ModelFit Score](<https://img.shields.io/badge/ModelFit-96%2F100%20(A%2B)-brightgreen>)](https://modelforge.dev/model-fit?model=Qwen%2FQwen2.5-32B-Instruct)
 [![OpenComputeBench](https://img.shields.io/badge/OpenComputeBench-Reproduced-indigo)](https://modelforge.dev/benchmarks)
 ```

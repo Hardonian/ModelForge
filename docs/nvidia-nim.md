@@ -21,7 +21,7 @@ ModelForge provides turnkey intelligence for NIM deployments:
 ## 2. Generated Docker Compose Manifest
 
 ```yaml
-version: '3.8'
+version: "3.8"
 
 services:
   nim-serving:
@@ -58,9 +58,9 @@ volumes:
 
 ## 3. When to Choose NIM vs Dynamo vs vLLM
 
-| Dimension | NVIDIA NIM | NVIDIA Dynamo | vLLM |
-| --- | --- | --- | --- |
-| **Setup Complexity** | Zero (Turnkey Container) | Moderate (Kubernetes Operator) | Low (Docker / Pip) |
-| **Prefill/Decode Split** | Monolithic Engine | Disaggregated (Highest Lift) | Monolithic Engine |
-| **Enterprise Support** | NVIDIA AI Enterprise | NVIDIA Open / Cloud | Open-Source Community |
-| **Hardware** | NVIDIA GPUs Only | NVIDIA GPUs (Hopper/Ada) | NVIDIA, AMD ROCm, Intel |
+| Dimension                | NVIDIA NIM               | NVIDIA Dynamo                  | vLLM                    |
+| ------------------------ | ------------------------ | ------------------------------ | ----------------------- |
+| **Setup Complexity**     | Zero (Turnkey Container) | Moderate (Kubernetes Operator) | Low (Docker / Pip)      |
+| **Prefill/Decode Split** | Monolithic Engine        | Disaggregated (Highest Lift)   | Monolithic Engine       |
+| **Enterprise Support**   | NVIDIA AI Enterprise     | NVIDIA Open / Cloud            | Open-Source Community   |
+| **Hardware**             | NVIDIA GPUs Only         | NVIDIA GPUs (Hopper/Ada)       | NVIDIA, AMD ROCm, Intel |

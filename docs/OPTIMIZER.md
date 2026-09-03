@@ -17,6 +17,7 @@ While optimizing objective $O \in \{ \text{lowest\_cost}, \text{lowest\_latency}
 ## Manifest Generation
 
 For each winning candidate, the optimizer generates drop-in infrastructure manifests:
+
 - **vLLM Docker Run**: Correct tensor-parallel flags, `--dtype`, `--kv-cache-dtype`, and GPU reservation flags.
 - **Docker Compose YAML**: Production multi-container serving specification with health checks.
 - **Kubernetes Pod YAML**: Resource limits, shared memory mounts (`/dev/shm`), and container spec.

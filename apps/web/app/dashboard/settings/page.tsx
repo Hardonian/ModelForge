@@ -1,11 +1,15 @@
-import { Settings, Shield, Bell, Save } from 'lucide-react';
+import { Settings, Shield, Bell, Save } from "lucide-react";
 
 export default function SettingsPage() {
   return (
     <div className="space-y-8 max-w-3xl">
       <div>
-        <h1 className="text-2xl font-bold text-white tracking-tight">Organization Settings</h1>
-        <p className="text-xs text-slate-400 mt-0.5">Manage organization profile, audit retention, and benchmark webhooks.</p>
+        <h1 className="text-2xl font-bold text-white tracking-tight">
+          Organization Settings
+        </h1>
+        <p className="text-xs text-slate-400 mt-0.5">
+          Manage organization profile, audit retention, and benchmark webhooks.
+        </p>
       </div>
 
       <div className="rounded-xl border border-slate-800 bg-slate-900/40 p-6 space-y-6">
@@ -13,7 +17,9 @@ export default function SettingsPage() {
           <h2 className="text-sm font-bold text-white">General Information</h2>
           <div className="space-y-3 font-mono text-xs">
             <div>
-              <label className="text-slate-400 block mb-1">Organization Name</label>
+              <label className="text-slate-400 block mb-1">
+                Organization Name
+              </label>
               <input
                 type="text"
                 defaultValue="Acme AI Lab"
@@ -21,7 +27,9 @@ export default function SettingsPage() {
               />
             </div>
             <div>
-              <label className="text-slate-400 block mb-1">Organization Slug</label>
+              <label className="text-slate-400 block mb-1">
+                Organization Slug
+              </label>
               <input
                 type="text"
                 defaultValue="acme-ai"
@@ -33,7 +41,9 @@ export default function SettingsPage() {
         </div>
 
         <div className="pt-4 border-t border-slate-800 space-y-4">
-          <h2 className="text-sm font-bold text-white">Benchmark Webhook URL</h2>
+          <h2 className="text-sm font-bold text-white">
+            Benchmark Webhook URL
+          </h2>
           <div className="font-mono text-xs space-y-2">
             <input
               type="text"
@@ -42,7 +52,8 @@ export default function SettingsPage() {
               className="w-full rounded border border-slate-700 bg-slate-950 p-2 text-white font-mono focus:border-sky-500 focus:outline-none"
             />
             <p className="text-[11px] text-slate-500 font-sans">
-              ModelForge will POST signed JSON payloads when reproducible benchmark runs complete on your registered runners.
+              ModelForge will POST signed JSON payloads when reproducible
+              benchmark runs complete on your registered runners.
             </p>
           </div>
         </div>

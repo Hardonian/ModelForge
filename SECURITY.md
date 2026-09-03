@@ -17,6 +17,7 @@ Instead, please send a detailed report via encrypted email to:
 **security@modelforge.dev**
 
 Include:
+
 1. Vulnerability description and impact.
 2. Steps to reproduce or proof-of-concept script.
 3. Affected components (e.g. CLI, Web, MCP Server, or API routes).

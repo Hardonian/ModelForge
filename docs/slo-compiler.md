@@ -19,7 +19,9 @@ $$\min_{\text{topology} \in \mathcal{T}} \text{Cost}(\text{topology}) \quad \tex
 ## 2. Input Specifications
 
 ### Workload Fingerprint (`WorkloadFingerprint`)
+
 A privacy-preserving representation of the serving workload:
+
 - `task_type`: `'rag' | 'code_completion' | 'conversational' | 'reasoning' | 'summarization' | 'embedding' | 'custom'`
 - `prompt_token_mean`: Average input prompt length in tokens.
 - `output_token_mean`: Average generated sequence length in tokens.
@@ -30,6 +32,7 @@ A privacy-preserving representation of the serving workload:
 - `arrival_pattern`: `'steady' | 'bursty' | 'poisson' | 'diurnal'`.
 
 ### Service Level Objective (`SLOSpec`)
+
 - `p95_ttft_ms`: Maximum acceptable Time-to-First-Token in milliseconds.
 - `target_tpot_ms`: Maximum acceptable Time-per-Output-Token (inter-token latency).
 - `max_cost_per_million_tokens_usd`: Maximum allowable blended token cost.

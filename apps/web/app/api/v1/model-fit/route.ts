@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { computeModelFit, ModelFitInputSchema } from '@modelforge/model-fit';
+import { NextRequest, NextResponse } from "next/server";
+import { computeModelFit, ModelFitInputSchema } from "@modelforge/model-fit";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export async function POST(request: NextRequest) {
   try {
@@ -10,8 +10,11 @@ export async function POST(request: NextRequest) {
 
     if (!parsed.success) {
       return NextResponse.json(
-        { error: 'Invalid ModelFit parameters', details: parsed.error.format() },
-        { status: 400 }
+        {
+          error: "Invalid ModelFit parameters",
+          details: parsed.error.format(),
+        },
+        { status: 400 },
       );
     }
 
@@ -19,8 +22,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(fit);
   } catch (err: any) {
     return NextResponse.json(
-      { error: 'ModelFit scoring calculation failed', message: err.message },
-      { status: 500 }
+      { error: "ModelFit scoring calculation failed", message: err.message },
+      { status: 500 },
     );
   }
 }

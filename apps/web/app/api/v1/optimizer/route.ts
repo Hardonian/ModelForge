@@ -1,7 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { solveWorkloadOptimization, OptimizerQuerySchema } from '@modelforge/optimizer';
+import { NextRequest, NextResponse } from "next/server";
+import {
+  solveWorkloadOptimization,
+  OptimizerQuerySchema,
+} from "@modelforge/optimizer";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export async function POST(request: NextRequest) {
   try {
@@ -10,8 +13,11 @@ export async function POST(request: NextRequest) {
 
     if (!parsed.success) {
       return NextResponse.json(
-        { error: 'Invalid optimization query parameters', details: parsed.error.format() },
-        { status: 400 }
+        {
+          error: "Invalid optimization query parameters",
+          details: parsed.error.format(),
+        },
+        { status: 400 },
       );
     }
 
@@ -19,8 +25,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(result);
   } catch (err: any) {
     return NextResponse.json(
-      { error: 'Optimizer solver error', message: err.message },
-      { status: 500 }
+      { error: "Optimizer solver error", message: err.message },
+      { status: 500 },
     );
   }
 }

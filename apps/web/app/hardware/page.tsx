@@ -1,6 +1,6 @@
-import Link from 'next/link';
-import { Cpu, Zap, Activity, ArrowRight } from 'lucide-react';
-import { HARDWARE_CATALOG } from '@modelforge/hardware-registry';
+import Link from "next/link";
+import { Cpu, Zap, Activity, ArrowRight } from "lucide-react";
+import { HARDWARE_CATALOG } from "@modelforge/hardware-registry";
 
 export default function HardwareCatalogPage() {
   const devices = HARDWARE_CATALOG;
@@ -8,9 +8,12 @@ export default function HardwareCatalogPage() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
       <div>
-        <h1 className="text-3xl font-extrabold text-white tracking-tight">Hardware Registry</h1>
+        <h1 className="text-3xl font-extrabold text-white tracking-tight">
+          Hardware Registry
+        </h1>
         <p className="text-sm text-slate-400 mt-1">
-          Cataloged accelerators with exact manufacturer hardware specifications vs observed empirical community bandwidth.
+          Cataloged accelerators with exact manufacturer hardware specifications
+          vs observed empirical community bandwidth.
         </p>
       </div>
 
@@ -25,8 +28,12 @@ export default function HardwareCatalogPage() {
               <div className="space-y-4">
                 <div className="flex items-start justify-between">
                   <div>
-                    <span className="text-xs font-mono uppercase text-emerald-400 font-semibold">{device.vendor}</span>
-                    <h3 className="text-base font-bold text-white mt-0.5">{device.name}</h3>
+                    <span className="text-xs font-mono uppercase text-emerald-400 font-semibold">
+                      {device.vendor}
+                    </span>
+                    <h3 className="text-base font-bold text-white mt-0.5">
+                      {device.name}
+                    </h3>
                   </div>
                   <span className="rounded-md bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2.5 py-1 text-xs font-mono font-bold">
                     {vramGb} GB
@@ -35,27 +42,49 @@ export default function HardwareCatalogPage() {
 
                 <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-800/80 text-xs font-mono">
                   <div>
-                    <span className="text-slate-500 block text-[10px]">Memory Bandwidth</span>
-                    <span className="text-slate-300 font-semibold">{device.manufacturer.memory_bandwidth_gb_s} GB/s</span>
+                    <span className="text-slate-500 block text-[10px]">
+                      Memory Bandwidth
+                    </span>
+                    <span className="text-slate-300 font-semibold">
+                      {device.manufacturer.memory_bandwidth_gb_s} GB/s
+                    </span>
                   </div>
                   <div>
-                    <span className="text-slate-500 block text-[10px]">TDP</span>
-                    <span className="text-slate-300">{device.manufacturer.tdp_watts} Watts</span>
+                    <span className="text-slate-500 block text-[10px]">
+                      TDP
+                    </span>
+                    <span className="text-slate-300">
+                      {device.manufacturer.tdp_watts} Watts
+                    </span>
                   </div>
                   <div>
-                    <span className="text-slate-500 block text-[10px]">Architecture</span>
-                    <span className="text-slate-300">{device.manufacturer.architecture}</span>
+                    <span className="text-slate-500 block text-[10px]">
+                      Architecture
+                    </span>
+                    <span className="text-slate-300">
+                      {device.manufacturer.architecture}
+                    </span>
                   </div>
                   <div>
-                    <span className="text-slate-500 block text-[10px]">Interconnect</span>
-                    <span className="text-slate-300">{device.manufacturer.interconnect}</span>
+                    <span className="text-slate-500 block text-[10px]">
+                      Interconnect
+                    </span>
+                    <span className="text-slate-300">
+                      {device.manufacturer.interconnect}
+                    </span>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-2 pt-2 text-[11px] font-mono text-slate-400">
                   <Activity className="h-3.5 w-3.5 text-sky-400" />
-                  <span>Observed Bandwidth: {device.observed.observed_effective_bandwidth_gb_s || 'N/A'} GB/s</span>
-                  <span className="text-slate-600">({device.observed.sample_count} runs)</span>
+                  <span>
+                    Observed Bandwidth:{" "}
+                    {device.observed.observed_effective_bandwidth_gb_s || "N/A"}{" "}
+                    GB/s
+                  </span>
+                  <span className="text-slate-600">
+                    ({device.observed.sample_count} runs)
+                  </span>
                 </div>
 
                 <div className="flex flex-wrap gap-1 pt-1">
@@ -72,7 +101,9 @@ export default function HardwareCatalogPage() {
 
               <div className="mt-6 pt-4 border-t border-slate-800 flex items-center justify-between">
                 <span className="text-xs font-mono text-slate-400">
-                  {device.typical_cloud_cost_per_hour_usd ? `$${device.typical_cloud_cost_per_hour_usd.toFixed(2)}/hr` : 'On-Prem / Local'}
+                  {device.typical_cloud_cost_per_hour_usd
+                    ? `$${device.typical_cloud_cost_per_hour_usd.toFixed(2)}/hr`
+                    : "On-Prem / Local"}
                 </span>
 
                 <Link

@@ -1,33 +1,37 @@
-import Link from 'next/link';
-import { 
-  LayoutDashboard, 
-  FolderKanban, 
-  Activity, 
-  BarChart3, 
-  Key, 
-  TrendingUp, 
-  Users, 
-  CreditCard, 
+import Link from "next/link";
+import {
+  LayoutDashboard,
+  FolderKanban,
+  Activity,
+  BarChart3,
+  Key,
+  TrendingUp,
+  Users,
+  CreditCard,
   Settings,
   ShieldCheck,
-  Cpu
-} from 'lucide-react';
+  Cpu,
+} from "lucide-react";
 
 export default function DashboardLayout({
-  children
+  children,
 }: {
   children: React.ReactNode;
 }) {
   const navItems = [
-    { label: 'Overview', href: '/dashboard', icon: LayoutDashboard },
-    { label: 'Projects', href: '/dashboard/projects', icon: FolderKanban },
-    { label: 'Workloads', href: '/dashboard/workloads', icon: Activity },
-    { label: 'Private Benchmarks', href: '/dashboard/benchmarks', icon: BarChart3 },
-    { label: 'API Keys', href: '/dashboard/api-keys', icon: Key },
-    { label: 'Usage & Quota', href: '/dashboard/usage', icon: TrendingUp },
-    { label: 'Team & RBAC', href: '/dashboard/team', icon: Users },
-    { label: 'Billing & Plans', href: '/dashboard/billing', icon: CreditCard },
-    { label: 'Settings', href: '/dashboard/settings', icon: Settings }
+    { label: "Overview", href: "/dashboard", icon: LayoutDashboard },
+    { label: "Projects", href: "/dashboard/projects", icon: FolderKanban },
+    { label: "Workloads", href: "/dashboard/workloads", icon: Activity },
+    {
+      label: "Private Benchmarks",
+      href: "/dashboard/benchmarks",
+      icon: BarChart3,
+    },
+    { label: "API Keys", href: "/dashboard/api-keys", icon: Key },
+    { label: "Usage & Quota", href: "/dashboard/usage", icon: TrendingUp },
+    { label: "Team & RBAC", href: "/dashboard/team", icon: Users },
+    { label: "Billing & Plans", href: "/dashboard/billing", icon: CreditCard },
+    { label: "Settings", href: "/dashboard/settings", icon: Settings },
   ];
 
   return (
@@ -38,9 +42,13 @@ export default function DashboardLayout({
           <div className="px-2">
             <div className="flex items-center gap-2">
               <span className="h-2 w-2 rounded-full bg-emerald-400"></span>
-              <span className="text-xs font-mono font-bold text-white uppercase tracking-wider">Acme AI Lab</span>
+              <span className="text-xs font-mono font-bold text-white uppercase tracking-wider">
+                Acme AI Lab
+              </span>
             </div>
-            <span className="text-[10px] font-mono text-slate-500 block mt-0.5">Org ID: org-89104 (Team Plan)</span>
+            <span className="text-[10px] font-mono text-slate-500 block mt-0.5">
+              Org ID: org-89104 (Team Plan)
+            </span>
           </div>
 
           <nav className="space-y-1">
@@ -65,15 +73,15 @@ export default function DashboardLayout({
             <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" />
             <span>Tenant Isolation: Active</span>
           </div>
-          <p className="text-[10px] text-slate-500">Row Level Security (RLS) enforced.</p>
+          <p className="text-[10px] text-slate-500">
+            Row Level Security (RLS) enforced.
+          </p>
         </div>
       </aside>
 
       {/* Main Content Area */}
       <div className="flex-1 p-6 md:p-10 overflow-y-auto">
-        <div className="max-w-6xl mx-auto">
-          {children}
-        </div>
+        <div className="max-w-6xl mx-auto">{children}</div>
       </div>
     </div>
   );

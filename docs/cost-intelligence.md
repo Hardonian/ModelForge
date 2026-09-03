@@ -18,12 +18,12 @@ $$\text{Cost per 1M Tokens} = \frac{\text{Hourly GPU Cost} \ (\$/\text{hr})}{\te
 
 ## 2. Cost Profiles: 32B Model (Qwen2.5-32B / DeepSeek-R1-32B)
 
-| Accelerator | Runtime & Precision | Sustained TPS | Hourly Cost ($/hr) | Blended Cost / 1M Tok |
-| --- | --- | --- | --- | --- |
-| **NVIDIA L40S 48GB** | vLLM (FP8) | 72.4 tok/s | $1.15 | **$0.32** |
-| **NVIDIA L40S 48GB (2x)** | Dynamo Disaggregated | 86.8 tok/s | $2.30 | **$0.38** (62% lower TTFT) |
-| **NVIDIA H100 SXM5 80GB** | TensorRT-LLM (FP8) | 88.6 tok/s | $3.20 | **$0.85** |
-| **RTX 4090 24GB (Self-Hosted)** | llama.cpp (INT4) | 44.2 tok/s | $0.25 (PUE amortized) | **$0.12** |
+| Accelerator                     | Runtime & Precision  | Sustained TPS | Hourly Cost ($/hr)    | Blended Cost / 1M Tok      |
+| ------------------------------- | -------------------- | ------------- | --------------------- | -------------------------- |
+| **NVIDIA L40S 48GB**            | vLLM (FP8)           | 72.4 tok/s    | $1.15                 | **$0.32**                  |
+| **NVIDIA L40S 48GB (2x)**       | Dynamo Disaggregated | 86.8 tok/s    | $2.30                 | **$0.38** (62% lower TTFT) |
+| **NVIDIA H100 SXM5 80GB**       | TensorRT-LLM (FP8)   | 88.6 tok/s    | $3.20                 | **$0.85**                  |
+| **RTX 4090 24GB (Self-Hosted)** | llama.cpp (INT4)     | 44.2 tok/s    | $0.25 (PUE amortized) | **$0.12**                  |
 
 ---
 

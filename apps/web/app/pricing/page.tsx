@@ -1,79 +1,79 @@
-import Link from 'next/link';
-import { Check, Sparkles, ArrowRight, ShieldCheck } from 'lucide-react';
+import Link from "next/link";
+import { Check, Sparkles, ArrowRight, ShieldCheck } from "lucide-react";
 
 export default function PricingPage() {
   const plans = [
     {
-      name: 'Free',
-      tagline: 'For developers, researchers & open-source teams',
-      price: '$0',
-      period: 'forever',
+      name: "Free",
+      tagline: "For developers, researchers & open-source teams",
+      price: "$0",
+      period: "forever",
       features: [
-        'Full public benchmark explorer',
-        'ModelFit score calculator',
-        'Public workload optimizer',
-        '100 API requests / day',
-        'OpenComputeBench community submissions',
-        'Standard community Discord support'
+        "Full public benchmark explorer",
+        "ModelFit score calculator",
+        "Public workload optimizer",
+        "100 API requests / day",
+        "OpenComputeBench community submissions",
+        "Standard community Discord support",
       ],
-      cta: 'Start Free',
-      href: '/explore',
-      highlighted: false
+      cta: "Start Free",
+      href: "/explore",
+      highlighted: false,
     },
     {
-      name: 'Pro',
-      tagline: 'For AI engineers deploying production workloads',
-      price: '$49',
-      period: 'per month',
+      name: "Pro",
+      tagline: "For AI engineers deploying production workloads",
+      price: "$49",
+      period: "per month",
       features: [
-        'Everything in Free',
-        'Saved production workloads & traces',
-        '50,000 API requests / month',
-        'Multi-accelerator comparison matrix',
-        'Private configuration exports',
-        'Automated Docker & K8s manifest generator',
-        'Priority email support'
+        "Everything in Free",
+        "Saved production workloads & traces",
+        "50,000 API requests / month",
+        "Multi-accelerator comparison matrix",
+        "Private configuration exports",
+        "Automated Docker & K8s manifest generator",
+        "Priority email support",
       ],
-      cta: 'Upgrade to Pro',
-      href: '/dashboard/billing',
-      highlighted: true
+      cta: "Upgrade to Pro",
+      href: "/dashboard/billing",
+      highlighted: true,
     },
     {
-      name: 'Team',
-      tagline: 'For fast-growing AI teams & inference infrastructure',
-      price: '$299',
-      period: 'per month',
+      name: "Team",
+      tagline: "For fast-growing AI teams & inference infrastructure",
+      price: "$299",
+      period: "per month",
       features: [
-        'Everything in Pro',
-        'Multi-tenant organizations & projects',
-        'Private team benchmark repository',
-        'Team-scoped API keys with RBAC',
-        '500,000 API requests / month',
-        'Detailed usage analytics & audit trails',
-        'Dedicated Slack support channel'
+        "Everything in Pro",
+        "Multi-tenant organizations & projects",
+        "Private team benchmark repository",
+        "Team-scoped API keys with RBAC",
+        "500,000 API requests / month",
+        "Detailed usage analytics & audit trails",
+        "Dedicated Slack support channel",
       ],
-      cta: 'Start Team Trial',
-      href: '/dashboard/billing',
-      highlighted: false
+      cta: "Start Team Trial",
+      href: "/dashboard/billing",
+      highlighted: false,
     },
     {
-      name: 'Enterprise',
-      tagline: 'For hyperscalers, cloud providers & large AI fleets',
-      price: 'Custom',
-      period: 'annual contract',
+      name: "Enterprise",
+      tagline: "For hyperscalers, cloud providers & large AI fleets",
+      price: "Custom",
+      period: "annual contract",
       features: [
-        'Everything in Team',
-        'Private benchmark runners inside your VPC',
-        'Proprietary model registry isolation',
-        'Continuous fleet inference FinOps',
-        'SAML SSO & SCIM directory sync',
-        'Custom benchmark verification harnesses',
-        'Dedicated ML infrastructure architect'
+        "Everything in Team",
+        "Private benchmark runners inside your VPC",
+        "Proprietary model registry isolation",
+        "Continuous fleet inference FinOps",
+        "SAML SSO & SCIM directory sync",
+        "Custom benchmark verification harnesses",
+        "Dedicated ML infrastructure architect",
       ],
-      cta: 'Contact Sales',
-      href: 'mailto:enterprise@modelforge.dev',
-      highlighted: false
-    }
+      cta: "Contact Sales",
+      href: "mailto:enterprise@modelforge.dev",
+      highlighted: false,
+    },
   ];
 
   return (
@@ -83,7 +83,8 @@ export default function PricingPage() {
           Transparent Inference Intelligence Pricing
         </h1>
         <p className="text-base text-slate-400">
-          From open-source developers to venture-scale enterprise clusters. Pay only for private infrastructure and team orchestration.
+          From open-source developers to venture-scale enterprise clusters. Pay
+          only for private infrastructure and team orchestration.
         </p>
       </div>
 
@@ -93,8 +94,8 @@ export default function PricingPage() {
             key={plan.name}
             className={`flex flex-col justify-between rounded-2xl border p-6 transition-all ${
               plan.highlighted
-                ? 'border-sky-500/50 bg-gradient-to-b from-sky-500/10 to-slate-900/40 shadow-xl shadow-sky-500/10'
-                : 'border-slate-800 bg-slate-900/40 hover:border-slate-700'
+                ? "border-sky-500/50 bg-gradient-to-b from-sky-500/10 to-slate-900/40 shadow-xl shadow-sky-500/10"
+                : "border-slate-800 bg-slate-900/40 hover:border-slate-700"
             }`}
           >
             <div className="space-y-4">
@@ -107,12 +108,18 @@ export default function PricingPage() {
                     </span>
                   )}
                 </div>
-                <p className="text-xs text-slate-400 mt-1 min-h-[32px]">{plan.tagline}</p>
+                <p className="text-xs text-slate-400 mt-1 min-h-[32px]">
+                  {plan.tagline}
+                </p>
               </div>
 
               <div className="pt-2 border-t border-slate-800/80">
-                <span className="text-3xl font-extrabold text-white">{plan.price}</span>
-                <span className="text-xs text-slate-400 font-mono ml-1.5">/ {plan.period}</span>
+                <span className="text-3xl font-extrabold text-white">
+                  {plan.price}
+                </span>
+                <span className="text-xs text-slate-400 font-mono ml-1.5">
+                  / {plan.period}
+                </span>
               </div>
 
               <ul className="space-y-2.5 pt-4 border-t border-slate-800/80 text-xs text-slate-300 font-sans">
@@ -130,8 +137,8 @@ export default function PricingPage() {
                 href={plan.href}
                 className={`w-full flex items-center justify-center gap-1.5 rounded-lg py-2.5 text-xs font-semibold transition-all ${
                   plan.highlighted
-                    ? 'bg-sky-500 text-white shadow-md shadow-sky-500/25 hover:bg-sky-400'
-                    : 'bg-slate-800 text-slate-200 hover:bg-slate-700 hover:text-white'
+                    ? "bg-sky-500 text-white shadow-md shadow-sky-500/25 hover:bg-sky-400"
+                    : "bg-slate-800 text-slate-200 hover:bg-slate-700 hover:text-white"
                 }`}
               >
                 <span>{plan.cta}</span>

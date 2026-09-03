@@ -1,8 +1,8 @@
-import { CandidateDeployment, WorkloadFingerprint } from '../types';
+import { CandidateDeployment, WorkloadFingerprint } from "../types";
 
 export function generateDynamoManifest(
   candidate: CandidateDeployment,
-  workload: WorkloadFingerprint
+  workload: WorkloadFingerprint,
 ): {
   dynamo_config_yaml: string;
   env_example: string;
@@ -18,7 +18,7 @@ export function generateDynamoManifest(
 apiVersion: dynamo.nvidia.com/v1alpha1
 kind: DynamoServingDeployment
 metadata:
-  name: ${candidate.model_id.toLowerCase().replace(/[^a-z0-9]/g, '-')}-dynamo
+  name: ${candidate.model_id.toLowerCase().replace(/[^a-z0-9]/g, "-")}-dynamo
 spec:
   model:
     repository: "${candidate.model_id}"
@@ -26,12 +26,12 @@ spec:
     precision: "${candidate.precision}"
     engine: "tensorrt-llm"
   
-  serving_mode: ${isDisaggregated ? 'disaggregated' : 'converged'}
+  serving_mode: ${isDisaggregated ? "disaggregated" : "converged"}
   
   routing:
-    policy: ${candidate.disaggregated_topology?.kv_routing_policy ?? 'kv_cache_affinity'}
+    policy: ${candidate.disaggregated_topology?.kv_routing_policy ?? "kv_cache_affinity"}
     session_stickiness: true
-    cross_node_interconnect: "${candidate.disaggregated_topology?.cross_node_interconnect ?? 'infiniband_ndr'}"
+    cross_node_interconnect: "${candidate.disaggregated_topology?.cross_node_interconnect ?? "infiniband_ndr"}"
 
   topology:
     ${
@@ -83,7 +83,7 @@ TENSORRT_LLM_ENABLE_KV_TRANSFER=1
 `;
 
   const deploymentNotesMd = `### NVIDIA Dynamo Deployment Notes
-- **Serving Architecture:** ${isDisaggregated ? 'Disaggregated Prefill / Decode Topology' : 'Converged Serving'}
+- **Serving Architecture:** ${isDisaggregated ? "Disaggregated Prefill / Decode Topology" : "Converged Serving"}
 - **Model Revision:** \`${candidate.model_id}@${candidate.model_revision}\`
 - **Recommended Hardware:** ${candidate.accelerator_count}x ${candidate.accelerator} (${candidate.precision.toUpperCase()})
 - **KV Routing:** KV Cache affinity ensures minimum cross-node recomputation overhead.
@@ -94,6 +94,6 @@ TENSORRT_LLM_ENABLE_KV_TRANSFER=1
   return {
     dynamo_config_yaml: dynamoConfigYaml,
     env_example: envExample,
-    deployment_notes_md: deploymentNotesMd
+    deployment_notes_md: deploymentNotesMd,
   };
 }

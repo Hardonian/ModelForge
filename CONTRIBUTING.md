@@ -24,12 +24,14 @@ ModelForge is organized as a Turborepo monorepo with Node.js/TypeScript packages
 ## Development Setup
 
 ### Prerequisites
+
 - Node.js >= 20.0.0
 - pnpm >= 9.0.0
 - Python >= 3.12
 - [uv](https://docs.astral.sh/uv/)
 
 ### Installation
+
 ```bash
 # Clone the repository
 git clone https://github.com/Hardonian/ModelForge.git

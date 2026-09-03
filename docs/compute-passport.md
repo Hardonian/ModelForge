@@ -12,10 +12,10 @@ In the open-source LLM ecosystem, a repository identifier like `Qwen/Qwen2.5-32B
 
 Furthermore, serving teams routinely run into unverified runtime claims:
 
-- *"Does this model support vLLM continuous batching?"*
-- *"Does it run in FP8 on Ada L40S?"*
-- *"Can I deploy this on NVIDIA Dynamo with disaggregated prefill/decode?"*
-- *"Will this run within 24GB VRAM?"*
+- _"Does this model support vLLM continuous batching?"_
+- _"Does it run in FP8 on Ada L40S?"_
+- _"Can I deploy this on NVIDIA Dynamo with disaggregated prefill/decode?"_
+- _"Will this run within 24GB VRAM?"_
 
 A **Compute Passport** is a cryptographically verifiable, revision-specific deployment specification that certifies exact model identity, empirical execution compatibility across runtimes, memory profiles across precisions, and benchmark evidence coverage.
 
@@ -40,13 +40,13 @@ Treating `org/model` as sufficient without revision tracking is explicitly prohi
 
 Every compatibility claim and performance metric in a Compute Passport declares its provenance:
 
-| Provenance Level | Description | Trust Weight |
-| --- | --- | --- |
-| **`MEASURED`** | Multi-run empirical telemetry executed on real physical accelerators by verified OpenComputeBench workers. | **1.00** |
-| **`DOCUMENTED`** | Official vendor support statements, framework release notes, or tested architectural PRs. | **0.85** |
-| **`DERIVED`** | Analytically calculated using GPU memory models, tensor parallelism rules, and roofline formulas. | **0.70** |
-| **`PREDICTED`** | Machine-learning regression estimated from adjacent parameter architectures. | **0.50** |
-| **`UNKNOWN`** | Untested runtime or accelerator configuration. | **0.00** |
+| Provenance Level | Description                                                                                                | Trust Weight |
+| ---------------- | ---------------------------------------------------------------------------------------------------------- | ------------ |
+| **`MEASURED`**   | Multi-run empirical telemetry executed on real physical accelerators by verified OpenComputeBench workers. | **1.00**     |
+| **`DOCUMENTED`** | Official vendor support statements, framework release notes, or tested architectural PRs.                  | **0.85**     |
+| **`DERIVED`**    | Analytically calculated using GPU memory models, tensor parallelism rules, and roofline formulas.          | **0.70**     |
+| **`PREDICTED`**  | Machine-learning regression estimated from adjacent parameter architectures.                               | **0.50**     |
+| **`UNKNOWN`**    | Untested runtime or accelerator configuration.                                                             | **0.00**     |
 
 ---
 
@@ -65,7 +65,11 @@ Every compatibility claim and performance metric in a Compute Passport declares 
   "license": "Apache-2.0",
   "gated": false,
   "compatibility": {
-    "vllm": { "status": "supported", "provenance": "MEASURED", "notes": "Verified v0.6.4" },
+    "vllm": {
+      "status": "supported",
+      "provenance": "MEASURED",
+      "notes": "Verified v0.6.4"
+    },
     "nvidia-nim": { "status": "supported", "provenance": "DOCUMENTED" },
     "nvidia-dynamo": { "status": "supported", "provenance": "MEASURED" },
     "tensorrt-llm": { "status": "supported", "provenance": "MEASURED" },
@@ -82,7 +86,11 @@ Every compatibility claim and performance metric in a Compute Passport declares 
     "recommended_vram_gb": 48.0
   },
   "coverage": {
-    "accelerators_tested": ["NVIDIA L40S 48GB", "NVIDIA H100 SXM5 80GB", "RTX 4090 24GB"],
+    "accelerators_tested": [
+      "NVIDIA L40S 48GB",
+      "NVIDIA H100 SXM5 80GB",
+      "RTX 4090 24GB"
+    ],
     "runtimes_tested": ["vllm", "tensorrt-llm", "dynamo"],
     "total_benchmarks": 18,
     "total_reproductions": 8,
@@ -103,5 +111,5 @@ You can embed dynamic ModelForge badges directly into your Hugging Face `README.
 
 ```markdown
 [![ModelForge Compute Passport](https://img.shields.io/badge/Compute%20Passport-Verified-blue)](https://modelforge.dev/models/Qwen/Qwen2.5-32B-Instruct/passport)
-[![ModelFit Score](https://img.shields.io/badge/ModelFit-96%2F100%20(A%2B)-brightgreen)](https://modelforge.dev/model-fit?model=Qwen%2FQwen2.5-32B-Instruct)
+[![ModelFit Score](<https://img.shields.io/badge/ModelFit-96%2F100%20(A%2B)-brightgreen>)](https://modelforge.dev/model-fit?model=Qwen%2FQwen2.5-32B-Instruct)
 ```

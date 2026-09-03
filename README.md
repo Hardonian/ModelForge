@@ -43,22 +43,29 @@
 ## 🚀 Key Phase 2 Pillars
 
 ### 1. 🪪 Revision-Specific Compute Passports
+
 Models like `Qwen/Qwen2.5-32B-Instruct` evolve over time. ModelForge binds verified execution profiles to exact commits (`org/model@revision`), tracking:
+
 - Provenance tiers: `MEASURED` vs `DOCUMENTED` vs `DERIVED` vs `PREDICTED`.
 - Memory profiles across FP16, FP8, and INT4.
 - Execution compatibility across NVIDIA Dynamo, NIM, TensorRT-LLM, vLLM, SGLang, and llama.cpp.
 
 ### 2. ⚡ Inference SLO Compiler (`packages/slo-compiler`)
+
 Turns vague sizing into exact infrastructure manifests. Given a context length, concurrency target, and P95 TTFT SLA:
+
 - Solves Pareto-optimal serving topologies.
 - Synthesizes disaggregated prefill/decode Kubernetes CRDs for **NVIDIA Dynamo** (`dynamo-config.yaml`).
 - Generates turnkey container composition for **NVIDIA NIM** (`docker-compose.yaml`).
 
 ### 3. 🚀 Software Lift Metric (`/software-lift`)
+
 Measures throughput gain and TTFT reduction achieved by upgrading the serving software on **identical hardware and workloads**:
-- *Hopper H100 (70B FP8):* Transformers (1.00x) &rarr; vLLM (1.78x) &rarr; TensorRT-LLM (2.31x) &rarr; Dynamo + TRT-LLM (2.71x).
+
+- _Hopper H100 (70B FP8):_ Transformers (1.00x) &rarr; vLLM (1.78x) &rarr; TensorRT-LLM (2.31x) &rarr; Dynamo + TRT-LLM (2.71x).
 
 ### 4. 🛡️ Performance CI (`.modelforge.yml`)
+
 Automated performance regression firewall in GitHub Actions. Fails PRs if throughput regresses > 5% or P95 TTFT rises > 10%.
 
 ---

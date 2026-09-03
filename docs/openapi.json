@@ -145,8 +145,16 @@
           { "name": "model", "in": "query", "schema": { "type": "string" } },
           { "name": "hardware", "in": "query", "schema": { "type": "string" } },
           { "name": "runtime", "in": "query", "schema": { "type": "string" } },
-          { "name": "precision", "in": "query", "schema": { "type": "string" } },
-          { "name": "verifiedOnly", "in": "query", "schema": { "type": "boolean" } }
+          {
+            "name": "precision",
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "verifiedOnly",
+            "in": "query",
+            "schema": { "type": "boolean" }
+          }
         ],
         "responses": {
           "200": {
@@ -270,7 +278,9 @@
       "post": {
         "summary": "Evaluate ModelFit Score",
         "responses": {
-          "200": { "description": "Dimensional ModelFit evaluation score (0-100)" }
+          "200": {
+            "description": "Dimensional ModelFit evaluation score (0-100)"
+          }
         }
       }
     },
@@ -278,7 +288,9 @@
       "post": {
         "summary": "Pareto Frontier Hardware Optimizer",
         "responses": {
-          "200": { "description": "Optimal cost vs latency serving configuration" }
+          "200": {
+            "description": "Optimal cost vs latency serving configuration"
+          }
         }
       }
     },
@@ -286,7 +298,9 @@
       "get": {
         "summary": "Software Lift Multipliers",
         "responses": {
-          "200": { "description": "Runtime speedup multipliers on identical hardware" }
+          "200": {
+            "description": "Runtime speedup multipliers on identical hardware"
+          }
         }
       }
     },
@@ -317,9 +331,18 @@
           "version": { "type": "string" },
           "model_families": { "type": "array", "items": { "type": "object" } },
           "runtimes": { "type": "array", "items": { "type": "object" } },
-          "execution_backends": { "type": "array", "items": { "type": "object" } },
-          "deployment_targets": { "type": "array", "items": { "type": "object" } },
-          "accelerator_support": { "type": "array", "items": { "type": "object" } }
+          "execution_backends": {
+            "type": "array",
+            "items": { "type": "object" }
+          },
+          "deployment_targets": {
+            "type": "array",
+            "items": { "type": "object" }
+          },
+          "accelerator_support": {
+            "type": "array",
+            "items": { "type": "object" }
+          }
         }
       },
       "ModelMetadata": {
@@ -339,7 +362,11 @@
         "properties": {
           "model_id": { "type": "string" },
           "revision": { "type": "string" },
-          "confidence_score": { "type": "integer", "minimum": 0, "maximum": 100 },
+          "confidence_score": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100
+          },
           "confidence_explanation": { "type": "string" },
           "compatibility": { "type": "object" },
           "memory_profile": { "type": "object" }
@@ -357,7 +384,15 @@
       },
       "BenchmarkRecord": {
         "type": "object",
-        "required": ["benchmark_id", "schema_version", "model", "hardware", "runtime", "metrics", "provenance"],
+        "required": [
+          "benchmark_id",
+          "schema_version",
+          "model",
+          "hardware",
+          "runtime",
+          "metrics",
+          "provenance"
+        ],
         "properties": {
           "benchmark_id": { "type": "string", "format": "uuid" },
           "schema_version": { "type": "string" },

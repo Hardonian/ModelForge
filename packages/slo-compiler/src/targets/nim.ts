@@ -1,12 +1,14 @@
-import { CandidateDeployment } from '../types';
+import { CandidateDeployment } from "../types";
 
 export function generateNimManifest(candidate: CandidateDeployment): {
   nim_compose_yaml: string;
   env_example: string;
   deployment_notes_md: string;
 } {
-  const safeModelTag = candidate.model_id.toLowerCase().replace(/[^a-z0-9]/g, '-');
-  const nimImage = `nvcr.io/nim/${candidate.model_id.toLowerCase().replace('/', '-')}:latest`;
+  const safeModelTag = candidate.model_id
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, "-");
+  const nimImage = `nvcr.io/nim/${candidate.model_id.toLowerCase().replace("/", "-")}:latest`;
 
   const nimComposeYaml = `version: '3.8'
 
@@ -61,6 +63,6 @@ NIM_HTTP_PORT=8000
   return {
     nim_compose_yaml: nimComposeYaml,
     env_example: envExample,
-    deployment_notes_md: deploymentNotesMd
+    deployment_notes_md: deploymentNotesMd,
   };
 }

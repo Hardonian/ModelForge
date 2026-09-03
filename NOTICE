@@ -1,8 +1,10 @@
+# ModelForge NOTICE
+
 ModelForge
 Copyright 2025 ModelForge Contributors
 
 This product includes software developed by the ModelForge Project
-(https://modelforge.dev).
+(<https://modelforge.dev>).
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -18,8 +20,9 @@ limitations under the License.
 
 This project incorporates and references benchmarking methodology and
 interfaces compatible with:
-- Hugging Face Hub (https://huggingface.co)
-- NVIDIA Dynamo, TensorRT-LLM, and NIM (https://nvidia.com)
-- vLLM Project (https://vllm.ai)
-- SGLang Project (https://sglang.ai)
-- llama.cpp Project (https://github.com/ggerganov/llama.cpp)
+
+- Hugging Face Hub (<https://huggingface.co>)
+- NVIDIA Dynamo, TensorRT-LLM, and NIM (<https://nvidia.com>)
+- vLLM Project (<https://vllm.ai>)
+- SGLang Project (<https://sglang.ai>)
+- llama.cpp Project (<https://github.com/ggerganov/llama.cpp>)

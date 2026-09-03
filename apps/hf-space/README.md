@@ -16,6 +16,7 @@ short_description: Determine optimal model + GPU + runtime + serving configurati
 Given an AI model, workload, hardware environment, latency target, and cost constraint, ModelForge determines the optimal model + accelerator + runtime + precision + serving configuration.
 
 ## Features
+
 - **ModelFit**: 6-dimension explainable scoring algorithm across memory, prefill/decode latency, runtime support, and context limits.
 - **Workload Optimizer**: Multi-objective Pareto optimization across lowest cost, lowest latency, and highest throughput.
 - **OpenComputeBench Browser**: Search reproducible benchmarks with cryptographic environment and result hashes.

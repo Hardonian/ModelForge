@@ -38,9 +38,9 @@ hardware:
   primary: "NVIDIA L40S 48GB"
 
 thresholds:
-  throughput_regression_percent: 5.0   # Fail if tok/s drops > 5%
-  ttft_regression_percent: 10.0        # Fail if P95 TTFT rises > 10%
-  vram_regression_percent: 8.0         # Fail if peak VRAM increases > 8%
+  throughput_regression_percent: 5.0 # Fail if tok/s drops > 5%
+  ttft_regression_percent: 10.0 # Fail if P95 TTFT rises > 10%
+  vram_regression_percent: 8.0 # Fail if peak VRAM increases > 8%
 ```
 
 ---
@@ -63,7 +63,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: "3.12"
       - uses: astral-sh/setup-uv@v3
       - run: uv pip install -e packages/benchmark-cli
       - run: modelforge ci check --config .modelforge.yml
@@ -75,10 +75,10 @@ jobs:
 
 When running in CI, ModelForge posts a markdown table to the GitHub pull request:
 
-| Metric | Baseline | Current Run | Delta % | Threshold | Status |
-| --- | --- | --- | --- | --- | --- |
-| **Throughput (tok/s)** | 72.4 | 71.0 | -1.9% | -5.0% max drop | ✅ **PASS** |
-| **P95 TTFT (ms)** | 280.0 | 290.0 | +3.5% | +10.0% max rise | ✅ **PASS** |
-| **Peak VRAM (GB)** | 38.6 | 38.8 | +0.5% | +8.0% max rise | ✅ **PASS** |
+| Metric                 | Baseline | Current Run | Delta % | Threshold       | Status      |
+| ---------------------- | -------- | ----------- | ------- | --------------- | ----------- |
+| **Throughput (tok/s)** | 72.4     | 71.0        | -1.9%   | -5.0% max drop  | ✅ **PASS** |
+| **P95 TTFT (ms)**      | 280.0    | 290.0       | +3.5%   | +10.0% max rise | ✅ **PASS** |
+| **Peak VRAM (GB)**     | 38.6     | 38.8        | +0.5%   | +8.0% max rise  | ✅ **PASS** |
 
 If any regression exceeds its configured threshold, the job exits with non-zero status code `1`, blocking the merge.

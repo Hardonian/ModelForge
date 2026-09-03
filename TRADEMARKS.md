@@ -3,9 +3,11 @@
 ModelForge is an open source initiative and deployment intelligence layer for artificial intelligence models.
 
 ## ModelForge Trademarks
+
 "ModelForge", "OpenComputeBench", "Compute Passport", and "ModelFit" are trademarks of the ModelForge Project. Use of these marks to refer truthfully and accurately to ModelForge software, APIs, and specifications is permitted provided such use does not imply endorsement, sponsorship, or false affiliation.
 
 ## Third-Party Trademarks & Attributions
+
 All third-party brand names, product names, logos, and trademarks appearing in this repository, documentation, CLI outputs, or web applications are the property of their respective owners. Their mention here is purely for identification, technical compatibility, and interoperability purposes:
 
 - **NVIDIA®, CUDA®, TensorRT™, NVIDIA NIM™, and NVIDIA Dynamo™** are registered trademarks or trademarks of NVIDIA Corporation in the United States and other countries.

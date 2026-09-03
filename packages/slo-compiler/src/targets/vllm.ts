@@ -1,16 +1,16 @@
-import { CandidateDeployment } from '../types';
+import { CandidateDeployment } from "../types";
 
 export function generateVllmManifest(candidate: CandidateDeployment): {
   vllm_docker_run: string;
   kubernetes_pod_yaml: string;
   deployment_notes_md: string;
 } {
-  const safeName = candidate.model_id.toLowerCase().replace(/[^a-z0-9]/g, '-');
+  const safeName = candidate.model_id.toLowerCase().replace(/[^a-z0-9]/g, "-");
   const tp = candidate.tensor_parallel_size;
 
   const vllmDockerRun = `docker run -d \\
   --name vllm-${safeName} \\
-  --gpus '"device=0${candidate.accelerator_count > 1 ? `-${candidate.accelerator_count - 1}` : ''}"' \\
+  --gpus '"device=0${candidate.accelerator_count > 1 ? `-${candidate.accelerator_count - 1}` : ""}"' \\
   -v ~/.cache/huggingface:/root/.cache/huggingface \\
   -p 8000:8000 \\
   --ipc=host \\
@@ -18,7 +18,7 @@ export function generateVllmManifest(candidate: CandidateDeployment): {
   --model ${candidate.model_id} \\
   --revision ${candidate.model_revision} \\
   --tensor-parallel-size ${tp} \\
-  --dtype ${candidate.precision.includes('8') ? 'auto --kv-cache-dtype fp8' : 'auto'} \\
+  --dtype ${candidate.precision.includes("8") ? "auto --kv-cache-dtype fp8" : "auto"} \\
   --max-model-len 16384 \\
   --gpu-memory-utilization 0.92`;
 
@@ -67,6 +67,6 @@ spec:
   return {
     vllm_docker_run: vllmDockerRun,
     kubernetes_pod_yaml: kubernetesPodYaml,
-    deployment_notes_md: deploymentNotesMd
+    deployment_notes_md: deploymentNotesMd,
   };
 }

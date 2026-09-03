@@ -5,12 +5,14 @@ We welcome contributions across model intelligence, hardware adapters, serving r
 ## Development Setup
 
 1. **Clone the repository**:
+
    ```bash
    git clone https://github.com/Hardonian/ModelForge.git
    cd ModelForge
    ```
 
 2. **Install Node & Python dependencies**:
+
    ```bash
    pnpm install
    cd packages/benchmark-cli
@@ -18,11 +20,13 @@ We welcome contributions across model intelligence, hardware adapters, serving r
    ```
 
 3. **Verify local system health**:
+
    ```bash
    uv run modelforge doctor
    ```
 
 4. **Run test suites**:
+
    ```bash
    pnpm test
    uv run pytest packages/benchmark-cli/tests

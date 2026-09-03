@@ -7,6 +7,7 @@ assignees: ""
 ---
 
 **Device Specification**
+
 - Manufacturer / Vendor: (e.g. NVIDIA, AMD, Intel, Apple, Qualcomm)
 - Device Name: (e.g. NVIDIA RTX 5090 32GB)
 - Physical VRAM (Bytes / GB):

@@ -9,11 +9,13 @@
 ## 1. The Strict Workload Equivalence Principle
 
 Performance comparisons across inference software stacks are frequently distorted:
+
 - Comparing FP16 PyTorch eager execution to FP8 TensorRT-LLM and attributing the speedup to "software".
 - Comparing a 2k context run to an 8k context run.
 - Comparing varying client concurrency levels.
 
 ModelForge enforces the **Strict Workload Equivalence Principle**:
+
 ```
 Software Lift is ONLY measured when:
   Accelerator(Run A) == Accelerator(Run B)
@@ -40,24 +42,26 @@ Baseline reference is standard Hugging Face Transformers (`transformers>=4.40.0`
 ## 3. Verified Benchmark Observations
 
 ### Hopper Architecture: NVIDIA H100 SXM5 80GB
-*Model: `meta-llama/Llama-3.3-70B-Instruct@main` | Precision: `FP8` | Context: `4,096 tokens`*
 
-| Serving Runtime | Throughput | Software Lift | P95 TTFT | TTFT Reduction | Provenance |
-|---|---|---|---|---|---|
-| **Transformers (v4.44.0)** | `38.4 tok/s` | **1.00x** (Baseline) | `480 ms` | 0% | `MEASURED` |
-| **vLLM (v0.6.4)** | `68.2 tok/s` | **+1.78x** | `280 ms` | -42% | `MEASURED` |
-| **SGLang (v0.3.5)** | `71.5 tok/s` | **+1.86x** | `265 ms` | -45% | `MEASURED` |
-| **TensorRT-LLM (v0.16.0)** | `88.6 tok/s` | **+2.31x** | `220 ms` | -54% | `MEASURED` |
-| **NVIDIA Dynamo + TRT-LLM** | **104.2 tok/s** | **+2.71x** | **180 ms** | **-62%** | `MEASURED` |
+_Model: `meta-llama/Llama-3.3-70B-Instruct@main` | Precision: `FP8` | Context: `4,096 tokens`_
+
+| Serving Runtime             | Throughput      | Software Lift        | P95 TTFT   | TTFT Reduction | Provenance |
+| --------------------------- | --------------- | -------------------- | ---------- | -------------- | ---------- |
+| **Transformers (v4.44.0)**  | `38.4 tok/s`    | **1.00x** (Baseline) | `480 ms`   | 0%             | `MEASURED` |
+| **vLLM (v0.6.4)**           | `68.2 tok/s`    | **+1.78x**           | `280 ms`   | -42%           | `MEASURED` |
+| **SGLang (v0.3.5)**         | `71.5 tok/s`    | **+1.86x**           | `265 ms`   | -45%           | `MEASURED` |
+| **TensorRT-LLM (v0.16.0)**  | `88.6 tok/s`    | **+2.31x**           | `220 ms`   | -54%           | `MEASURED` |
+| **NVIDIA Dynamo + TRT-LLM** | **104.2 tok/s** | **+2.71x**           | **180 ms** | **-62%**       | `MEASURED` |
 
 ---
 
 ### Ada Architecture: NVIDIA L40S 48GB
-*Model: `Qwen/Qwen2.5-32B-Instruct@main` | Precision: `FP8` | Context: `4,096 tokens`*
 
-| Serving Runtime | Throughput | Software Lift | P95 TTFT | TTFT Reduction | Provenance |
-|---|---|---|---|---|---|
-| **Transformers (v4.44.0)** | `34.0 tok/s` | **1.00x** (Baseline) | `450 ms` | 0% | `MEASURED` |
-| **vLLM (v0.6.4)** | `58.4 tok/s` | **+1.72x** | `280 ms` | -38% | `MEASURED` |
-| **TensorRT-LLM (v0.16.0)** | `72.4 tok/s` | **+2.13x** | `235 ms` | -48% | `MEASURED` |
-| **NVIDIA Dynamo + TRT-LLM** | **86.8 tok/s** | **+2.55x** | **202 ms** | **-55%** | `MEASURED` |
+_Model: `Qwen/Qwen2.5-32B-Instruct@main` | Precision: `FP8` | Context: `4,096 tokens`_
+
+| Serving Runtime             | Throughput     | Software Lift        | P95 TTFT   | TTFT Reduction | Provenance |
+| --------------------------- | -------------- | -------------------- | ---------- | -------------- | ---------- |
+| **Transformers (v4.44.0)**  | `34.0 tok/s`   | **1.00x** (Baseline) | `450 ms`   | 0%             | `MEASURED` |
+| **vLLM (v0.6.4)**           | `58.4 tok/s`   | **+1.72x**           | `280 ms`   | -38%           | `MEASURED` |
+| **TensorRT-LLM (v0.16.0)**  | `72.4 tok/s`   | **+2.13x**           | `235 ms`   | -48%           | `MEASURED` |
+| **NVIDIA Dynamo + TRT-LLM** | **86.8 tok/s** | **+2.55x**           | **202 ms** | **-55%**       | `MEASURED` |

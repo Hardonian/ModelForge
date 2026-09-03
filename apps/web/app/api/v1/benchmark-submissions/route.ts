@@ -1,8 +1,11 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { OpenComputeBenchSchema, validateBenchmarkIntegrity } from '@modelforge/benchmark-schema';
-import { dataLayer } from '@modelforge/database';
+import { NextRequest, NextResponse } from "next/server";
+import {
+  OpenComputeBenchSchema,
+  validateBenchmarkIntegrity,
+} from "@modelforge/benchmark-schema";
+import { dataLayer } from "@modelforge/database";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export async function POST(request: NextRequest) {
   try {
@@ -11,8 +14,8 @@ export async function POST(request: NextRequest) {
 
     if (!parsed.success) {
       return NextResponse.json(
-        { error: 'Schema validation failed', details: parsed.error.format() },
-        { status: 400 }
+        { error: "Schema validation failed", details: parsed.error.format() },
+        { status: 400 },
       );
     }
 
@@ -21,8 +24,11 @@ export async function POST(request: NextRequest) {
 
     if (!isValid) {
       return NextResponse.json(
-        { error: 'Benchmark cryptographic integrity verification failed', details: errors },
-        { status: 422 }
+        {
+          error: "Benchmark cryptographic integrity verification failed",
+          details: errors,
+        },
+        { status: 422 },
       );
     }
 
@@ -31,17 +37,17 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(
       {
-        status: 'accepted',
+        status: "accepted",
         benchmark_id: record.benchmark_id,
         verification_status: record.verification.status,
-        url: `https://modelforge.dev/benchmarks/${record.benchmark_id}`
+        url: `https://modelforge.dev/benchmarks/${record.benchmark_id}`,
       },
-      { status: 201 }
+      { status: 201 },
     );
   } catch (err: any) {
     return NextResponse.json(
-      { error: 'Internal processing error', message: err.message },
-      { status: 500 }
+      { error: "Internal processing error", message: err.message },
+      { status: 500 },
     );
   }
 }

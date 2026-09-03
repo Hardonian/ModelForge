@@ -1,7 +1,13 @@
-import Link from 'next/link';
-import { BarChart3, Filter, Search, ShieldCheck, ArrowRight } from 'lucide-react';
-import { dataLayer } from '@modelforge/database';
-import { VerificationBadge } from '@/components/Badges';
+import Link from "next/link";
+import {
+  BarChart3,
+  Filter,
+  Search,
+  ShieldCheck,
+  ArrowRight,
+} from "lucide-react";
+import { dataLayer } from "@modelforge/database";
+import { VerificationBadge } from "@/components/Badges";
 
 export default function BenchmarksIndexPage() {
   const benchmarks = dataLayer.listBenchmarks();
@@ -20,7 +26,8 @@ export default function BenchmarksIndexPage() {
             Reproducible Benchmark Observations
           </h1>
           <p className="text-sm text-slate-400 mt-1">
-            Cryptographically signed, deterministic inference benchmarks across architectures, runtimes, and accelerators.
+            Cryptographically signed, deterministic inference benchmarks across
+            architectures, runtimes, and accelerators.
           </p>
         </div>
 
@@ -51,26 +58,52 @@ export default function BenchmarksIndexPage() {
           </thead>
           <tbody className="divide-y divide-slate-800/60 text-slate-300">
             {benchmarks.map((b) => (
-              <tr key={b.benchmark_id} className="hover:bg-slate-800/30 transition-colors">
+              <tr
+                key={b.benchmark_id}
+                className="hover:bg-slate-800/30 transition-colors"
+              >
                 <td className="py-3.5 px-4 font-bold text-sky-400">
-                  <Link href={`/benchmarks/${b.benchmark_id}`} className="hover:underline">
+                  <Link
+                    href={`/benchmarks/${b.benchmark_id}`}
+                    className="hover:underline"
+                  >
                     {b.benchmark_id.slice(0, 8)}...
                   </Link>
                 </td>
                 <td className="py-3.5 px-4 font-sans font-semibold text-white">
-                  <Link href={`/models/${b.model.repository}`} className="hover:text-sky-400">
+                  <Link
+                    href={`/models/${b.model.repository}`}
+                    className="hover:text-sky-400"
+                  >
                     {b.model.repository}
                   </Link>
                 </td>
-                <td className="py-3.5 px-4 text-slate-200">{b.hardware.device}</td>
-                <td className="py-3.5 px-4 uppercase text-slate-300 font-bold">{b.precision.type}</td>
-                <td className="py-3.5 px-4 text-slate-400">{b.runtime.name} {b.runtime.version}</td>
-                <td className="py-3.5 px-4 text-right font-bold text-sky-400">{b.metrics.tokens_per_second} tok/s</td>
-                <td className="py-3.5 px-4 text-right">{b.metrics.ttft_ms.p50_ms} ms</td>
-                <td className="py-3.5 px-4 text-right">{b.metrics.tpot_ms.p50_ms} ms</td>
-                <td className="py-3.5 px-4 text-right">{(b.metrics.peak_vram_bytes / 1e9).toFixed(1)} GB</td>
+                <td className="py-3.5 px-4 text-slate-200">
+                  {b.hardware.device}
+                </td>
+                <td className="py-3.5 px-4 uppercase text-slate-300 font-bold">
+                  {b.precision.type}
+                </td>
+                <td className="py-3.5 px-4 text-slate-400">
+                  {b.runtime.name} {b.runtime.version}
+                </td>
+                <td className="py-3.5 px-4 text-right font-bold text-sky-400">
+                  {b.metrics.tokens_per_second} tok/s
+                </td>
+                <td className="py-3.5 px-4 text-right">
+                  {b.metrics.ttft_ms.p50_ms} ms
+                </td>
+                <td className="py-3.5 px-4 text-right">
+                  {b.metrics.tpot_ms.p50_ms} ms
+                </td>
+                <td className="py-3.5 px-4 text-right">
+                  {(b.metrics.peak_vram_bytes / 1e9).toFixed(1)} GB
+                </td>
                 <td className="py-3.5 px-4">
-                  <VerificationBadge status={b.verification.status} synthetic={b.synthetic_fixture} />
+                  <VerificationBadge
+                    status={b.verification.status}
+                    synthetic={b.synthetic_fixture}
+                  />
                 </td>
               </tr>
             ))}

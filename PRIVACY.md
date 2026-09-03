@@ -16,6 +16,7 @@ ModelForge is designed with privacy-by-design principles for production AI engin
 ## Telemetry & Benchmark Submissions
 
 When you choose to submit a benchmark result to the OpenComputeBench network:
+
 - Only hardware specifications, software/driver versions, and benchmark latency/throughput distributions are uploaded.
 - Each submission is cryptographically hashed (`environment_hash` and `result_hash`) to guarantee authenticity.
 - Submissions are publicly accessible under the CDLA-Permissive-2.0 license to advance open AI research.

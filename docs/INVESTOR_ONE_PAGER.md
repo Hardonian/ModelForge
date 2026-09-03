@@ -9,6 +9,7 @@
 Global enterprise spend on AI compute is accelerating past **$100B annually**, yet **over 40% of GPU compute is wasted** due to suboptimal model deployment configurations, over-provisioning, and avoidable out-of-memory crashes.
 
 Today, there are over **1.5 million open models on Hugging Face**. When an enterprise team downloads open weights (e.g. Llama 3.3, DeepSeek R1, Qwen 2.5), they face an expensive trial-and-error dilemma:
+
 - Which accelerator (H100, L40S, RTX 4090, MI300X) delivers the best cost-to-latency ratio?
 - What runtime (vLLM, TensorRT-LLM, NVIDIA Dynamo, NIM) meets their Time-To-First-Token SLA?
 - How can they avoid renting oversized GPU instances?
@@ -20,11 +21,12 @@ Today, there are over **1.5 million open models on Hugging Face**. When an enter
 ModelForge is the **deployment intelligence layer** that translates model architectures and latency SLOs into mathematically optimal, reproducible deployment configurations.
 
 ```
-HUGGING FACE MODEL → EXACT REVISION → COMPUTE PASSPORT → WORKLOAD → SLO 
+HUGGING FACE MODEL → EXACT REVISION → COMPUTE PASSPORT → WORKLOAD → SLO
   → DEPLOYMENT PLAN → EVIDENCE → ARTIFACT → BENCHMARK → REPRODUCTION
 ```
 
 ### Core Product Capabilities:
+
 1. **Compute Passports**: Revision-specific hardware compatibility, memory footprints, and deterministic confidence scoring.
 2. **Inference SLO Compiler**: Multi-objective Pareto optimizer ranking hardware topologies by cost and latency.
 3. **Turnkey Deployment Manifests**: Generates validated Docker Compose, Kubernetes CRDs (NVIDIA Dynamo), and vLLM launch scripts.

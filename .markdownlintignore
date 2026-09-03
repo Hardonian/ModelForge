@@ -1,0 +1,5 @@
+NOTICE
+node_modules
+.next
+dist
+.venv

@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.0.0] - 2025-02-01 — Official Public Launch
 
 ### Added
+
 - **OpenComputeBench v1.0 Public Dataset**: Released under CDLA-Permissive-2.0 with cryptographic verification hashes (`environment_hash`, `result_hash`) and Golden Benchmark status.
 - **Deterministic Confidence Engine v1.0.0**: Formalized, versioned evidence confidence calculation algorithm scoring revision match, sample volume, reproduction count, hardware match, and variance.
 - **Model Context Protocol (MCP) Server**: Full JSON-RPC 2.0 stdio server (`modelforge mcp`) exposing 9 v1 tools for Cursor, Windsurf, Claude Code, and autonomous AI coding agents.
@@ -27,12 +28,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Governance & Legal Documentation**: `NOTICE`, `TRADEMARKS.md`, `SECURITY.md`, `GOVERNANCE.md`, `ROADMAP.md`, `PRIVACY.md`, `KNOWN_LIMITATIONS.md`.
 
 ### Changed
+
 - Upgraded Hugging Face Space (`apps/hf-space/app.py`) with dynamic SLO compilation, failure corpus filters, and strict typing.
 - Hardened database schema and migration SQL with `SECURITY DEFINER` RLS policy validation.
 
 ## [0.2.0] - 2025-01-15 — Phase 2: Deployment Intelligence Layer
 
 ### Added
+
 - Compute Passports tracking exact Hugging Face model revisions.
 - Workload ModelFit scoring across memory, performance, runtime, context, and efficiency.
 - Inference SLO Compiler with support for NVIDIA Dynamo disaggregated serving and NVIDIA NIM.
@@ -42,6 +45,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.1.0] - 2025-01-01 — Phase 1: Core Foundation
 
 ### Added
+
 - Monorepo infrastructure with Turborepo, pnpm, Next.js, and Python Typer CLI.
 - OpenComputeBench JSON schema and deterministic hash calculation.
 - Hardware registry catalog (H100, L40S, RTX 4090, MI300X, M3 Ultra).

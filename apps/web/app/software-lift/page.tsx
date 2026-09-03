@@ -1,15 +1,15 @@
-import Link from 'next/link';
-import { 
-  TrendingUp, 
-  Sparkles, 
-  ShieldAlert, 
-  Cpu, 
-  CheckCircle2, 
-  Layers, 
+import Link from "next/link";
+import {
+  TrendingUp,
+  Sparkles,
+  ShieldAlert,
+  Cpu,
+  CheckCircle2,
+  Layers,
   ArrowRight,
-  Info
-} from 'lucide-react';
-import { dataLayer } from '@modelforge/database';
+  Info,
+} from "lucide-react";
+import { dataLayer } from "@modelforge/database";
 
 export default function SoftwareLiftPage() {
   const liftMetrics = dataLayer.listSoftwareLift();
@@ -26,8 +26,9 @@ export default function SoftwareLiftPage() {
           Software Lift: Serving Runtime Multipliers
         </h1>
         <p className="text-sm text-slate-400 max-w-2xl leading-relaxed">
-          Measuring the empirical throughput gain and latency reduction achieved on identical hardware 
-          and workload by optimizing the inference software stack.
+          Measuring the empirical throughput gain and latency reduction achieved
+          on identical hardware and workload by optimizing the inference
+          software stack.
         </p>
       </div>
 
@@ -37,9 +38,18 @@ export default function SoftwareLiftPage() {
           <ShieldAlert className="h-5 w-5" />
         </div>
         <div className="space-y-1 text-xs">
-          <h3 className="font-bold text-white text-sm">Strict Workload Equivalence Principle</h3>
+          <h3 className="font-bold text-white text-sm">
+            Strict Workload Equivalence Principle
+          </h3>
           <p className="text-slate-300 leading-relaxed">
-            Software Lift measurements are only valid when holding the <strong className="text-white">accelerator</strong>, <strong className="text-white">model revision</strong>, <strong className="text-white">quantization format</strong>, <strong className="text-white">context length</strong>, and <strong className="text-white">client concurrency</strong> strictly identical. Never compare FP16 Transformers to FP8 TensorRT-LLM and attribute the gain solely to software.
+            Software Lift measurements are only valid when holding the{" "}
+            <strong className="text-white">accelerator</strong>,{" "}
+            <strong className="text-white">model revision</strong>,{" "}
+            <strong className="text-white">quantization format</strong>,{" "}
+            <strong className="text-white">context length</strong>, and{" "}
+            <strong className="text-white">client concurrency</strong> strictly
+            identical. Never compare FP16 Transformers to FP8 TensorRT-LLM and
+            attribute the gain solely to software.
           </p>
         </div>
       </div>
@@ -60,7 +70,8 @@ export default function SoftwareLiftPage() {
                   {metric.model_id}
                 </h2>
                 <div className="text-xs text-slate-400 font-mono mt-0.5">
-                  Revision: {metric.model_revision} | Context: {metric.context_length.toLocaleString()} tokens
+                  Revision: {metric.model_revision} | Context:{" "}
+                  {metric.context_length.toLocaleString()} tokens
                 </div>
               </div>
               <div className="flex items-center gap-2">
@@ -78,11 +89,18 @@ export default function SoftwareLiftPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
               {/* Baseline */}
               <div className="rounded-xl border border-slate-800 bg-[#070b14] p-4 text-center">
-                <div className="text-[11px] font-mono text-slate-400">Baseline (Transformers)</div>
-                <div className="text-2xl font-bold text-white mt-1">
-                  {metric.baseline_tps} <span className="text-xs font-normal text-slate-400">tok/s</span>
+                <div className="text-[11px] font-mono text-slate-400">
+                  Baseline (Transformers)
                 </div>
-                <div className="text-[10px] text-slate-500 font-mono mt-1">1.00x reference</div>
+                <div className="text-2xl font-bold text-white mt-1">
+                  {metric.baseline_tps}{" "}
+                  <span className="text-xs font-normal text-slate-400">
+                    tok/s
+                  </span>
+                </div>
+                <div className="text-[10px] text-slate-500 font-mono mt-1">
+                  1.00x reference
+                </div>
               </div>
 
               {/* Comparisons */}
@@ -93,13 +111,20 @@ export default function SoftwareLiftPage() {
                     key={c.runtime}
                     className={`rounded-xl p-4 text-center ${
                       isMax
-                        ? 'border border-emerald-500/40 bg-emerald-950/20'
-                        : 'border border-slate-800 bg-[#070b14]'
+                        ? "border border-emerald-500/40 bg-emerald-950/20"
+                        : "border border-slate-800 bg-[#070b14]"
                     }`}
                   >
-                    <div className="text-[11px] font-mono text-slate-300 capitalize">{c.runtime}</div>
-                    <div className={`text-2xl font-bold mt-1 ${isMax ? 'text-emerald-300' : 'text-sky-300'}`}>
-                      {c.tps} <span className="text-xs font-normal text-slate-400">tok/s</span>
+                    <div className="text-[11px] font-mono text-slate-300 capitalize">
+                      {c.runtime}
+                    </div>
+                    <div
+                      className={`text-2xl font-bold mt-1 ${isMax ? "text-emerald-300" : "text-sky-300"}`}
+                    >
+                      {c.tps}{" "}
+                      <span className="text-xs font-normal text-slate-400">
+                        tok/s
+                      </span>
                     </div>
                     <div className="text-[11px] font-mono font-bold text-emerald-400 mt-1">
                       +{c.throughput_lift}x Lift
@@ -114,11 +139,15 @@ export default function SoftwareLiftPage() {
 
             {/* Visual Bar Comparison */}
             <div className="space-y-3 pt-2">
-              <div className="text-xs font-mono text-slate-400">Throughput Progression (tok/s):</div>
+              <div className="text-xs font-mono text-slate-400">
+                Throughput Progression (tok/s):
+              </div>
               <div className="space-y-2 text-xs font-mono">
                 {/* Baseline Bar */}
                 <div className="flex items-center gap-3">
-                  <span className="w-36 truncate text-slate-400">Transformers</span>
+                  <span className="w-36 truncate text-slate-400">
+                    Transformers
+                  </span>
                   <div className="flex-1 bg-slate-800/80 rounded-full h-4 overflow-hidden">
                     <div
                       className="bg-slate-500 h-full rounded-full text-[10px] text-white flex items-center pl-2 font-bold"
@@ -133,7 +162,9 @@ export default function SoftwareLiftPage() {
                 {/* Comparison Bars */}
                 {metric.comparisons.map((c) => (
                   <div key={c.runtime} className="flex items-center gap-3">
-                    <span className="w-36 truncate text-white">{c.runtime}</span>
+                    <span className="w-36 truncate text-white">
+                      {c.runtime}
+                    </span>
                     <div className="flex-1 bg-slate-800/80 rounded-full h-4 overflow-hidden">
                       <div
                         className="bg-gradient-to-r from-sky-500 to-emerald-400 h-full rounded-full text-[10px] text-black flex items-center pl-2 font-bold"
@@ -142,7 +173,9 @@ export default function SoftwareLiftPage() {
                         {c.tps}
                       </div>
                     </div>
-                    <span className="w-16 text-right text-emerald-400 font-bold">+{c.throughput_lift}x</span>
+                    <span className="w-16 text-right text-emerald-400 font-bold">
+                      +{c.throughput_lift}x
+                    </span>
                   </div>
                 ))}
               </div>

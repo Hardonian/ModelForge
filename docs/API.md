@@ -13,9 +13,11 @@ Authorization: Bearer mf_live_xxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ## Endpoints
 
 ### 1. List Benchmarks
+
 `GET /api/v1/benchmarks`
 
 Query Parameters:
+
 - `model`: Filter by model repository (e.g. `Qwen`).
 - `hardware`: Filter by accelerator device (e.g. `L40S`).
 - `runtime`: Filter by runtime engine (`vllm`, `llama.cpp`, `tensorrt-llm`).
@@ -26,6 +28,7 @@ Response: `200 OK` array of `OpenComputeBenchRecord`.
 ---
 
 ### 2. Get Benchmark
+
 `GET /api/v1/benchmarks/:id`
 
 Response: `200 OK` single `OpenComputeBenchRecord` or `404 Not Found`.
@@ -33,11 +36,13 @@ Response: `200 OK` single `OpenComputeBenchRecord` or `404 Not Found`.
 ---
 
 ### 3. Submit Benchmark
+
 `POST /api/v1/benchmark-submissions`
 
 Payload: Complete `OpenComputeBenchRecord` with valid `environment_hash` and `result_hash`.
 
 Response:
+
 ```json
 {
   "status": "accepted",
@@ -50,9 +55,11 @@ Response:
 ---
 
 ### 4. Calculate ModelFit
+
 `POST /api/v1/model-fit`
 
 Payload:
+
 ```json
 {
   "model": {
@@ -78,9 +85,11 @@ Response: `200 OK` with composite score, 6 sub-scores, and memory waterfall.
 ---
 
 ### 5. Workload Optimizer
+
 `POST /api/v1/optimizer`
 
 Payload:
+
 ```json
 {
   "model": {

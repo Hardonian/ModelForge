@@ -7,6 +7,7 @@
 ## 1. System Architecture Overview
 
 ModelForge operates as a multi-tier deployment intelligence platform comprising:
+
 1. **Schema & Verification Engine (`@modelforge/benchmark-schema`)**: Zod runtime validation, canonical cryptographic hash generators, and Deterministic Confidence Engine v1.0.0.
 2. **Hardware Registry (`@modelforge/hardware-registry`)**: Normalized accelerator telemetry and manufacturer baseline catalog.
 3. **Inference SLO Compiler (`@modelforge/slo-compiler`)**: Workload compiler sizing weight memory, KV cache allocation, concurrency scaling, and ranking deployment topologies.
@@ -25,6 +26,7 @@ Confidence scoring on ModelForge is strictly algorithmic and deterministic. It n
 $$\text{Confidence} = S_{\text{rev}} + S_{\text{runtime}} + S_{\text{hw}} + S_{\text{samples}} + S_{\text{repro}} + S_{\text{fresh}} + S_{\text{var}}$$
 
 Where:
+
 - **Exact Revision Match ($S_{\text{rev}}$)**: 25 points if the benchmark exactly matches the target commit SHA; 10 points if branch match (`main`).
 - **Runtime Match ($S_{\text{runtime}}$)**: 20 points if verified on target runtime engine; 10 points for compatible runtime.
 - **Hardware Family Match ($S_{\text{hw}}$)**: 20 points for exact accelerator match; 10 points for identical architecture.
@@ -40,10 +42,12 @@ Where:
 Every benchmark record generates two SHA-256 digests:
 
 ### Environment Hash (`environment_hash`)
+
 Computes digest over normalized hardware specifications, operating system, display driver version, CUDA/ROCm runtime version, and serving engine arguments:
 $$\text{environment\_hash} = \text{SHA256}(\text{SortKeys}(\text{Hardware} \parallel \text{Software} \parallel \text{Runtime}))$$
 
 ### Result Hash (`result_hash`)
+
 Computes digest over workload distributions and measured output metrics:
 $$\text{result\_hash} = \text{SHA256}(\text{SortKeys}(\text{Model} \parallel \text{Precision} \parallel \text{Workload} \parallel \text{Metrics}))$$
 
@@ -59,6 +63,7 @@ $$\text{VRAM}_{\text{total}} = \text{Memory}_{\text{weights}} + \text{Memory}_{\
 
 Where:
 $$\text{Memory}_{\text{weights}} = \text{Parameters}_{\text{billions}} \times \text{BytesPerParam}$$
+
 - FP16/BF16: 2.0 bytes/param
 - FP8: 1.0 byte/param
 - INT4: 0.55 bytes/param
