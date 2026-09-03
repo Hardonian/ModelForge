@@ -39,6 +39,7 @@ print(f"Confidence: {passport['confidence']}/100")
 ## 4. REST Endpoints for Agents
 
 All ModelForge REST endpoints return clean JSON adhering to strict Zod and Pydantic schemas:
+
 - `GET /api/v1/models/{model}/passport`
 - `POST /api/v1/plans`
 - `POST /api/v1/slo/compile`

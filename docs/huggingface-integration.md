@@ -9,6 +9,7 @@
 ModelForge integrates directly with the Hugging Face Hub, Jobs infrastructure, and model repositories to convert static weights into production-ready deployments.
 
 ### Key Integration Points
+
 1. **Repository & Revision Resolution:** Ingests `org/model` and exact commit SHAs (`org/model@revision`) directly from Hugging Face Hub metadata.
 2. **Model Card Badges:** Generates dynamic markdown badges linking model cards to verified Compute Passports and ModelFit grades.
 3. **Hugging Face Jobs:** Dispatches reproducible benchmark runs to remote Hugging Face Jobs instances via `--hf-job`.
@@ -26,6 +27,7 @@ modelforge benchmark Qwen/Qwen2.5-32B-Instruct --hf-job --precision fp8 --runtim
 ```
 
 The CLI:
+
 - Validates `HF_TOKEN` credentials.
 - Provisions compute instance matching target hardware.
 - Pulls model weights and runs OpenComputeBench standardized workloads.

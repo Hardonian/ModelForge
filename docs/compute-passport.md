@@ -11,6 +11,7 @@
 In the open-source LLM ecosystem, a repository identifier like `Qwen/Qwen2.5-32B-Instruct` is **not static**. Model maintainers continuously push updated checkpoint commits, convert tokenizer configurations, add quantized branches, or modify chat templates.
 
 Furthermore, serving teams routinely run into unverified runtime claims:
+
 - *"Does this model support vLLM continuous batching?"*
 - *"Does it run in FP8 on Ada L40S?"*
 - *"Can I deploy this on NVIDIA Dynamo with disaggregated prefill/decode?"*
@@ -23,7 +24,8 @@ A **Compute Passport** is a cryptographically verifiable, revision-specific depl
 ## 2. Canonical Identity
 
 Every Compute Passport is strictly anchored to:
-```
+
+```text
 {organization}/{model_name}@{revision}
 ```
 
@@ -39,7 +41,7 @@ Treating `org/model` as sufficient without revision tracking is explicitly prohi
 Every compatibility claim and performance metric in a Compute Passport declares its provenance:
 
 | Provenance Level | Description | Trust Weight |
-|---|---|---|
+| --- | --- | --- |
 | **`MEASURED`** | Multi-run empirical telemetry executed on real physical accelerators by verified OpenComputeBench workers. | **1.00** |
 | **`DOCUMENTED`** | Official vendor support statements, framework release notes, or tested architectural PRs. | **0.85** |
 | **`DERIVED`** | Analytically calculated using GPU memory models, tensor parallelism rules, and roofline formulas. | **0.70** |

@@ -13,7 +13,9 @@ In monolithic serving architectures (standard vLLM, TGI, or vanilla TensorRT-LLM
 Under high concurrency or bursty RAG workloads, prefill bursts preempt active decodes, causing **massive P95 TTFT spikes** and degrading inter-token latency (TPOT).
 
 ### Disaggregated Prefill/Decode in ModelForge
+
 ModelForge synthesizes dedicated worker topologies:
+
 - **Prefill Workers:** Sized for high compute density (Tensor Cores / FLOPS). Processes large prompt contexts rapidly.
 - **Decode Workers:** Sized for maximum memory bandwidth (HBM3e / high GB/s). Maximizes parallel sequence decodes.
 - **High-Speed Interconnect:** Transfers KV cache across nodes over InfiniBand NDR or NVLink.
@@ -58,6 +60,7 @@ spec:
 ## 3. Empirical Advantages
 
 Holding the underlying accelerator and model constant:
+
 - **P95 TTFT Reduction:** 62% decrease compared to monolithic baseline.
 - **Throughput Lift:** 2.71x tokens/sec sustained at concurrency = 32.
 - **KV Cache Evictions:** Reduced to near 0% under bursty arrivals.
