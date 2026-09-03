@@ -15,6 +15,7 @@
     "@modelforge/hardware-registry": "workspace:*",
     "@modelforge/model-fit": "workspace:*",
     "@modelforge/optimizer": "workspace:*",
+    "@modelforge/performance-predictor": "workspace:*",
     "@modelforge/slo-compiler": "workspace:*",
     "clsx": "^2.1.1",
     "lucide-react": "^1.16.0",

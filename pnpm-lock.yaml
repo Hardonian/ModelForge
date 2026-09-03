@@ -35,6 +35,9 @@ importers:
       '@modelforge/optimizer':
         specifier: workspace:*
         version: link:../../packages/optimizer
+      '@modelforge/performance-predictor':
+        specifier: workspace:*
+        version: link:../../packages/performance-predictor
       '@modelforge/slo-compiler':
         specifier: workspace:*
         version: link:../../packages/slo-compiler

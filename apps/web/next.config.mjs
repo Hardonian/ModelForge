@@ -6,7 +6,9 @@ const nextConfig = {
     '@modelforge/model-fit',
     '@modelforge/optimizer',
     '@modelforge/database',
-    '@modelforge/api-client'
+    '@modelforge/api-client',
+    '@modelforge/slo-compiler',
+    '@modelforge/performance-predictor'
   ],
   reactStrictMode: true,
   poweredByHeader: false,

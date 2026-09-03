@@ -1,4 +1,15 @@
-import type { OpenComputeBenchRecord } from "@modelforge/benchmark-schema";
+import type {
+  OpenComputeBenchRecord,
+  Worker,
+  BenchmarkJob,
+  CoverageCell,
+  PredictionResult,
+  FleetResource,
+  ProductionDeployment,
+  TelemetryWindow,
+  OptimizationRecommendation,
+  VerifiedSavings,
+} from "@modelforge/benchmark-schema";
 import type { HardwareDevice } from "@modelforge/hardware-registry";
 import type { ModelFitInput, ModelFitResult } from "@modelforge/model-fit";
 import type { OptimizerQuery, OptimizerResult } from "@modelforge/optimizer";
@@ -216,5 +227,98 @@ export class ModelForgeClient {
       method: "POST",
       body: JSON.stringify(spec),
     });
+  }
+
+  // --- PHASE 4 METHODS ---
+
+  async listWorkers(orgId?: string): Promise<Worker[]> {
+    const qs = orgId ? `?org_id=${encodeURIComponent(orgId)}` : "";
+    return this.request<Worker[]>(`/workers${qs}`);
+  }
+
+  async registerWorker(worker: Partial<Worker>): Promise<Worker> {
+    return this.request<Worker>(`/workers`, {
+      method: "POST",
+      body: JSON.stringify(worker),
+    });
+  }
+
+  async claimJob(workerId: string, trustTier = "community"): Promise<{ job: BenchmarkJob | null }> {
+    return this.request<{ job: BenchmarkJob | null }>(`/jobs/claim`, {
+      method: "POST",
+      body: JSON.stringify({ worker_id: workerId, trust_tier: trustTier }),
+    });
+  }
+
+  async completeJob(jobId: string, resultBenchmark: unknown): Promise<{ job: BenchmarkJob }> {
+    return this.request<{ job: BenchmarkJob }>(`/jobs/${jobId}/complete`, {
+      method: "POST",
+      body: JSON.stringify({ result_benchmark: resultBenchmark }),
+    });
+  }
+
+  async listJobs(filters?: { status?: string; orgId?: string }): Promise<BenchmarkJob[]> {
+    const query = new URLSearchParams();
+    if (filters?.status) query.set("status", filters.status);
+    if (filters?.orgId) query.set("org_id", filters.orgId);
+    const qs = query.toString() ? `?${query.toString()}` : "";
+    return this.request<BenchmarkJob[]>(`/jobs${qs}`);
+  }
+
+  async getCoverageMatrix(modelId?: string): Promise<CoverageCell[]> {
+    const qs = modelId ? `?model=${encodeURIComponent(modelId)}` : "";
+    return this.request<CoverageCell[]>(`/coverage${qs}`);
+  }
+
+  async predictPerformance(target: unknown): Promise<PredictionResult> {
+    return this.request<PredictionResult>(`/predictions`, {
+      method: "POST",
+      body: JSON.stringify(target),
+    });
+  }
+
+  async listFleet(orgId?: string): Promise<FleetResource[]> {
+    const qs = orgId ? `?org_id=${encodeURIComponent(orgId)}` : "";
+    return this.request<FleetResource[]>(`/fleet${qs}`);
+  }
+
+  async optimizeFleet(fleet: unknown[], workloads: unknown[]): Promise<unknown> {
+    return this.request(`/fleet/optimize`, {
+      method: "POST",
+      body: JSON.stringify({ fleet, workloads }),
+    });
+  }
+
+  async listDeployments(orgId?: string): Promise<ProductionDeployment[]> {
+    const qs = orgId ? `?org_id=${encodeURIComponent(orgId)}` : "";
+    return this.request<ProductionDeployment[]>(`/deployments${qs}`);
+  }
+
+  async recordTelemetry(data: unknown): Promise<TelemetryWindow> {
+    return this.request<TelemetryWindow>(`/telemetry`, {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  }
+
+  async listTelemetry(deploymentId: string): Promise<TelemetryWindow[]> {
+    return this.request<TelemetryWindow[]>(`/telemetry?deployment_id=${encodeURIComponent(deploymentId)}`);
+  }
+
+  async listRecommendations(orgId?: string): Promise<OptimizationRecommendation[]> {
+    const qs = orgId ? `?org_id=${encodeURIComponent(orgId)}` : "";
+    return this.request<OptimizationRecommendation[]>(`/recommendations${qs}`);
+  }
+
+  async approveRecommendation(id: string, approver = "admin"): Promise<OptimizationRecommendation> {
+    return this.request<OptimizationRecommendation>(`/recommendations/${id}/approve`, {
+      method: "POST",
+      body: JSON.stringify({ approver }),
+    });
+  }
+
+  async listVerifiedSavings(orgId?: string): Promise<VerifiedSavings[]> {
+    const qs = orgId ? `?org_id=${encodeURIComponent(orgId)}` : "";
+    return this.request<VerifiedSavings[]>(`/verified-savings${qs}`);
   }
 }
