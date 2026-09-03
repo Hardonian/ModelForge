@@ -1,0 +1,388 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "ModelForge Public API",
+    "version": "1.0.0",
+    "description": "The open deployment intelligence layer between Hugging Face models and production AI compute. Powered by OpenComputeBench reproducible inference benchmarks.",
+    "contact": {
+      "name": "ModelForge Team",
+      "url": "https://modelforge.dev",
+      "email": "api@modelforge.dev"
+    },
+    "license": {
+      "name": "Apache-2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://modelforge.dev/api",
+      "description": "Production Cloud API"
+    },
+    {
+      "url": "http://localhost:3000/api",
+      "description": "Local Development Server"
+    }
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "summary": "Platform Health and Readiness",
+        "description": "Returns operational status across web, database, Hugging Face sync, and MCP gateway.",
+        "responses": {
+          "200": {
+            "description": "Platform operational status",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthStatus"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/support-matrix": {
+      "get": {
+        "summary": "Architecture Support Matrix",
+        "description": "Returns verified model families, serving runtimes, deployment targets, and accelerators.",
+        "responses": {
+          "200": {
+            "description": "Complete architecture support matrix",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SupportMatrix"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/models": {
+      "get": {
+        "summary": "List Supported Models",
+        "parameters": [
+          {
+            "name": "family",
+            "in": "query",
+            "schema": { "type": "string" },
+            "description": "Filter models by architecture family (e.g. Qwen2.5, Llama-3)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Array of verified model metadata records",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/ModelMetadata" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/models/{modelId}/passport": {
+      "get": {
+        "summary": "Get Model Compute Passport",
+        "parameters": [
+          {
+            "name": "modelId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "URL-encoded Hugging Face model repository ID"
+          },
+          {
+            "name": "revision",
+            "in": "query",
+            "schema": { "type": "string", "default": "main" },
+            "description": "Exact commit SHA or branch"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Compute Passport record with confidence scoring",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ComputePassport" }
+              }
+            }
+          },
+          "404": {
+            "description": "Model or passport not found"
+          }
+        }
+      }
+    },
+    "/v1/hardware": {
+      "get": {
+        "summary": "Hardware Accelerator Registry",
+        "responses": {
+          "200": {
+            "description": "Catalog of supported GPU and accelerator hardware",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/HardwareDevice" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/benchmarks": {
+      "get": {
+        "summary": "Query OpenComputeBench Records",
+        "parameters": [
+          { "name": "model", "in": "query", "schema": { "type": "string" } },
+          { "name": "hardware", "in": "query", "schema": { "type": "string" } },
+          { "name": "runtime", "in": "query", "schema": { "type": "string" } },
+          { "name": "precision", "in": "query", "schema": { "type": "string" } },
+          { "name": "verifiedOnly", "in": "query", "schema": { "type": "boolean" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Array of benchmark records",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/BenchmarkRecord" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/benchmarks/{id}": {
+      "get": {
+        "summary": "Get Single Benchmark Record",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Benchmark record with full metrics and provenance",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/BenchmarkRecord" }
+              }
+            }
+          },
+          "404": {
+            "description": "Benchmark ID not found"
+          }
+        }
+      }
+    },
+    "/v1/benchmark-submissions": {
+      "post": {
+        "summary": "Submit Benchmark Observation",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/BenchmarkRecord" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Benchmark accepted and verified"
+          },
+          "400": {
+            "description": "Validation or cryptographic hash mismatch"
+          }
+        }
+      }
+    },
+    "/v1/failures": {
+      "get": {
+        "summary": "Query Deployment Failure Corpus",
+        "parameters": [
+          { "name": "model", "in": "query", "schema": { "type": "string" } },
+          { "name": "category", "in": "query", "schema": { "type": "string" } },
+          { "name": "runtime", "in": "query", "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Normalized failure records with mitigations",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "total_count": { "type": "integer" },
+                    "failures": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/FailureRecord" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/slo": {
+      "post": {
+        "summary": "Compile Inference Workload SLO",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["model_repository", "workload", "slo"],
+                "properties": {
+                  "model_repository": { "type": "string" },
+                  "model_revision": { "type": "string", "default": "main" },
+                  "workload": { "type": "object" },
+                  "slo": { "type": "object" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ranked deployment candidates and manifests"
+          }
+        }
+      }
+    },
+    "/v1/model-fit": {
+      "post": {
+        "summary": "Evaluate ModelFit Score",
+        "responses": {
+          "200": { "description": "Dimensional ModelFit evaluation score (0-100)" }
+        }
+      }
+    },
+    "/v1/optimizer": {
+      "post": {
+        "summary": "Pareto Frontier Hardware Optimizer",
+        "responses": {
+          "200": { "description": "Optimal cost vs latency serving configuration" }
+        }
+      }
+    },
+    "/v1/software-lift": {
+      "get": {
+        "summary": "Software Lift Multipliers",
+        "responses": {
+          "200": { "description": "Runtime speedup multipliers on identical hardware" }
+        }
+      }
+    },
+    "/v1/leaderboards": {
+      "get": {
+        "summary": "Public Efficiency & Throughput Leaderboards",
+        "responses": {
+          "200": { "description": "Ranked leaderboard slices" }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "HealthStatus": {
+        "type": "object",
+        "properties": {
+          "status": { "type": "string", "enum": ["healthy", "degraded"] },
+          "version": { "type": "string" },
+          "timestamp": { "type": "string", "format": "date-time" },
+          "response_time_ms": { "type": "number" },
+          "services": { "type": "object" }
+        }
+      },
+      "SupportMatrix": {
+        "type": "object",
+        "properties": {
+          "version": { "type": "string" },
+          "model_families": { "type": "array", "items": { "type": "object" } },
+          "runtimes": { "type": "array", "items": { "type": "object" } },
+          "execution_backends": { "type": "array", "items": { "type": "object" } },
+          "deployment_targets": { "type": "array", "items": { "type": "object" } },
+          "accelerator_support": { "type": "array", "items": { "type": "object" } }
+        }
+      },
+      "ModelMetadata": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "provider": { "type": "string" },
+          "name": { "type": "string" },
+          "family": { "type": "string" },
+          "parameters_billions": { "type": "number" },
+          "architecture": { "type": "string" },
+          "context_window": { "type": "integer" }
+        }
+      },
+      "ComputePassport": {
+        "type": "object",
+        "properties": {
+          "model_id": { "type": "string" },
+          "revision": { "type": "string" },
+          "confidence_score": { "type": "integer", "minimum": 0, "maximum": 100 },
+          "confidence_explanation": { "type": "string" },
+          "compatibility": { "type": "object" },
+          "memory_profile": { "type": "object" }
+        }
+      },
+      "HardwareDevice": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "vendor": { "type": "string" },
+          "vram_bytes": { "type": "integer" },
+          "memory_bandwidth_gb_s": { "type": "number" }
+        }
+      },
+      "BenchmarkRecord": {
+        "type": "object",
+        "required": ["benchmark_id", "schema_version", "model", "hardware", "runtime", "metrics", "provenance"],
+        "properties": {
+          "benchmark_id": { "type": "string", "format": "uuid" },
+          "schema_version": { "type": "string" },
+          "golden": { "type": "boolean" },
+          "synthetic_fixture": { "type": "boolean" },
+          "model": { "type": "object" },
+          "hardware": { "type": "object" },
+          "runtime": { "type": "object" },
+          "metrics": { "type": "object" },
+          "provenance": { "type": "object" }
+        }
+      },
+      "FailureRecord": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "model_repository": { "type": "string" },
+          "model_revision": { "type": "string" },
+          "runtime": { "type": "string" },
+          "accelerator": { "type": "string" },
+          "failure_category": { "type": "string" },
+          "normalized_reason": { "type": "string" },
+          "mitigation": { "type": "string" }
+        }
+      }
+    }
+  }
+}

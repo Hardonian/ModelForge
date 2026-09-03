@@ -129,4 +129,70 @@ export class ModelForgeClient {
   async listHardware(): Promise<HardwareDevice[]> {
     return this.request<HardwareDevice[]>(`/hardware`);
   }
+
+  async getHealth(): Promise<{
+    status: string;
+    version: string;
+    timestamp: string;
+    response_time_ms: number;
+    services: Record<string, unknown>;
+  }> {
+    // Health is at /api/health rather than /api/v1/health
+    const healthUrl = this.baseUrl.replace(/\/v1$/, '') + '/health';
+    const response = await fetch(healthUrl, {
+      headers: { Accept: 'application/json' }
+    });
+    if (!response.ok) {
+      throw new ModelForgeError(`Health check failed with status ${response.status}`, response.status);
+    }
+    return response.json();
+  }
+
+  async getSupportMatrix(): Promise<unknown> {
+    return this.request(`/support-matrix`);
+  }
+
+  async listFailures(params?: {
+    model?: string;
+    category?: string;
+    runtime?: string;
+  }): Promise<{ total_count: number; failures: unknown[] }> {
+    const query = new URLSearchParams();
+    if (params?.model) query.set('model', params.model);
+    if (params?.category) query.set('category', params.category);
+    if (params?.runtime) query.set('runtime', params.runtime);
+    const qs = query.toString() ? `?${query.toString()}` : '';
+    return this.request(`/failures${qs}`);
+  }
+
+  async getComputePassport(modelId: string, revision = 'main'): Promise<unknown> {
+    const safeModel = encodeURIComponent(modelId);
+    return this.request(`/models/${safeModel}/passport?revision=${encodeURIComponent(revision)}`);
+  }
+
+  async listModels(family?: string): Promise<unknown[]> {
+    const qs = family ? `?family=${encodeURIComponent(family)}` : '';
+    return this.request<unknown[]>(`/models${qs}`);
+  }
+
+  async getSoftwareLift(modelId?: string, accelerator?: string): Promise<unknown[]> {
+    const query = new URLSearchParams();
+    if (modelId) query.set('model', modelId);
+    if (accelerator) query.set('accelerator', accelerator);
+    const qs = query.toString() ? `?${query.toString()}` : '';
+    return this.request<unknown[]>(`/software-lift${qs}`);
+  }
+
+  async compileSlo(spec: {
+    model_repository: string;
+    model_revision?: string;
+    workload: Record<string, unknown>;
+    slo: Record<string, unknown>;
+  }): Promise<unknown> {
+    return this.request(`/slo`, {
+      method: 'POST',
+      body: JSON.stringify(spec)
+    });
+  }
 }
+
