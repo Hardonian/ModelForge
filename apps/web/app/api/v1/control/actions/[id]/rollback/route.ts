@@ -41,7 +41,7 @@ export async function POST(
       organization_id: action.organization_id,
       action_id: action.action_id,
       actor: { user_id: body.actor || "operator", role: "operator", service_account: false },
-      event_type: "rollback_executed",
+      event_type: "rollback_triggered",
       action_hash: action.action_hash,
       details: { reason },
       timestamp: new Date().toISOString(),
