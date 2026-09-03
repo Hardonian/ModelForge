@@ -9,6 +9,14 @@ import type {
   TelemetryWindow,
   OptimizationRecommendation,
   VerifiedSavings,
+  InferenceDeploymentState,
+  InferenceDeploymentSpec,
+  OptimizationAction,
+  CanaryRun,
+  AutomationPolicy,
+  ProductionOutcome,
+  AutomationFreeze,
+  ControlAuditLog,
 } from "@modelforge/benchmark-schema";
 import type { HardwareDevice } from "@modelforge/hardware-registry";
 import type { ModelFitInput, ModelFitResult } from "@modelforge/model-fit";
