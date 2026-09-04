@@ -11,6 +11,10 @@
 [![Hugging Face Space](https://img.shields.io/badge/%F0%9F%A4%97%20Space-ModelForge-yellow.svg)](apps/hf-space)
 [![Agents Guide](https://img.shields.io/badge/Agents-agents.md-purple.svg)](agents.md)
 
+<!-- BEGIN: REPO HERO -->
+![Repository hero generated locally on the GPU stack](assets/repo-hero.png)
+<!-- END: REPO HERO -->
+
 ---
 
 ## 🏛️ Ecosystem Architecture
