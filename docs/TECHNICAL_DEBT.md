@@ -10,19 +10,21 @@ Technical debt is categorized and prioritized according to operational impact an
 
 ---
 
-## 2. Technical Debt Backlog
+## 2. Resolved Technical Debt (v1.1.0)
 
-### Medium Priority
-
-1. **TD-MED-01: Real-time Telemetry Push via WebSockets / SSE**
-   - *Current State*: The operator dashboard polls live canary telemetry at 5-second intervals via `GET /api/v1/control/actions/[id]`.
-   - *Target State*: Integrate Server-Sent Events (SSE) for sub-second telemetry streaming during active canaries.
-   - *Impact*: Negligible at current scale; recommended for clusters with >100 concurrent canaries.
+1. **TD-MED-01: Real-time Telemetry Push via Server-Sent Events (SSE)**
+   - *Status*: **RESOLVED**
+   - *Resolution*: Implemented `GET /api/v1/control/actions/[id]/stream` delivering sub-second Server-Sent Events streaming (`snapshot`, `telemetry`, `heartbeat`, `complete`).
+   - *Evidence*: [apps/web/app/api/v1/control/actions/[id]/stream/route.ts](file:///c:/Users/scott/GitHub/ModelForge/apps/web/app/api/v1/control/actions/%5Bid%5D/stream/route.ts)
 
 2. **TD-MED-02: Multi-Cluster Kubernetes Federation**
-   - *Current State*: `KubernetesExecutionProvider` targets a designated cluster endpoint per deployment configuration.
-   - *Target State*: Native support for multi-cluster global load balancer (GSLB) traffic splitting across disparate cloud providers.
-   - *Impact*: Deployments requiring cross-cloud failover currently manage ingress routing via external DNS.
+   - *Status*: **RESOLVED**
+   - *Resolution*: Upgraded `KubernetesExecutionProvider` with native multi-cluster endpoint configuration, GSLB traffic splitting annotations, dynamic weight rebalancing, and automated regional failover.
+   - *Evidence*: [packages/reconciler/src/adapters/kubernetes-provider.ts](file:///c:/Users/scott/GitHub/ModelForge/packages/reconciler/src/adapters/kubernetes-provider.ts) & [packages/reconciler/src/tests/shadow-engine.test.ts](file:///c:/Users/scott/GitHub/ModelForge/packages/reconciler/src/tests/shadow-engine.test.ts)
+
+---
+
+## 3. Active Technical Debt Backlog
 
 ### Low Priority
 
@@ -35,3 +37,4 @@ Technical debt is categorized and prioritized according to operational impact an
    - *Current State*: Typer CLI subcommands have help messages and options; auto-completion scripts are optional.
    - *Target State*: Packaged bash/zsh/fish completion scripts bundled with pip package distribution.
    - *Impact*: Pure developer ergonomics.
+

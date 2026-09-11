@@ -30,8 +30,8 @@
 ### 3. Control Plane
 
 - **Status**: **PASS**
-- **Evidence**: [reconciler.test.ts](file:///c:/Users/scott/GitHub/ModelForge/packages/reconciler/src/tests/reconciler.test.ts)
-- **Details**: Cryptographic SHA-256 action hash binding prevents post-approval parameter tampering. Blast radius constraints strictly enforced.
+- **Evidence**: [reconciler.test.ts](file:///c:/Users/scott/GitHub/ModelForge/packages/reconciler/src/tests/reconciler.test.ts) & [shadow-engine.test.ts](file:///c:/Users/scott/GitHub/ModelForge/packages/reconciler/src/tests/shadow-engine.test.ts)
+- **Details**: Cryptographic SHA-256 action hash binding prevents post-approval parameter tampering. Blast radius constraints strictly enforced. Real asynchronous shadow replay suppresses mutations and side-effects. Multi-cluster Kubernetes federation enables zero-downtime regional failover and GSLB traffic splitting.
 
 ### 4. Database
 
@@ -42,14 +42,14 @@
 ### 5. API
 
 - **Status**: **PASS**
-- **Evidence**: [Next.js API Routes](file:///c:/Users/scott/GitHub/ModelForge/apps/web/app/api/v1/)
-- **Details**: Typecheck passes with code 0. OpenAPI schema matches real routes. Normalized error codes emitted.
+- **Evidence**: [Next.js API Routes](file:///c:/Users/scott/GitHub/ModelForge/apps/web/app/api/v1/) & [stream/route.ts](file:///c:/Users/scott/GitHub/ModelForge/apps/web/app/api/v1/control/actions/%5Bid%5D/stream/route.ts)
+- **Details**: Typecheck passes with code 0. OpenAPI schema matches real routes. Sub-second Server-Sent Events (SSE) telemetry push live for canaries (TD-MED-01 resolved).
 
 ### 6. CLI
 
 - **Status**: **PASS**
 - **Evidence**: [test_phase5_control.py](file:///c:/Users/scott/GitHub/ModelForge/packages/benchmark-cli/tests/test_phase5_control.py)
-- **Details**: 31/31 pytest tests pass in 21s. `modelforge control status`, `action`, and `freeze` subcommands verified.
+- **Details**: 31/31 pytest tests pass in 19s. `modelforge control status`, `action`, and `freeze` subcommands verified.
 
 ### 7. MCP (Model Context Protocol)
 
@@ -63,11 +63,11 @@
 - **Evidence**: [HUGGINGFACE_LAUNCH_BRIEF.md](file:///c:/Users/scott/GitHub/ModelForge/docs/HUGGINGFACE_LAUNCH_BRIEF.md)
 - **Details**: Revision-pinned model tracking; disabled `trust_remote_code=True` by default; Space demo ready.
 
-### 9. NVIDIA Integration
+### 9. NVIDIA & Accelerator Integration
 
 - **Status**: **PASS**
-- **Evidence**: [NVIDIA_INCEPTION_BRIEF.md](file:///c:/Users/scott/GitHub/ModelForge/docs/NVIDIA_INCEPTION_BRIEF.md)
-- **Details**: TensorRT-LLM software lift, NVIDIA NIM intelligence, and NVIDIA Dynamo disaggregation plans verified.
+- **Evidence**: [registry.test.ts](file:///c:/Users/scott/GitHub/ModelForge/packages/hardware-registry/src/tests/registry.test.ts) & [NVIDIA_INCEPTION_BRIEF.md](file:///c:/Users/scott/GitHub/ModelForge/docs/NVIDIA_INCEPTION_BRIEF.md)
+- **Details**: NVIDIA Blackwell B200 and GB200 NVL72 modeled with NVLink 5 and FP4 tensor scaling. AMD MI350X and Intel Gaudi 3 verified. TensorRT-LLM software lift, NVIDIA NIM intelligence, and NVIDIA Dynamo disaggregation plans verified.
 
 ### 10. Benchmarks & Provenance
 

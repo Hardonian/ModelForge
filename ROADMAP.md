@@ -30,16 +30,23 @@
 
 ---
 
-## Future Roadmap: Phase 4 & Beyond
+### Phase 4: Next-Generation Silicon & Enterprise Control Plane (v1.1.0)
 
-### Q2 2025: Next-Generation Silicon & Distributed Inference
+- [x] **NVIDIA Blackwell Architecture Support**: Native B200 and GB200 NVL72 benchmark profiles, FP4 Tensor Core scaling, and NVLink 5 switch telemetry.
+- [x] **Expanded Accelerator Targets**: Deep support for Intel Gaudi 3 and AMD Instinct MI350X in `@modelforge/hardware-registry`.
+- [x] **Real-Time Shadow Replay & Side-Effect Suppression Engine**: Production-grade async request mirroring with automated suppression of mutating APIs, payments, notifications, and DB writes in `@modelforge/reconciler`.
+- [x] **Multi-Cluster Kubernetes Federation (TD-MED-02)**: GSLB traffic annotations, dynamic weights, and automated regional failover in `KubernetesExecutionProvider`.
+- [x] **Sub-Second Canary Streaming (TD-MED-01)**: Server-Sent Events (SSE) telemetry push endpoint for live canary monitoring.
 
-- [ ] **NVIDIA Blackwell Architecture Support**: Native B200 and GB200 NVL72 benchmark profiles, FP4 Tensor Core scaling, and NVLink 5 switch telemetry.
+---
+
+## Future Roadmap: Enterprise Unicorn Expansion
+
+### Q3-Q4 2025: Planetary Scale & Autonomous Mesh
+
 - [ ] **Multi-Node Distributed Benchmark Harness**: Automated inter-node bandwidth, InfiniBand NDR, and RoCE latency profiling across multi-node Dynamo topologies.
 - [ ] **Automated Speculative Decoding Profiler**: Empirical acceptance rate benchmarks across draft-target model pairs on production serving engines.
-
-### Q3 2025: Extended Ecosystem & Autonomous Agents
-
-- [ ] **Expanded Accelerator Targets**: Deep support for Intel Gaudi 3, AWS Inferentia 2, and Tenstorrent Wormhole.
 - [ ] **Continuous Hugging Face Hub Webhook Sync**: Real-time Compute Passport generation triggered on new model commit events.
 - [ ] **Decentralized Benchmark Network**: Cryptographically verified remote worker network with proof-of-execution validation.
+- [ ] **Ultra-Low-Latency Smart Router (<1ms)**: OpenAI-compatible reverse proxy gateway with prefix-cache affinity and spot-drain migration.
+

@@ -62,7 +62,75 @@ export interface AcceleratorProvider {
 }
 
 export const HARDWARE_CATALOG: HardwareDevice[] = [
-  // NVIDIA Datacenter & Workstation
+  // NVIDIA Datacenter & Workstation - Blackwell Generation
+  {
+    id: "nvidia-b200-sxm-192gb",
+    slug: "b200-sxm-192gb",
+    name: "NVIDIA B200 SXM 192GB",
+    vendor: "nvidia",
+    category: "datacenter",
+    manufacturer: {
+      architecture: "Blackwell",
+      vram_bytes: 206158430208, // 192 GB HBM3e
+      memory_bandwidth_gb_s: 8000,
+      tdp_watts: 1000,
+      fp32_tflops: 90,
+      tf32_tflops: 1125,
+      fp16_tflops: 2250,
+      bf16_tflops: 2250,
+      fp8_tflops: 4500,
+      int8_tops: 4500,
+      int4_tops: 9000,
+      interconnect: "nvlink_5",
+      max_interconnect_bandwidth_gb_s: 1800,
+      compute_capability: "10.0",
+    },
+    observed: {
+      observed_effective_bandwidth_gb_s: 7450,
+      sample_count: 512,
+    },
+    supported_precisions: [
+      "fp16",
+      "bf16",
+      "fp8",
+      "fp4",
+      "int8",
+      "int4",
+      "awq",
+      "gptq",
+    ],
+    supported_runtimes: ["vllm", "tensorrt-llm", "sglang", "dynamo", "nim"],
+    release_year: 2025,
+    typical_cloud_cost_per_hour_usd: 5.85,
+  },
+  {
+    id: "nvidia-gb200-nvl72",
+    slug: "gb200-nvl72",
+    name: "NVIDIA GB200 NVL72 Rack-Scale System",
+    vendor: "nvidia",
+    category: "datacenter",
+    manufacturer: {
+      architecture: "Blackwell NVL72",
+      vram_bytes: 14843407982592, // 13.8 TB HBM3e across 72 GPUs
+      memory_bandwidth_gb_s: 576000,
+      tdp_watts: 120000,
+      fp16_tflops: 162000,
+      bf16_tflops: 162000,
+      fp8_tflops: 324000,
+      int4_tops: 648000,
+      interconnect: "nvlink_5",
+      max_interconnect_bandwidth_gb_s: 129600, // 1.8 TB/s per GPU * 72
+      compute_capability: "10.0",
+    },
+    observed: {
+      observed_effective_bandwidth_gb_s: 540000,
+      sample_count: 64,
+    },
+    supported_precisions: ["fp16", "bf16", "fp8", "fp4", "int8", "int4"],
+    supported_runtimes: ["tensorrt-llm", "dynamo", "nim", "vllm"],
+    release_year: 2025,
+    typical_cloud_cost_per_hour_usd: 295.0,
+  },
   {
     id: "nvidia-h100-sxm5-80gb",
     slug: "h100-sxm5-80gb",
@@ -306,6 +374,34 @@ export const HARDWARE_CATALOG: HardwareDevice[] = [
 
   // AMD Accelerators
   {
+    id: "amd-instinct-mi350x-288gb",
+    slug: "instinct-mi350x-288gb",
+    name: "AMD Instinct MI350X 288GB",
+    vendor: "amd",
+    category: "datacenter",
+    manufacturer: {
+      architecture: "CDNA 4",
+      vram_bytes: 309237645312, // 288 GB HBM3e
+      memory_bandwidth_gb_s: 8000,
+      tdp_watts: 750,
+      fp16_tflops: 2300,
+      bf16_tflops: 2300,
+      fp8_tflops: 4600,
+      int8_tops: 4600,
+      int4_tops: 9200,
+      interconnect: "infinity_fabric",
+      max_interconnect_bandwidth_gb_s: 1024,
+    },
+    observed: {
+      observed_effective_bandwidth_gb_s: 7100,
+      sample_count: 128,
+    },
+    supported_precisions: ["fp16", "bf16", "fp8", "fp4", "int8", "int4"],
+    supported_runtimes: ["vllm", "sglang"],
+    release_year: 2025,
+    typical_cloud_cost_per_hour_usd: 4.2,
+  },
+  {
     id: "amd-instinct-mi300x-192gb",
     slug: "instinct-mi300x-192gb",
     name: "AMD Instinct MI300X 192GB",
@@ -445,6 +541,34 @@ export const HARDWARE_CATALOG: HardwareDevice[] = [
     release_year: 2023,
     typical_cloud_cost_per_hour_usd: 0.4,
   },
+
+  // Intel AI Accelerators
+  {
+    id: "intel-gaudi-3-128gb",
+    slug: "gaudi-3-128gb",
+    name: "Intel Gaudi 3 AI Accelerator 128GB",
+    vendor: "intel",
+    category: "datacenter",
+    manufacturer: {
+      architecture: "Gaudi 3",
+      vram_bytes: 137438953472, // 128 GB HBM2e
+      memory_bandwidth_gb_s: 3700,
+      tdp_watts: 900,
+      bf16_tflops: 1835,
+      fp8_tflops: 1835,
+      int8_tops: 1835,
+      interconnect: "system_bus",
+      max_interconnect_bandwidth_gb_s: 600,
+    },
+    observed: {
+      observed_effective_bandwidth_gb_s: 3100,
+      sample_count: 190,
+    },
+    supported_precisions: ["bf16", "fp8", "int8"],
+    supported_runtimes: ["vllm", "tgi"],
+    release_year: 2024,
+    typical_cloud_cost_per_hour_usd: 2.1,
+  },
 ];
 
 class BaseAcceleratorProvider implements AcceleratorProvider {
@@ -476,6 +600,7 @@ class BaseAcceleratorProvider implements AcceleratorProvider {
 export const nvidiaProvider = new BaseAcceleratorProvider("nvidia");
 export const amdProvider = new BaseAcceleratorProvider("amd");
 export const appleProvider = new BaseAcceleratorProvider("apple");
+export const intelProvider = new BaseAcceleratorProvider("intel");
 export const cpuProvider = new BaseAcceleratorProvider("cpu");
 
 export function getAcceleratorProvider(
@@ -488,6 +613,8 @@ export function getAcceleratorProvider(
       return amdProvider;
     case "apple":
       return appleProvider;
+    case "intel":
+      return intelProvider;
     case "cpu":
       return cpuProvider;
     default:
