@@ -213,7 +213,7 @@ describe("Google Cloud Execution Providers", () => {
 
       assert.strictEqual(stepRes.action.status, "completed");
       assert.ok(stepRes.outcome);
-      assert.strictEqual(stepRes.outcome?.action_type, "change_gpu_count");
+      assert.strictEqual(stepRes.outcome?.action_type, action.action_type);
     });
   });
 });
