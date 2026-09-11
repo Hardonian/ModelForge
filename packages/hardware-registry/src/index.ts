@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export type AcceleratorVendor = "nvidia" | "amd" | "apple" | "intel" | "cpu";
+export type AcceleratorVendor = "nvidia" | "amd" | "apple" | "intel" | "google" | "cpu";
 
 export const ManufacturerSpecsSchema = z.object({
   architecture: z.string(),
@@ -24,6 +24,7 @@ export const ManufacturerSpecsSchema = z.object({
     "infinity_fabric",
     "unified_memory",
     "system_bus",
+    "ici_optical_switch",
   ]),
   max_interconnect_bandwidth_gb_s: z.number().positive().optional(),
   compute_capability: z.string().optional(),
@@ -42,7 +43,7 @@ export const HardwareDeviceSchema = z.object({
   id: z.string(),
   slug: z.string(),
   name: z.string(),
-  vendor: z.enum(["nvidia", "amd", "apple", "intel", "cpu"]),
+  vendor: z.enum(["nvidia", "amd", "apple", "intel", "google", "cpu"]),
   category: z.enum(["datacenter", "workstation", "consumer", "edge", "soc"]),
   manufacturer: ManufacturerSpecsSchema,
   observed: ObservedPerformanceSchema.default({ sample_count: 0 }),
