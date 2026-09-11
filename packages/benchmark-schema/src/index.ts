@@ -1115,4 +1115,139 @@ export const ModelForgeErrorResponseSchema = z.object({
 });
 export type ModelForgeErrorResponse = z.infer<typeof ModelForgeErrorResponseSchema>;
 
+// --- 2026 Planetary Scale & Autonomous Mesh Schemas ---
+
+// 1. Multi-Node Distributed Benchmark & Fabric Schemas
+export const InterconnectFabricSchema = z.enum([
+  "infiniband_ndr",
+  "infiniband_xdr",
+  "roce_v2",
+  "nvlink_network",
+  "slingshot_11",
+  "tcp_ethernet",
+]);
+export type InterconnectFabric = z.infer<typeof InterconnectFabricSchema>;
+
+export const MultiNodeTopologySpecSchema = z.object({
+  nodes_count: z.number().int().positive(),
+  gpus_per_node: z.number().int().positive(),
+  total_gpus: z.number().int().positive(),
+  interconnect_fabric: InterconnectFabricSchema,
+  cross_node_bandwidth_gbps: z.number().positive(),
+  allreduce_busbw_gbps: z.number().positive(),
+  p2p_latency_us: z.number().positive(),
+  recommended_tp_max: z.number().int().positive(),
+  recommended_pp_min: z.number().int().positive(),
+});
+export type MultiNodeTopologySpec = z.infer<typeof MultiNodeTopologySpecSchema>;
+
+export const DistributedBenchmarkResultSchema = z.object({
+  benchmark_id: z.string(),
+  topology: MultiNodeTopologySpecSchema,
+  workload: WorkloadSpecSchema,
+  allreduce_latency_ms: z.number().positive(),
+  effective_throughput_tok_s: z.number().positive(),
+  communication_overhead_pct: z.number().nonnegative(),
+  scaling_efficiency_pct: z.number().min(0).max(100),
+  timestamp: z.string().datetime(),
+});
+export type DistributedBenchmarkResult = z.infer<typeof DistributedBenchmarkResultSchema>;
+
+// 2. Automated Speculative Decoding Profiler Schemas
+export const SpeculativeDomainSchema = z.enum(["code", "chat", "reasoning", "general"]);
+export type SpeculativeDomain = z.infer<typeof SpeculativeDomainSchema>;
+
+export const SpeculativePairSpecSchema = z.object({
+  target_model: z.string().min(1),
+  draft_model: z.string().min(1),
+  target_parameters_b: z.number().positive(),
+  draft_parameters_b: z.number().positive(),
+  lookahead_gamma: z.number().int().positive(),
+  empirical_acceptance_rate: z.number().min(0).max(1),
+  expected_accepted_tokens: z.number().positive(),
+  theoretical_speedup: z.number().positive(),
+  empirical_speedup: z.number().positive(),
+  draft_memory_overhead_mb: z.number().nonnegative(),
+  break_even_acceptance_rate: z.number().min(0).max(1),
+  domain: SpeculativeDomainSchema.default("general"),
+});
+export type SpeculativePairSpec = z.infer<typeof SpeculativePairSpecSchema>;
+
+// 3. Continuous Hugging Face Webhook Schemas
+export const HuggingFaceWebhookPayloadSchema = z.object({
+  event: z.enum(["repo_created", "repo_updated", "commit_pushed", "model_card_updated"]),
+  repo_id: z.string().min(1),
+  commit_sha: z.string().min(1),
+  author: z.string().optional(),
+  model_architecture: z.string().optional(),
+  parameters_billions: z.number().positive().optional(),
+  context_length: z.number().int().positive().optional(),
+  timestamp: z.string().datetime(),
+});
+export type HuggingFaceWebhookPayload = z.infer<typeof HuggingFaceWebhookPayloadSchema>;
+
+// 4. Decentralized Benchmark Network & Proof-of-Execution (PoE)
+export const BenchmarkChallengeSchema = z.object({
+  challenge_id: z.string(),
+  nonce: z.string(),
+  target_hardware: z.string(),
+  matrix_dim_m: z.number().int().positive(),
+  matrix_dim_n: z.number().int().positive(),
+  matrix_dim_k: z.number().int().positive(),
+  expected_min_duration_ms: z.number().positive(),
+  expected_max_duration_ms: z.number().positive(),
+  issued_at: z.string().datetime(),
+  expires_at: z.string().datetime(),
+});
+export type BenchmarkChallenge = z.infer<typeof BenchmarkChallengeSchema>;
+
+export const ProofOfExecutionSchema = z.object({
+  proof_id: z.string(),
+  challenge_id: z.string(),
+  worker_id: z.string(),
+  hardware_uuid: z.string(),
+  execution_duration_ms: z.number().positive(),
+  raw_latency_samples: z.array(z.number()),
+  compute_digest: z.string(),
+  worker_signature: z.string(),
+  timestamp: z.string().datetime(),
+});
+export type ProofOfExecution = z.infer<typeof ProofOfExecutionSchema>;
+
+export const BenchmarkAttestationSchema = z.object({
+  attestation_id: z.string(),
+  worker_id: z.string(),
+  proof_id: z.string(),
+  hardware_spec: HardwareSpecSchema,
+  verified: z.boolean(),
+  confidence_score: z.number().min(0).max(1),
+  attestation_signature: z.string(),
+  issued_at: z.string().datetime(),
+});
+export type BenchmarkAttestation = z.infer<typeof BenchmarkAttestationSchema>;
+
+// 5. Ultra-Low-Latency Smart Router Schemas
+export const SmartRouterBackendSchema = z.object({
+  id: z.string(),
+  url: z.string(),
+  model: z.string(),
+  status: z.enum(["active", "draining", "offline"]),
+  active_requests: z.number().int().nonnegative(),
+  capacity: z.number().int().positive(),
+  warm_prefix_hashes: z.array(z.string()).default([]),
+  last_heartbeat: z.string().datetime(),
+});
+export type SmartRouterBackend = z.infer<typeof SmartRouterBackendSchema>;
+
+export const SmartRouterRouteSpecSchema = z.object({
+  request_id: z.string(),
+  selected_worker_id: z.string(),
+  cache_hit: z.boolean(),
+  prefix_hash: z.string().optional(),
+  routing_overhead_ms: z.number().nonnegative(),
+  spot_drain_migrated: z.boolean().default(false),
+});
+export type SmartRouterRouteSpec = z.infer<typeof SmartRouterRouteSpecSchema>;
+
 export * from "./confidence";
+
