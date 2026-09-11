@@ -50,13 +50,22 @@
 
 ---
 
-## Future Roadmap: Enterprise Unicorn Expansion
+---
 
-### Q3-Q4 2025: Planetary Scale & Autonomous Mesh
+### Phase 6: Planetary Scale & Autonomous Mesh (v1.3.0 - 2026 Enterprise Unicorn)
 
-- [ ] **Multi-Node Distributed Benchmark Harness**: Automated inter-node bandwidth, InfiniBand NDR, and RoCE latency profiling across multi-node Dynamo topologies.
-- [ ] **Automated Speculative Decoding Profiler**: Empirical acceptance rate benchmarks across draft-target model pairs on production serving engines.
-- [ ] **Continuous Hugging Face Hub Webhook Sync**: Real-time Compute Passport generation triggered on new model commit events.
-- [ ] **Decentralized Benchmark Network**: Cryptographically verified remote worker network with proof-of-execution validation.
-- [ ] **Ultra-Low-Latency Smart Router (<1ms)**: OpenAI-compatible reverse proxy gateway with prefix-cache affinity and spot-drain migration.
+- [x] **Multi-Node Distributed Benchmark Harness**: Automated inter-node bandwidth, InfiniBand NDR (400–800 Gbps), and RoCE latency profiling across multi-node Dynamo topologies in `@modelforge/benchmark-schema` and CLI `modelforge distributed`.
+- [x] **Automated Speculative Decoding Profiler**: Empirical acceptance rate benchmarks ($\alpha$), optimal lookahead ($\gamma^*$), and speedup modeling across draft-target model pairs in `@modelforge/performance-predictor` and CLI `modelforge profile speculative`.
+- [x] **Continuous Hugging Face Hub Webhook Sync**: Real-time Compute Passport generation triggered on new model commit events with HMAC SHA-256 signature verification (`/api/v1/webhooks/huggingface`) and CLI `modelforge hf-sync`.
+- [x] **Decentralized Benchmark Network**: Cryptographically verified remote worker network with proof-of-execution (PoE) validation against physical hardware bounds in `ProofOfExecutionEngine` and CLI `modelforge network`.
+- [x] **Ultra-Low-Latency Smart Router (<1ms)**: OpenAI-compatible reverse proxy gateway with prefix-cache affinity and zero-downtime spot-drain migration (`/api/v1/router/chat/completions`) and CLI `modelforge router`.
+- [x] **Planetary Mesh & Profiler Lab UI**: Interactive Next.js 15 dashboard at `/mesh` featuring real-time fabric analyzers, speculative speedup sweeps, live PoE attestations, and smart routing telemetry.
+
+---
+
+## Future Roadmap: Autonomous AI Factory (2026+)
+
+- [ ] **Cross-Cloud Mesh Arbitrage**: Autonomous runtime-migration across spot pricing gradients between AWS Trainium2, GCP TPU v6e, and Azure NDv5 instances.
+- [ ] **Zero-Knowledge Inference Attestations**: zk-SNARK cryptographic proofs verifying that output tokens were generated on untampered certified model weights.
+
 

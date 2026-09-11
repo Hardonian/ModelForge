@@ -3,6 +3,8 @@
 import json
 from pathlib import Path
 
+from typing import Any, Dict, List, Optional
+
 import httpx
 import typer
 from rich.console import Console
@@ -852,6 +854,161 @@ def lift_freeze(
     console.print("[dim]Control plane restored to policy-governed operation.[/]")
 
 
+# --- 2026 Planetary Scale & Autonomous Mesh Subcommands ---
+
+@app.command("distributed")
+def distributed_benchmark(
+    nodes: int = typer.Option(2, "--nodes", "-n", help="Number of physical compute nodes"),
+    gpus_per_node: int = typer.Option(8, "--gpus-per-node", "-g", help="GPUs per node"),
+    fabric: str = typer.Option("infiniband_ndr", "--fabric", "-f", help="Fabric: infiniband_ndr, roce_v2, nvlink_network, etc."),
+    model: str = typer.Option("meta-llama/Llama-3-70B", "--model", "-m", help="Target model ID"),
+) -> None:
+    """Run automated multi-node distributed benchmark harness for InfiniBand NDR/RoCE."""
+    from modelforge.distributed import MultiNodeDistributedHarness
+
+    harness = MultiNodeDistributedHarness(nodes_count=nodes, gpus_per_node=gpus_per_node, fabric=fabric)
+    result = harness.run_distributed_benchmark(model_name=model)
+
+    table = Table(title="Multi-Node Distributed Topology Benchmark", show_lines=True)
+    table.add_column("Metric", style="cyan", width=30)
+    table.add_column("Value", style="green", width=30)
+
+    table.add_row("Nodes / Total GPUs", f"{result['topology']['nodes_count']} nodes / {result['topology']['total_gpus']} GPUs")
+    table.add_row("Interconnect Fabric", result['topology']['interconnect_fabric'].upper())
+    table.add_row("Cross-Node Bandwidth", f"{result['topology']['cross_node_bandwidth_gbps']} Gbps")
+    table.add_row("AllReduce Bus Bandwidth", f"{result['topology']['allreduce_busbw_gbps']} Gbps")
+    table.add_row("AllReduce Latency (128MB)", f"{result['allreduce_latency_ms']} ms")
+    table.add_row("Communication Overhead", f"{result['communication_overhead_pct']}%")
+    table.add_row("Scaling Efficiency", f"{result['scaling_efficiency_pct']}%")
+    table.add_row("Effective Throughput", f"{result['effective_throughput_tok_s']} tok/s")
+    table.add_row("Recommended Parallelism", f"TP={result['topology']['recommended_tp_max']}, PP={result['topology']['recommended_pp_min']}")
+
+    console.print(table)
+
+
+profile_app = typer.Typer(help="Inference optimization profiling.")
+app.add_typer(profile_app, name="profile")
+
+
+@profile_app.command("speculative")
+def profile_speculative(
+    target: str = typer.Option("meta-llama/Llama-3-70B", "--target", "-t", help="Target model"),
+    draft: Optional[str] = typer.Option(None, "--draft", "-d", help="Draft model"),
+    gamma: Optional[int] = typer.Option(None, "--gamma", "-g", help="Lookahead tokens"),
+    domain: str = typer.Option("general", "--domain", help="Workload domain: general, code, reasoning"),
+) -> None:
+    """Profile speculative decoding acceptance rates, lookahead, and speedup curves."""
+    from modelforge.speculative import SpeculativeProfiler
+
+    res = SpeculativeProfiler.profile(target_model=target, draft_model=draft, lookahead_gamma=gamma, domain=domain)
+
+    table = Table(title="Speculative Decoding Profiler Report", show_lines=True)
+    table.add_column("Property", style="cyan", width=28)
+    table.add_column("Value", style="green", width=32)
+
+    table.add_row("Target Model", res["target_model"])
+    table.add_row("Draft Model", res["draft_model"])
+    table.add_row("Target / Draft Params", f"{res['target_parameters_b']}B / {res['draft_parameters_b']}B")
+    table.add_row("Lookahead Window (γ)", f"{res['lookahead_gamma']} tokens")
+    table.add_row("Empirical Acceptance (α)", f"{res['empirical_acceptance_rate'] * 100:.1f}%")
+    table.add_row("Expected Accepted / Step", f"{res['expected_accepted_tokens']} tokens")
+    table.add_row("Empirical Speedup Factor", f"[bold yellow]{res['empirical_speedup']}x[/]")
+    table.add_row("Break-Even Acceptance Rate", f"{res['break_even_acceptance_rate'] * 100:.1f}%")
+    table.add_row("Draft Memory Overhead", f"{res['draft_memory_overhead_mb']} MB")
+    table.add_row("Domain Multiplier", res["domain"].upper())
+
+    console.print(table)
+
+
+@app.command("hf-sync")
+def hf_sync(
+    repo: str = typer.Argument(..., help="Hugging Face repo ID (e.g. google/gemma-2-9b)"),
+    revision: str = typer.Option("main", "--revision", "-r", help="Commit SHA or revision"),
+) -> None:
+    """Trigger real-time Compute Passport compilation from Hugging Face model commit."""
+    from modelforge.hf_sync import HuggingFaceSyncManager
+
+    mgr = HuggingFaceSyncManager()
+    res = mgr.trigger_sync(repo_id=repo, commit_sha=revision)
+
+    console.print(f"[bold green]✓ Real-time Hugging Face Sync completed for {repo}@{revision}[/]")
+    console.print(f"[dim]Generated Passport ID: {res.get('passport_id', 'N/A')}[/]")
+    console.print(f"[dim]Parameters: {res.get('parameters_billions', 'N/A')}B[/]")
+
+
+network_app = typer.Typer(help="Decentralized benchmark network and proof-of-execution consensus.")
+app.add_typer(network_app, name="network")
+
+
+@network_app.command("register")
+def network_register(
+    device: str = typer.Option("nvidia-h100-80gb", "--device", "-d", help="Hardware device claimed"),
+    vram: int = typer.Option(80, "--vram", help="VRAM in GB"),
+) -> None:
+    """Register this worker on the decentralized ModelForge benchmark network."""
+    from modelforge.worker_network import WorkerNetworkManager
+
+    mgr = WorkerNetworkManager()
+    res = mgr.register_worker(device=device, vram_gb=vram)
+    console.print(f"[bold green]✓ Worker registered: {res['worker_id']}[/]")
+    console.print(f"[dim]Hardware UUID: {res['hardware_uuid']} ({device}, {vram}GB)[/]")
+
+
+@network_app.command("prove")
+def network_prove(
+    device: str = typer.Option("nvidia-h100-80gb", "--device", "-d", help="Target hardware device"),
+) -> None:
+    """Solve consensus benchmark challenge and submit verifiable ProofOfExecution."""
+    from modelforge.worker_network import WorkerNetworkManager
+
+    mgr = WorkerNetworkManager()
+    chal = mgr.request_challenge(target_hardware=device)
+    console.print(f"[dim]Received challenge {chal['challenge_id']} with nonce {chal['nonce'][:12]}...[/]")
+
+    proof = mgr.solve_challenge(chal)
+    attest = mgr.verify_attestation(chal, proof)
+
+    if attest["verified"]:
+        console.print(f"[bold green]✓ Cryptographic Proof-of-Execution Verified! Attestation: {attest['attestation_id']}[/]")
+        console.print(f"[dim]Confidence Score: {attest['confidence_score'] * 100:.1f}%, Duration: {proof['execution_duration_ms']}ms[/]")
+    else:
+        console.print(f"[bold red]✗ Attestation Rejected: Out of physical hardware bounds[/]")
+
+
+router_app = typer.Typer(help="Ultra-low-latency Smart Router (<1ms) management.")
+app.add_typer(router_app, name="router")
+
+
+@router_app.command("test")
+def router_test(
+    prompt: str = typer.Option("System: Enterprise code reviewer.\nReview this code.", "--prompt", "-p", help="Test prompt"),
+    model: str = typer.Option("meta-llama/Llama-3-70B", "--model", "-m", help="Target model"),
+) -> None:
+    """Test fast-path routing and measure router overhead."""
+    from modelforge.smart_router import SmartRouterClient
+
+    client = SmartRouterClient()
+    res1 = client.route_request(prompt, model)
+    res2 = client.route_request(prompt, model)  # Repeated prompt to test prefix hit
+
+    console.print(f"[bold green]✓ Request 1 Dispatched to {res1['selected_worker_id']} (Overhead: {res1['routing_overhead_ms']}ms, Cache Hit: {res1['cache_hit']})[/]")
+    console.print(f"[bold green]✓ Request 2 Dispatched to {res2['selected_worker_id']} (Overhead: {res2['routing_overhead_ms']}ms, Cache Hit: {res2['cache_hit']})[/]")
+
+
+@router_app.command("drain")
+def router_drain(
+    worker_id: str = typer.Argument(..., help="Worker ID to drain"),
+) -> None:
+    """Trigger immediate graceful spot instance drain with zero dropped requests."""
+    from modelforge.smart_router import SmartRouterClient
+
+    client = SmartRouterClient()
+    report = client.trigger_spot_drain(worker_id)
+    console.print(f"[bold yellow]! Initiated graceful spot drain on {worker_id}[/]")
+    console.print(f"[bold green]✓ {report['migrated_requests']} active requests migrated to healthy backends. Drain completed.[/]")
+
+
 if __name__ == "__main__":
     app()
+
 

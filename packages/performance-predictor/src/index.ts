@@ -1,6 +1,7 @@
 export * from "./analytical";
 export * from "./interpolator";
 export * from "./evaluator";
+export * from "./speculative";
 
 import { PredictionTarget, predictWithNeighbors } from "./interpolator";
 import {

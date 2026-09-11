@@ -12,3 +12,5 @@ export * from "./adapters/dynamo-provider";
 export * from "./adapters/google-vertex-provider";
 export * from "./adapters/gke-tpu-provider";
 export * from "./hot-patch";
+export * from "./proof-of-execution";
+export * from "./smart-router";
