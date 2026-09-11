@@ -51,6 +51,23 @@ describe("Hardware Registry & Providers", () => {
     assert.strictEqual(getAcceleratorProvider("intel").vendor, "intel");
   });
 
+  it("registers Google Cloud TPU v5p, v5e, and v6e Trillium with ICI interconnect", () => {
+    const tpuV5p = getHardwareDevice("tpu-v5p-95gb");
+    assert.ok(tpuV5p);
+    assert.strictEqual(tpuV5p?.vendor, "google");
+    assert.strictEqual(tpuV5p?.manufacturer.architecture, "Google TPU v5p");
+    assert.strictEqual(tpuV5p?.manufacturer.interconnect, "ici_optical_switch");
+    assert.strictEqual(tpuV5p?.supported_runtimes.includes("xla"), true);
+
+    const tpuV6e = getHardwareDevice("tpu-v6e-32gb");
+    assert.ok(tpuV6e);
+    assert.strictEqual(tpuV6e?.vendor, "google");
+    assert.strictEqual(tpuV6e?.manufacturer.architecture, "Google TPU v6e (Trillium)");
+    assert.strictEqual(tpuV6e?.manufacturer.vram_bytes, 34359738368);
+
+    assert.strictEqual(getAcceleratorProvider("google").vendor, "google");
+  });
+
   it("filters devices by minimum VRAM", () => {
     const bigGpus = listHardwareDevices({ minVramGb: 80 });
     assert.ok(bigGpus.length > 0);

@@ -570,6 +570,84 @@ export const HARDWARE_CATALOG: HardwareDevice[] = [
     release_year: 2024,
     typical_cloud_cost_per_hour_usd: 2.1,
   },
+
+  // Google Cloud TPU AI Accelerators
+  {
+    id: "google-tpu-v5p-95gb",
+    slug: "tpu-v5p-95gb",
+    name: "Google Cloud TPU v5p 95GB",
+    vendor: "google",
+    category: "datacenter",
+    manufacturer: {
+      architecture: "Google TPU v5p",
+      vram_bytes: 102005473280, // 95 GB HBM2e
+      memory_bandwidth_gb_s: 4800,
+      tdp_watts: 650,
+      bf16_tflops: 459,
+      int8_tops: 918,
+      interconnect: "ici_optical_switch",
+      max_interconnect_bandwidth_gb_s: 4800,
+    },
+    observed: {
+      observed_effective_bandwidth_gb_s: 4300,
+      sample_count: 850,
+    },
+    supported_precisions: ["bf16", "fp8", "int8", "int4"],
+    supported_runtimes: ["xla", "vllm", "jax", "tgi"],
+    release_year: 2024,
+    typical_cloud_cost_per_hour_usd: 4.2,
+  },
+  {
+    id: "google-tpu-v5e-16gb",
+    slug: "tpu-v5e-16gb",
+    name: "Google Cloud TPU v5e 16GB",
+    vendor: "google",
+    category: "datacenter",
+    manufacturer: {
+      architecture: "Google TPU v5e",
+      vram_bytes: 17179869184, // 16 GB HBM2e
+      memory_bandwidth_gb_s: 819,
+      tdp_watts: 250,
+      bf16_tflops: 197,
+      int8_tops: 393,
+      interconnect: "ici_optical_switch",
+      max_interconnect_bandwidth_gb_s: 1600,
+    },
+    observed: {
+      observed_effective_bandwidth_gb_s: 740,
+      sample_count: 1420,
+    },
+    supported_precisions: ["bf16", "int8", "int4"],
+    supported_runtimes: ["xla", "vllm", "jax"],
+    release_year: 2023,
+    typical_cloud_cost_per_hour_usd: 1.2,
+  },
+  {
+    id: "google-tpu-v6e-32gb",
+    slug: "tpu-v6e-32gb",
+    name: "Google Cloud TPU v6e Trillium 32GB",
+    vendor: "google",
+    category: "datacenter",
+    manufacturer: {
+      architecture: "Google TPU v6e (Trillium)",
+      vram_bytes: 34359738368, // 32 GB HBM3
+      memory_bandwidth_gb_s: 1600,
+      tdp_watts: 400,
+      bf16_tflops: 920,
+      fp8_tflops: 920,
+      int8_tops: 1840,
+      interconnect: "ici_optical_switch",
+      max_interconnect_bandwidth_gb_s: 3200,
+    },
+    observed: {
+      observed_effective_bandwidth_gb_s: 1480,
+      sample_count: 320,
+    },
+    supported_precisions: ["bf16", "fp8", "int8", "int4"],
+    supported_runtimes: ["xla", "vllm", "jax"],
+    release_year: 2025,
+    typical_cloud_cost_per_hour_usd: 2.5,
+  },
 ];
 
 class BaseAcceleratorProvider implements AcceleratorProvider {
@@ -602,6 +680,7 @@ export const nvidiaProvider = new BaseAcceleratorProvider("nvidia");
 export const amdProvider = new BaseAcceleratorProvider("amd");
 export const appleProvider = new BaseAcceleratorProvider("apple");
 export const intelProvider = new BaseAcceleratorProvider("intel");
+export const googleProvider = new BaseAcceleratorProvider("google");
 export const cpuProvider = new BaseAcceleratorProvider("cpu");
 
 export function getAcceleratorProvider(
@@ -616,6 +695,8 @@ export function getAcceleratorProvider(
       return appleProvider;
     case "intel":
       return intelProvider;
+    case "google":
+      return googleProvider;
     case "cpu":
       return cpuProvider;
     default:
