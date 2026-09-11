@@ -29,6 +29,7 @@ Instead of relying on LLM training weights to hallucinate whether an 8-bit model
 ## 3. Google GenAI SDK & Python SDK Usage
 
 ### Google GenAI SDK (`google.genai`)
+
 ```python
 from google import genai
 from google.genai import types
@@ -50,6 +51,7 @@ if response.function_calls:
 ```
 
 ### Python SDK Usage
+
 ```python
 from modelforge.schema import OpenComputeBenchRecord
 from modelforge.passport import KNOWN_PASSPORTS

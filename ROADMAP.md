@@ -50,8 +50,6 @@
 
 ---
 
----
-
 ### Phase 6: Planetary Scale & Autonomous Mesh (v1.3.0 - 2026 Enterprise Unicorn)
 
 - [x] **Multi-Node Distributed Benchmark Harness**: Automated inter-node bandwidth, InfiniBand NDR (400–800 Gbps), and RoCE latency profiling across multi-node Dynamo topologies in `@modelforge/benchmark-schema` and CLI `modelforge distributed`.
@@ -67,5 +65,3 @@
 
 - [ ] **Cross-Cloud Mesh Arbitrage**: Autonomous runtime-migration across spot pricing gradients between AWS Trainium2, GCP TPU v6e, and Azure NDv5 instances.
 - [ ] **Zero-Knowledge Inference Attestations**: zk-SNARK cryptographic proofs verifying that output tokens were generated on untampered certified model weights.
-
-

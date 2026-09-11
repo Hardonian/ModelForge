@@ -14,7 +14,7 @@ ModelForge provides **agent-native tools and structured schemas** so agents can 
 
 ### Core Premise
 
-```
+```text
 HF Model @ Revision + Workload + Latency SLA + Cost Target
            ↓ (ModelForge SLO Compiler)
 Optimal Topology (NVIDIA Dynamo / NIM / vLLM / SGLang) + Verifiable Manifests
@@ -205,6 +205,7 @@ Retrieves the Google BigQuery table DDL, partitioning specification, and analyti
 ModelForge provides native function declarations and extension specifications for Google's agentic ecosystem:
 
 ### Google GenAI SDK (`google.genai`)
+
 ```python
 from google import genai
 from google.genai import types
@@ -228,7 +229,9 @@ if response.function_calls:
 ```
 
 ### Vertex AI Agent Builder Extensions
+
 Export OpenAPI 3.0.3 specification for Vertex Extensions:
+
 ```python
 from modelforge.google_genai_agent import export_vertex_extension_spec
 
