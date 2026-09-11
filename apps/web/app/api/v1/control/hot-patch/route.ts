@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
         log_id: `log-${Date.now()}`,
         organization_id: organization_id || "org-default",
         actor: { user_id: body.user_id || "admin", role: "admin", service_account: false },
-        event_type: "action_rolled_back",
+        event_type: "rollback_completed",
         details: { patch_id, reason: "Hot-patch reverted by operator" },
         timestamp: new Date().toISOString(),
       });
@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
       log_id: `log-${Date.now()}`,
       organization_id: body.organization_id || "org-default",
       actor: { user_id: spec.applied_by || "web_console", role: "admin", service_account: false },
-      event_type: "action_executed",
+      event_type: "execution_started",
       details: {
         patch_id: spec.patch_id,
         patch_type: spec.patch_type,

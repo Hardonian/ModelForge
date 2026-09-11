@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import MobileBottomNav from "@/components/MobileBottomNav";
 
 export const metadata: Metadata = {
   title: "ModelForge — The Open Compute Intelligence Layer for AI",
@@ -38,8 +39,9 @@ export default function RootLayout({
     <html lang="en" className="dark">
       <body className="min-h-screen flex flex-col bg-[#090d16] text-slate-100 antialiased glow-mesh selection:bg-sky-500/30 selection:text-sky-200">
         <Navbar />
-        <main className="flex-1">{children}</main>
+        <main className="flex-1 pb-20 lg:pb-0">{children}</main>
         <Footer />
+        <MobileBottomNav />
       </body>
     </html>
   );
