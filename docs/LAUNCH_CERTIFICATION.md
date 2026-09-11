@@ -49,13 +49,13 @@
 
 - **Status**: **PASS**
 - **Evidence**: [test_phase5_control.py](file:///c:/Users/scott/GitHub/ModelForge/packages/benchmark-cli/tests/test_phase5_control.py)
-- **Details**: 31/31 pytest tests pass in 19s. `modelforge control status`, `action`, and `freeze` subcommands verified.
+- **Details**: 36/36 pytest tests pass in 20s. `modelforge control status`, `action`, `freeze`, and hardware inspect subcommands verified.
 
-### 7. MCP (Model Context Protocol)
+### 7. MCP & Agentic Frameworks (Model Context Protocol, Gemini SDK & Vertex Agent Builder)
 
 - **Status**: **PASS**
-- **Evidence**: [test_mcp.py](file:///c:/Users/scott/GitHub/ModelForge/packages/benchmark-cli/tests/test_mcp.py)
-- **Details**: 7/7 MCP tool validation and execution tests pass cleanly.
+- **Evidence**: [test_mcp.py](file:///c:/Users/scott/GitHub/ModelForge/packages/benchmark-cli/tests/test_mcp.py) & [google_genai_agent.py](file:///c:/Users/scott/GitHub/ModelForge/packages/benchmark-cli/modelforge/google_genai_agent.py)
+- **Details**: 12/12 MCP and GenAI tests pass cleanly. All 13 MCP tools, native Gemini 2.0 FunctionDeclarations, and Vertex AI Agent Builder OpenAPI 3.0.3 extension specs verified.
 
 ### 8. Hugging Face Ecosystem
 
@@ -63,11 +63,11 @@
 - **Evidence**: [HUGGINGFACE_LAUNCH_BRIEF.md](file:///c:/Users/scott/GitHub/ModelForge/docs/HUGGINGFACE_LAUNCH_BRIEF.md)
 - **Details**: Revision-pinned model tracking; disabled `trust_remote_code=True` by default; Space demo ready.
 
-### 9. NVIDIA & Accelerator Integration
+### 9. NVIDIA, Google Cloud TPU & Accelerator Integration
 
 - **Status**: **PASS**
-- **Evidence**: [registry.test.ts](file:///c:/Users/scott/GitHub/ModelForge/packages/hardware-registry/src/tests/registry.test.ts) & [NVIDIA_INCEPTION_BRIEF.md](file:///c:/Users/scott/GitHub/ModelForge/docs/NVIDIA_INCEPTION_BRIEF.md)
-- **Details**: NVIDIA Blackwell B200 and GB200 NVL72 modeled with NVLink 5 and FP4 tensor scaling. AMD MI350X and Intel Gaudi 3 verified. TensorRT-LLM software lift, NVIDIA NIM intelligence, and NVIDIA Dynamo disaggregation plans verified.
+- **Evidence**: [google-providers.test.ts](file:///c:/Users/scott/GitHub/ModelForge/packages/reconciler/src/tests/google-providers.test.ts) & [google-compiler.test.ts](file:///c:/Users/scott/GitHub/ModelForge/packages/slo-compiler/src/tests/google-compiler.test.ts)
+- **Details**: Google Cloud TPU v5e, v5p, and v6e Trillium multislice clusters with Optical Circuit Switch (OCS) modeled. Google Vertex AI Custom Endpoints and GKE TPU providers verified. NVIDIA Blackwell B200 and GB200 NVL72 modeled with NVLink 5 and FP4 tensor scaling. AMD MI350X and Intel Gaudi 3 verified.
 
 ### 10. Benchmarks & Provenance
 
@@ -91,7 +91,7 @@
 
 - **Status**: **PASS**
 - **Evidence**: [DEPLOYMENT.md](file:///c:/Users/scott/GitHub/ModelForge/docs/DEPLOYMENT.md)
-- **Details**: Next.js 15 production build succeeds cleanly (44/44 static and dynamic routes compiled).
+- **Details**: Next.js 15 production build succeeds cleanly (46/46 static and dynamic routes compiled).
 
 ### 14. Observability & Telemetry
 
