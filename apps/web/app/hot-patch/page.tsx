@@ -18,6 +18,10 @@ import {
   Layers,
   Award,
   ArrowRight,
+  Cloud,
+  Database,
+  Network,
+  Terminal,
 } from "lucide-react";
 
 interface HotPatchHistory {
@@ -42,6 +46,7 @@ export default function HotPatchArenaPage() {
   const [xp, setXp] = useState(9840);
   const [streak, setStreak] = useState(5);
   const [level, setLevel] = useState(42);
+  const [exportedTarget, setExportedTarget] = useState<string | null>(null);
 
   // Live telemetry metrics
   const [p95TtftMs, setP95TtftMs] = useState(48);
@@ -557,6 +562,69 @@ export default function HotPatchArenaPage() {
                 <div className="text-xs font-semibold text-violet-400">GSLB Sovereign</div>
                 <div className="text-[10px] text-slate-400">Multi-region federation</div>
               </div>
+            </div>
+          </div>
+
+          {/* Google Cloud Suite & Agentic Interoperability Panel */}
+          <div className="rounded-2xl bg-gradient-to-br from-slate-900 via-slate-950 to-slate-900 border border-slate-800 p-5 space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-semibold text-white flex items-center gap-2">
+                <Cloud className="h-4 w-4 text-emerald-400" />
+                Google Cloud & Agent Interoperability
+              </h3>
+              <span className="flex items-center gap-1.5 text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                Gemini 2.0 SDK Active
+              </span>
+            </div>
+
+            {/* TPU Topology Status */}
+            <div className="p-3.5 rounded-xl bg-slate-900/90 border border-slate-800 space-y-2">
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-slate-300 font-medium flex items-center gap-1.5">
+                  <Network className="h-3.5 w-3.5 text-sky-400" />
+                  GKE TPU v6e Trillium Multislice
+                </span>
+                <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                  Slice 2x2x2 (8 Chips)
+                </span>
+              </div>
+              <div className="grid grid-cols-2 gap-2 text-[10px] font-mono text-slate-400 pt-1">
+                <div>ICI OCS: <span className="text-white">3,200 GB/s</span></div>
+                <div>Runtime: <span className="text-white">XLA / PJRT</span></div>
+                <div>Duty Cycle: <span className="text-emerald-400">78.4%</span></div>
+                <div>BigQuery Sink: <span className="text-emerald-400">Streaming</span></div>
+              </div>
+            </div>
+
+            {/* Quick Agent Actions */}
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                onClick={() => {
+                  setExportedTarget("vertex");
+                  setTimeout(() => setExportedTarget(null), 3000);
+                }}
+                className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-slate-800/80 hover:bg-slate-800 border border-slate-700/60 text-xs text-slate-200 hover:text-white transition-all"
+              >
+                <Terminal className="h-3.5 w-3.5 text-sky-400" />
+                {exportedTarget === "vertex" ? "Manifest Ready!" : "Vertex AI Manifest"}
+              </button>
+
+              <button
+                onClick={() => {
+                  setExportedTarget("bigquery");
+                  setTimeout(() => setExportedTarget(null), 3000);
+                }}
+                className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-slate-800/80 hover:bg-slate-800 border border-slate-700/60 text-xs text-slate-200 hover:text-white transition-all"
+              >
+                <Database className="h-3.5 w-3.5 text-amber-400" />
+                {exportedTarget === "bigquery" ? "Schema Ready!" : "BigQuery DDL"}
+              </button>
+            </div>
+
+            <div className="text-[11px] text-slate-400 flex items-center justify-between pt-1 border-t border-slate-800/60 font-mono">
+              <span>MCP Protocol: <span className="text-sky-400">13 Tools</span></span>
+              <span>Vertex Extension: <span className="text-emerald-400">OpenAPI 3.0.3</span></span>
             </div>
           </div>
         </div>
